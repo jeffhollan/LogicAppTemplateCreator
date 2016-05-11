@@ -1,0 +1,232 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "svcPlanName": {
+      "type": "string"
+    },
+    "logicAppName": {
+      "type": "string"
+    },
+    "sku": {
+      "type": "string",
+      "defaultValue": "Standard",
+      "allowedValues": [
+        "Free",
+        "Basic",
+        "Standard",
+        "Premium"
+      ],
+      "metadata": {
+        "description": "The pricing tier for the logic app."
+      }
+    },
+    "salesforce_1Name": {
+      "type": "string"
+    },
+    "sql_1sqlConnectionString": {
+      "type": "securestring"
+    },
+    "sql_1Name": {
+      "type": "string"
+    },
+    "yammerName": {
+      "type": "string"
+    }
+  },
+  "variables": {},
+  "resources": [
+    {
+      "apiVersion": "2014-06-01",
+      "name": "[parameters('svcPlanName')]",
+      "type": "Microsoft.Web/serverfarms",
+      "location": "[resourceGroup().location]",
+      "properties": {
+        "name": "[parameters('svcPlanName')]",
+        "sku": "[parameters('sku')]",
+        "workerSize": "0",
+        "numberOfWorkers": 1
+      }
+    },
+    {
+      "type": "Microsoft.Web/connections",
+      "apiVersion": "2015-08-01-preview",
+      "location": "[resourceGroup().location]",
+      "name": "[parameters('yammerName')]",
+      "properties": {
+        "api": {
+          "id": "[concat('/subscriptions/80d4fe69-c95b-4dd2-a938-9250f1c8ab03/providers/Microsoft.Web/locations/', resourceGroup().location, '/managedApis/yammer']"
+        },
+        "displayName": "yammer",
+        "parameterValues": {}
+      }
+    },
+    {
+      "type": "Microsoft.Web/connections",
+      "apiVersion": "2015-08-01-preview",
+      "location": "[resourceGroup().location]",
+      "name": "[parameters('sql_1Name')]",
+      "properties": {
+        "api": {
+          "id": "[concat('/subscriptions/80d4fe69-c95b-4dd2-a938-9250f1c8ab03/providers/Microsoft.Web/locations/', resourceGroup().location, '/managedApis/sql']"
+        },
+        "displayName": "sql_1",
+        "parameterValues": {
+          "sqlConnectionString": "[parameters('sql_1sqlConnectionString')]"
+        }
+      }
+    },
+    {
+      "type": "Microsoft.Web/connections",
+      "apiVersion": "2015-08-01-preview",
+      "location": "[resourceGroup().location]",
+      "name": "[parameters('salesforce_1Name')]",
+      "properties": {
+        "api": {
+          "id": "[concat('/subscriptions/80d4fe69-c95b-4dd2-a938-9250f1c8ab03/providers/Microsoft.Web/locations/', resourceGroup().location, '/managedApis/salesforce']"
+        },
+        "displayName": "salesforce_1",
+        "parameterValues": {}
+      }
+    },
+    {
+      "type": "Microsoft.Logic/workflows",
+      "apiVersion": "2015-08-01-preview",
+      "name": "[parameters('logicAppName')]",
+      "location": "[resourceGroup().location]",
+      "dependsOn": [
+        "[resourceId('Microsoft.Web/connections', parameters('salesforce_1Name'))]",
+        "[resourceId('Microsoft.Web/connections', parameters('sql_1Name'))]",
+        "[resourceId('Microsoft.Web/connections', parameters('yammerName'))]"
+      ],
+      "properties": {
+        "sku": {
+          "name": "[parameters('sku')]",
+          "plan": {
+            "id": "[concat(resourceGroup().id, '/providers/Microsoft.Web/serverfarms/',parameters('svcPlanName'))]"
+          }
+        },
+        "definition": {
+          "$schema": "https://schema.management.azure.com/providers/Microsoft.Logic/schemas/2015-08-01-preview/workflowdefinition.json#",
+          "contentVersion": "1.0.0.0",
+          "parameters": {
+            "$connections": {
+              "defaultValue": {},
+              "type": "Object"
+            }
+          },
+          "triggers": {
+            "When_an_object_is_modified": {
+              "recurrence": {
+                "frequency": "Second",
+                "interval": 15
+              },
+              "splitOn": "@triggerBody()?.value",
+              "type": "ApiConnection",
+              "inputs": {
+                "host": {
+                  "connection": {
+                    "name": "@parameters('$connections')['salesforce_1']['connection']['id']"
+                  }
+                },
+                "method": "get",
+                "path": "/datasets/default/tables/@{encodeURIComponent(string('Order'))}/onupdateditems"
+              },
+              "conditions": []
+            }
+          },
+          "actions": {
+            "Execute_stored_procedure": {
+              "type": "ApiConnection",
+              "inputs": {
+                "body": {
+                  "param1": "@{triggerBody()['LastModifiedDate']}"
+                },
+                "host": {
+                  "connection": {
+                    "name": "@parameters('$connections')['sql_1']['connection']['id']"
+                  }
+                },
+                "method": "post",
+                "path": "/datasets/default/procedures/@{encodeURIComponent(encodeURIComponent(string('[dbo].[Procedure1]')))}"
+              },
+              "conditions": []
+            },
+            "Post_message": {
+              "type": "ApiConnection",
+              "inputs": {
+                "body": {
+                  "body": "We got a big order of @{triggerBody()['TotalAmount']} on @{body('myDateStringFunction')}. ",
+                  "group_id": 6012502
+                },
+                "host": {
+                  "connection": {
+                    "name": "@parameters('$connections')['yammer']['connection']['id']"
+                  }
+                },
+                "method": "post",
+                "path": "/messages.json"
+              },
+              "conditions": [
+                {
+                  "expression": "@greater(int(triggerBody()['TotalAmount']), 10000)"
+                },
+                {
+                  "dependsOn": "myDateStringFunction"
+                }
+              ]
+            },
+            "myDateStringFunction": {
+              "type": "Function",
+              "inputs": {
+                "body": {
+                  "date": "@{triggerBody()['LastModifiedDate']}"
+                },
+                "function": {
+                  "id": "/subscriptions/80d4fe69-c95b-4dd2-a938-9250f1c8ab03/resourceGroups/AzureFunctions-WestUS/providers/Microsoft.Web/sites/jehollanDateConversion/functions/myDateStringFunction"
+                }
+              },
+              "conditions": [
+                {
+                  "dependsOn": "Execute_stored_procedure"
+                }
+              ]
+            }
+          },
+          "outputs": {}
+        },
+        "parameters": {
+          "$connections": {
+            "value": {
+              "salesforce_1": {
+                "api": {
+                  "id": "[concat('/subscriptions/80d4fe69-c95b-4dd2-a938-9250f1c8ab03/providers/Microsoft.Web/locations/', resourceGroup().location, '/managedApis/salesforce']"
+                },
+                "connection": {
+                  "id": "[resourceId('Microsoft.Web/connections', parameters('salesforce_1Name'))]"
+                }
+              },
+              "sql_1": {
+                "api": {
+                  "id": "[concat('/subscriptions/80d4fe69-c95b-4dd2-a938-9250f1c8ab03/providers/Microsoft.Web/locations/', resourceGroup().location, '/managedApis/sql']"
+                },
+                "connection": {
+                  "id": "[resourceId('Microsoft.Web/connections', parameters('sql_1Name'))]"
+                }
+              },
+              "yammer": {
+                "api": {
+                  "id": "[concat('/subscriptions/80d4fe69-c95b-4dd2-a938-9250f1c8ab03/providers/Microsoft.Web/locations/', resourceGroup().location, '/managedApis/yammer']"
+                },
+                "connection": {
+                  "id": "[resourceId('Microsoft.Web/connections', parameters('yammerName'))]"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  ],
+  "outputs": {}
+}
