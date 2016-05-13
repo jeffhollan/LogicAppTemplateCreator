@@ -77,8 +77,13 @@ namespace ConverterLibrary
 
         public static string AuthString = "https://login.windows.net/common";
         public static string ClientId = "748bbb12-57ae-4ade-8138-13cd7caa0027";
-        public static string ResourceUrl = "https://management.core.windows.net/";
-        public static string ClientIdForUserAuthn = "748bbb12-57ae-4ade-8138-13cd7caa0027";
+        //  public static string ClientSecret = "NnFK4FPwE+usvvTIOvjUpmY8/zC2dXwm5i89UsSfNSg=";
+        public static string ResourceUrl = "https://management.core.windows.net/"; 
+        //  public static string ResourceUrl = "http://jeffhollanlive.onmicrosoft.com/armexplorer";
+
+
+        public static string RedirectUrl = "http://localhost/";
+        public static string AuthUrl = "https://login.microsoftonline.com/common/oauth2/token";
     }
 }
 

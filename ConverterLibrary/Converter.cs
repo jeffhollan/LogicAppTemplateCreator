@@ -13,6 +13,8 @@ using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Text;
 using System.Threading.Tasks;
+using System.Web;
+using System.Windows.Forms;
 
 namespace ConverterLibrary
 {
@@ -42,6 +44,7 @@ namespace ConverterLibrary
         public string Token = "";
         private DeploymentTemplate template;
         private JObject workflowTemplateReference;
+        private AuthenticationContext ac = new AuthenticationContext(Constants.AuthString);
 
 
         public Converter()
@@ -56,17 +59,68 @@ namespace ConverterLibrary
 
         protected override void ProcessRecord()
         {
-            AuthenticationContext ac = new AuthenticationContext(Constants.AuthString);
-            var ar = ac.AcquireToken(Constants.ResourceUrl, Constants.ClientId, new Uri("http://localhost"));
+            if (String.IsNullOrEmpty(Token))
+            {
 
+                var uri = String.Format("https://login.microsoftonline.com/common/oauth2/authorize?response_type=code&client_id={0}&redirect_uri={1}&resource={2}&prompt=consent", 
+                    Constants.ClientId, HttpUtility.UrlEncode(Constants.RedirectUrl), HttpUtility.UrlEncode(Constants.ResourceUrl));
+                WriteVerbose(uri);
+                WebBrowser browser = new WebBrowser();
+                browser.ScrollBarsEnabled = true;
+                browser.Width = 800;
+                browser.Height = 840;
+                browser.ScriptErrorsSuppressed = true;
+                browser.Url = new Uri(uri);
+                
+                Form form = new Form();
+                browser.DocumentCompleted += Browser_DocumentCompleted;
+                form.Controls.Add(browser);
+                form.AutoSize = true;
+                form.ShowIcon = false;
+                form.AutoSizeMode = AutoSizeMode.GrowOnly;
+                form.Width = 810;
+                form.Height = 840;
+                form.ShowDialog();
 
-            Token = ar.AccessToken;
+             //   Token = ar.AccessToken;
+            }
             WriteVerbose("Retrieved Token");
             var result = ConvertWithToken(SubscriptionId, ResourceGroup, LogicApp, Token).Result;
             WriteObject(result.ToString());
         }
 
-        
+        private void Browser_DocumentCompleted(object sender, WebBrowserDocumentCompletedEventArgs e)
+        {
+            if (e.Url.AbsoluteUri.Contains("code="))
+            {
+
+                var queryDictionary = System.Web.HttpUtility.ParseQueryString(e.Url.Query);
+                var code = queryDictionary[0];
+                WriteVerbose("fullURL: " + e.Url.AbsoluteUri);
+                WriteVerbose("code: " + code);
+
+                using (var client = new HttpClient())
+                {
+                    IEnumerable<KeyValuePair<string, string>> authorizeParameters = new[] {
+                        new KeyValuePair<string,string>("client_id",Constants.ClientId),
+                        new KeyValuePair<string,string>("code",code),
+                        new KeyValuePair<string, string>("grant_type", "authorization_code"),
+                        new KeyValuePair<string, string>("redirect_uri", Constants.RedirectUrl)
+                    };
+                    var response = client.PostAsync(Constants.AuthUrl, new FormUrlEncodedContent(authorizeParameters)).Result;
+                    WriteVerbose(response.Content.ReadAsStringAsync().Result);
+                }
+                    ((WebBrowser)sender).FindForm().Close();
+
+            }
+            else if (e.Url.AbsoluteUri.Contains("error="))
+            {
+                WriteVerbose("error: " + e.Url.AbsoluteUri);
+                ((WebBrowser)sender).FindForm().Close();
+            }
+                
+        }
+
         public async Task<JObject> ConvertWithToken(string subscriptionId, string resourceGroup, string logicAppName, string bearerToken)
         {
             SubscriptionId = subscriptionId;
