@@ -56,12 +56,16 @@ namespace ConverterLibrary
 
         protected override void ProcessRecord()
         {
-            AuthenticationContext ac = new AuthenticationContext(Constants.AuthString);
-            var ar = ac.AcquireToken(Constants.ResourceUrl, Constants.ClientId, new Uri("http://localhost"));
+            if (String.IsNullOrEmpty(Token))
+            {
+                AuthenticationContext ac = new AuthenticationContext(Constants.AuthString, true);
+                var ar = ac.AcquireToken(Constants.ResourceUrl, Constants.ClientId, new Uri(Constants.RedirectUrl), PromptBehavior.Always);
 
 
-            Token = ar.AccessToken;
-            WriteVerbose("Retrieved Token");
+                Token = ar.AccessToken;
+
+                WriteVerbose("Retrieved Token: " + Token);
+            }
             var result = ConvertWithToken(SubscriptionId, ResourceGroup, LogicApp, Token).Result;
             WriteObject(result.ToString());
         }
