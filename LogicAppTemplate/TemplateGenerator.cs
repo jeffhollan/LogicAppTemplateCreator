@@ -1,4 +1,4 @@
-﻿using ConverterLibrary.Models;
+﻿using LogicAppTemplate.Models;
 using Microsoft.IdentityModel.Clients.ActiveDirectory;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
@@ -15,10 +15,10 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
-namespace ConverterLibrary
+namespace LogicAppTemplate
 {
     [Cmdlet(VerbsCommon.Get, "LogicAppTemplate", ConfirmImpact = ConfirmImpact.None)]
-    public class Converter : PSCmdlet
+    public class TemplateGenerator : PSCmdlet
     {
         [Parameter(
             Mandatory = true,
@@ -50,12 +50,12 @@ namespace ConverterLibrary
         private JObject workflowTemplateReference;
 
 
-        public Converter()
+        public TemplateGenerator()
         {       
                 template = JsonConvert.DeserializeObject<DeploymentTemplate>(Constants.deploymentTemplate);
         }
 
-        public Converter(string token) : this()
+        public TemplateGenerator(string token) : this()
         {
             Token = token;
         }
@@ -100,7 +100,7 @@ namespace ConverterLibrary
             WriteVerbose("Retrieving Definition....");
             JObject _definition = await getDefinition();
             WriteVerbose("Converting definition to template");
-            return await convertTemplate(_definition);
+            return await generateDefinition(_definition);
         }
 
         private async Task<JObject> getDefinition()
@@ -120,14 +120,8 @@ namespace ConverterLibrary
             
         }
 
-        private async Task<JObject> convertTemplate(JObject definition)
-        {
-            
-            return  await createConnections(definition);
-        }
 
-
-        public async Task<JObject> createConnections(JObject definition)
+        private async Task<JObject> generateDefinition(JObject definition)
         {
             workflowTemplateReference = template.resources.Where(t => ((string)t["type"]) == "Microsoft.Logic/workflows").FirstOrDefault();
 

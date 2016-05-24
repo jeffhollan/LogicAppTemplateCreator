@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace ConverterLibrary.Models
+namespace LogicAppTemplate.Models
 {
     public class Api
     {

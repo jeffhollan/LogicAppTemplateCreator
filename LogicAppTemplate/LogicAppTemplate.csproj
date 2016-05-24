@@ -7,8 +7,8 @@
     <ProjectGuid>{CBEC9309-3748-487F-8118-A3865C21B02C}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>ConverterLibrary</RootNamespace>
-    <AssemblyName>ConverterLibrary</AssemblyName>
+    <RootNamespace>LogicAppTemplate</RootNamespace>
+    <AssemblyName>LogicAppTemplate</AssemblyName>
     <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
   </PropertyGroup>
@@ -59,7 +59,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Constants\Constants.cs" />
-    <Compile Include="Converter.cs" />
+    <Compile Include="TemplateGenerator.cs" />
     <Compile Include="Models\ConnectionTemplate.cs" />
     <Compile Include="Models\DeploymentTemplate.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
