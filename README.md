@@ -10,6 +10,16 @@ Open PowerShell and Import the module:
 
 `Import-Module C:\{pathToSolution}\LogicAppTemplateCreator\ConverterLibrary\bin\Debug\ConverterLibrary.dll`
 
-Run the PowerShell command `Get-LogicAppTemplate`.  You can pipe the output as needed:
+Run the PowerShell command `Get-LogicAppTemplate`.  You can pipe the output as needed, and recommended you pipe in a token from `armclient`
 
-`Get-LogicAppTemplate -LogicApp MyApp -ResourceGroup Integrate2016 -SubscriptionId 80d4fe69-xxxx-4dd2-a938-9250f1c8ab03 -Verbose | Out-File C:\template.json`
+`armclient token 80d4fe69-xxxx-4dd2-a938-9250f1c8ab03 | Get-LogicAppTemplate -LogicApp MyApp -ResourceGroup Integrate2016 -SubscriptionId 80d4fe69-xxxx-4dd2-a938-9250f1c8ab03 -Verbose | Out-File C:\template.json`
+
+### Specifications
+
+| Parameter | Description | Required |
+| --------- | ---------- | -------|
+| LogicApp | The name of the Logic App | true |
+| ResourceGroup | The name of the Resource Group | true |
+| SubscriptionId | The subscription Id for the resource | true |
+| Token | An AAD Token to access the resources - should not include `Bearer`, only the token | false |
+| ClaimsDump | A dump of claims piped in from `armclient` - should not be manually set | false |
