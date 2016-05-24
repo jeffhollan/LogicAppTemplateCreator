@@ -8,7 +8,7 @@ Clone the project, open, and build.
 
 Open PowerShell and Import the module:
 
-`Import-Module C:\{pathToSolution}\LogicAppTemplateCreator\ConverterLibrary\bin\Debug\ConverterLibrary.dll`
+`Import-Module C:\{pathToSolution}\LogicAppTemplateCreator\LogicAppTemplate\bin\Debug\ConverterLibrary.dll`
 
 Run the PowerShell command `Get-LogicAppTemplate`.  You can pipe the output as needed, and recommended you pipe in a token from `armclient`
 
