@@ -1,4 +1,4 @@
-﻿using ConverterLibrary.Models;
+﻿using LogicAppTemplate.Models;
 using Microsoft.IdentityModel.Clients.ActiveDirectory;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
@@ -13,11 +13,12 @@ using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Forms;
 
-namespace ConverterLibrary
+namespace LogicAppTemplate
 {
     [Cmdlet(VerbsCommon.Get, "LogicAppTemplate", ConfirmImpact = ConfirmImpact.None)]
-    public class Converter : PSCmdlet
+    public class TemplateGenerator : PSCmdlet
     {
         [Parameter(
             Mandatory = true,
@@ -36,36 +37,56 @@ namespace ConverterLibrary
         public string SubscriptionId;
         [Parameter(
             Mandatory = false,
-            HelpMessage = "Authorization Bearer Token",
-            ValueFromPipeline = true
+            HelpMessage = "Authorization Bearer Token"
             )]
         public string Token = "";
+        [Parameter(
+            Mandatory =false,
+            HelpMessage = "Piped input from armclient",
+            ValueFromPipeline = true
+        )]
+        public string ClaimsDump;
         private DeploymentTemplate template;
         private JObject workflowTemplateReference;
 
 
-        public Converter()
+        public TemplateGenerator()
         {       
                 template = JsonConvert.DeserializeObject<DeploymentTemplate>(Constants.deploymentTemplate);
         }
 
-        public Converter(string token) : this()
+        public TemplateGenerator(string token) : this()
         {
             Token = token;
         }
 
         protected override void ProcessRecord()
         {
-            if (String.IsNullOrEmpty(Token))
+            if(ClaimsDump == null)
             {
-                AuthenticationContext ac = new AuthenticationContext(Constants.AuthString, true);
-                var ar = ac.AcquireToken(Constants.ResourceUrl, Constants.ClientId, new Uri(Constants.RedirectUrl), PromptBehavior.Always);
+                WriteVerbose("No armclient token piped through.  Attempting to authenticate");
+                if (String.IsNullOrEmpty(Token))
+                {
+                    AuthenticationContext ac = new AuthenticationContext(Constants.AuthString, true);
+                    var ar = ac.AcquireToken(Constants.ResourceUrl, Constants.ClientId, new Uri(Constants.RedirectUrl), PromptBehavior.Always);
 
 
-                Token = ar.AccessToken;
+                    Token = ar.AccessToken;
 
-                WriteVerbose("Retrieved Token: " + Token);
+                    WriteVerbose("Retrieved Token: " + Token);
+                }
             }
+            else if(ClaimsDump.Contains("Token copied"))
+            {
+                Token = Clipboard.GetText().Replace("Bearer ", "");
+                WriteVerbose("Got token from armclient: " + Token);
+            }
+            else
+            {
+                return;
+            }
+           
+            
             var result = ConvertWithToken(SubscriptionId, ResourceGroup, LogicApp, Token).Result;
             WriteObject(result.ToString());
         }
@@ -79,7 +100,7 @@ namespace ConverterLibrary
             WriteVerbose("Retrieving Definition....");
             JObject _definition = await getDefinition();
             WriteVerbose("Converting definition to template");
-            return await convertTemplate(_definition);
+            return await generateDefinition(_definition);
         }
 
         private async Task<JObject> getDefinition()
@@ -99,14 +120,8 @@ namespace ConverterLibrary
             
         }
 
-        private async Task<JObject> convertTemplate(JObject definition)
-        {
-            
-            return  await createConnections(definition);
-        }
 
-
-        public async Task<JObject> createConnections(JObject definition)
+        private async Task<JObject> generateDefinition(JObject definition)
         {
             workflowTemplateReference = template.resources.Where(t => ((string)t["type"]) == "Microsoft.Logic/workflows").FirstOrDefault();
 
