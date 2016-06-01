@@ -121,7 +121,7 @@ namespace LogicAppTemplate
         }
 
 
-        private async Task<JObject> generateDefinition(JObject definition)
+        public async Task<JObject> generateDefinition(JObject definition)
         {
             workflowTemplateReference = template.resources.Where(t => ((string)t["type"]) == "Microsoft.Logic/workflows").FirstOrDefault();
 
