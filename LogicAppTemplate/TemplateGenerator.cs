@@ -244,7 +244,8 @@ namespace LogicAppTemplate
                     if ((string)parameter.Value["type"] == "gatewaySetting")
                         continue;
                     
-                    if (((JArray)parameter.Value["uiDefinition"]["constraints"]["capability"]).Count == 1 
+                    if (((JArray)parameter.Value["uiDefinition"]["constraints"]["capability"]) != null &&
+                        ((JArray)parameter.Value["uiDefinition"]["constraints"]["capability"]).Count == 1 
                         && (string)((JArray)parameter.Value["uiDefinition"]["constraints"]["capability"])[0] == "gateway")
                         continue;
 
