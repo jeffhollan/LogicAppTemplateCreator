@@ -242,11 +242,11 @@ namespace LogicAppTemplate
                     //Filter out gateway stuff - can't export to template yet
                     //TODO
                     if ((string)parameter.Value["type"] == "gatewaySetting")
-                        break;
+                        continue;
                     
                     if (((JArray)parameter.Value["uiDefinition"]["constraints"]["capability"]).Count == 1 
                         && (string)((JArray)parameter.Value["uiDefinition"]["constraints"]["capability"])[0] == "gateway")
-                        break;
+                        continue;
 
                     connectionParameters.Add(parameter.Name, $"[parameters('{connectionName + parameter.Name}')]");
                     template.parameters.Add(connectionName + parameter.Name, JObject.FromObject(new { type = parameter.Value["type"] }));
