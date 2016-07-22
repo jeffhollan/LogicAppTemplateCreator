@@ -1,4 +1,4 @@
-﻿using LogicAppTemplate.Models;
+using LogicAppTemplate.Models;
 using Microsoft.IdentityModel.Clients.ActiveDirectory;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
@@ -32,27 +32,33 @@ namespace LogicAppTemplate
         public string ResourceGroup;
         [Parameter(
             Mandatory = true,
-            HelpMessage = "Azure Subscription Id"
+            HelpMessage = "Name of the resource group"
             )]
         public string SubscriptionId;
         [Parameter(
             Mandatory = false,
-            HelpMessage = "Authorization Bearer Token"
+            HelpMessage = "The SubscriptionId"
             )]
+        public string TenantName = "";
+        [Parameter(
+            Mandatory = false,
+            HelpMessage = "Name of the Tenant i.e. contoso.onmicrosoft.com"
+        )]
         public string Token = "";
         [Parameter(
-            Mandatory =false,
+            Mandatory = false,
             HelpMessage = "Piped input from armclient",
             ValueFromPipeline = true
         )]
+
         public string ClaimsDump;
         private DeploymentTemplate template;
         private JObject workflowTemplateReference;
 
 
         public TemplateGenerator()
-        {       
-                template = JsonConvert.DeserializeObject<DeploymentTemplate>(Constants.deploymentTemplate);
+        {
+            template = JsonConvert.DeserializeObject<DeploymentTemplate>(Constants.deploymentTemplate);
         }
 
         public TemplateGenerator(string token) : this()
@@ -62,21 +68,24 @@ namespace LogicAppTemplate
 
         protected override void ProcessRecord()
         {
-            if(ClaimsDump == null)
+            if (ClaimsDump == null)
             {
                 WriteVerbose("No armclient token piped through.  Attempting to authenticate");
                 if (String.IsNullOrEmpty(Token))
                 {
-                    AuthenticationContext ac = new AuthenticationContext(Constants.AuthString, true);
-                    var ar = ac.AcquireToken(Constants.ResourceUrl, Constants.ClientId, new Uri(Constants.RedirectUrl), PromptBehavior.Always);
+                    string authstring = Constants.AuthString;
+                    if (!string.IsNullOrEmpty(TenantName))
+                    {
+                        authstring = authstring.Replace("common", TenantName);
+                    }
+                    AuthenticationContext ac = new AuthenticationContext(authstring, true);
 
-
+                    var ar = ac.AcquireToken(Constants.ResourceUrl, Constants.ClientId, new Uri(Constants.RedirectUrl), PromptBehavior.Auto);
                     Token = ar.AccessToken;
-
                     WriteVerbose("Retrieved Token: " + Token);
                 }
             }
-            else if(ClaimsDump.Contains("Token copied"))
+            else if (ClaimsDump.Contains("Token copied"))
             {
                 Token = Clipboard.GetText().Replace("Bearer ", "");
                 WriteVerbose("Got token from armclient: " + Token);
@@ -85,13 +94,12 @@ namespace LogicAppTemplate
             {
                 return;
             }
-           
-            
             var result = ConvertWithToken(SubscriptionId, ResourceGroup, LogicApp, Token).Result;
+
             WriteObject(result.ToString());
         }
 
-        
+
         public async Task<JObject> ConvertWithToken(string subscriptionId, string resourceGroup, string logicAppName, string bearerToken)
         {
             SubscriptionId = subscriptionId;
@@ -106,18 +114,18 @@ namespace LogicAppTemplate
         private async Task<JObject> getDefinition()
         {
 
-                string url = $"https://management.azure.com/subscriptions/{SubscriptionId}/resourceGroups/{ResourceGroup}/providers/Microsoft.Logic/workflows/{LogicApp}?api-version=2015-08-01-preview";
-                WriteVerbose("Doing a GET to: " + url);
-                var request = HttpWebRequest.Create(url);
-                 request.Headers[HttpRequestHeader.Authorization] = "Bearer " + Token;
+            string url = $"https://management.azure.com/subscriptions/{SubscriptionId}/resourceGroups/{ResourceGroup}/providers/Microsoft.Logic/workflows/{LogicApp}?api-version=2015-08-01-preview";
+            WriteVerbose("Doing a GET to: " + url);
+            var request = HttpWebRequest.Create(url);
+            request.Headers[HttpRequestHeader.Authorization] = "Bearer " + Token;
 
-                var logicAppRequest = request.GetResponse();
-                 var stream = logicAppRequest.GetResponseStream();
-                StreamReader reader = new StreamReader(stream);
-                var logicApp = reader.ReadToEnd();
-                WriteVerbose("Got definition");
-                return JObject.Parse(logicApp);
-            
+            var logicAppRequest = request.GetResponse();
+            var stream = logicAppRequest.GetResponseStream();
+            StreamReader reader = new StreamReader(stream);
+            var logicApp = reader.ReadToEnd();
+            WriteVerbose("Got definition");
+            return JObject.Parse(logicApp);
+
         }
 
 
@@ -132,6 +140,16 @@ namespace LogicAppTemplate
             workflowTemplateReference["properties"]["definition"] = removeApiFromActions(JObject.Parse(modifiedDefinition));
 
             JObject connections = (JObject)definition["properties"]["parameters"]["$connections"];
+
+            foreach (JProperty parameter in workflowTemplateReference["properties"]["definition"]["parameters"])
+            {
+                if (!parameter.Name.StartsWith("$"))
+                {
+                    var name = "param" + parameter.Name;
+                    template.parameters.Add(name, JObject.FromObject(new { type = parameter.Value["type"], defaultValue = parameter.Value["defaultValue"] }));
+                    parameter.Value["defaultValue"] = "[parameters('" + name + "')]";
+                }
+            }
 
             WriteVerbose("Checking connections...");
             if (connections == null)
@@ -148,9 +166,10 @@ namespace LogicAppTemplate
                 if (apiId == null)
                     throw new NullReferenceException($"Connection {connectionName} is missing an id");
 
-                 workflowTemplateReference["properties"]["parameters"]["$connections"]["value"][connectionName] = JObject.FromObject(new {
-                    id =  apiIdTemplate((string)apiId),
-                    connectionId = $"[resourceId('Microsoft.Web/connections', parameters('{connectionName}Name'))]" 
+                workflowTemplateReference["properties"]["parameters"]["$connections"]["value"][connectionName] = JObject.FromObject(new
+                {
+                    id = apiIdTemplate((string)apiId),
+                    connectionId = $"[resourceId('Microsoft.Web/connections', parameters('{connectionName}Name'))]"
                 });
                 ((JArray)workflowTemplateReference["dependsOn"]).Add($"[resourceId('Microsoft.Web/connections', parameters('{connectionName}Name'))]");
 
@@ -158,12 +177,15 @@ namespace LogicAppTemplate
                 JObject apiResource = await generateConnectionResource(connectionName, (string)apiId);
                 WriteVerbose($"Generating connection resource for {connectionName}....");
                 var connectionTemplate = generateConnectionTemplate(connectionName, apiResource, apiIdTemplate((string)apiId));
-                
+
                 template.resources.Insert(1, connectionTemplate);
                 template.parameters.Add(connectionName + "Name", JObject.FromObject(new { type = "string" }));
-                
+
+
 
             }
+
+
             WriteVerbose("Finalizing Template...");
             return JObject.FromObject(template);
 
@@ -171,7 +193,7 @@ namespace LogicAppTemplate
 
         private JToken removeApiFromActions(JObject definition)
         {
-            foreach(JProperty action in definition["actions"])
+            foreach (JProperty action in definition["actions"])
             {
                 var api = action.Value.SelectToken("inputs.host.api");
                 if (api != null)
@@ -191,7 +213,9 @@ namespace LogicAppTemplate
         {
             System.Text.RegularExpressions.Regex r = new System.Text.RegularExpressions.Regex(@"\/locations\/(.*)\/managedApis");
             apiId = r.Replace(apiId, @"/locations/', resourceGroup().location, '/managedApis");
-            return apiId.Insert(0, "[concat('") + "')]";
+            r = new System.Text.RegularExpressions.Regex(@"(.*)\/providers");
+            apiId = r.Replace(apiId, @"subscription().id,'/providers");
+            return apiId.Insert(0, "[concat(") + "')]";
         }
 
         private async Task<JObject> generateConnectionResource(string connectionName, string apiId)
@@ -215,7 +239,7 @@ namespace LogicAppTemplate
         {
             var connectionTemplate = new Models.ConnectionTemplate(connectionName, apiId);
             JObject connectionParameters = new JObject();
-            foreach(JProperty parameter in connectionResource["properties"]["connectionParameters"])
+            foreach (JProperty parameter in connectionResource["properties"]["connectionParameters"])
             {
                 if ((string)(parameter.Value)["type"] != "oauthSetting")
                 {
@@ -226,5 +250,7 @@ namespace LogicAppTemplate
             connectionTemplate.properties.parameterValues = connectionParameters;
             return JObject.FromObject(connectionTemplate);
         }
+
+
     }
 }
