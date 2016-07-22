@@ -37,7 +37,7 @@ namespace LogicAppTemplate.Models
                 return "Microsoft.Web/connections";
             } }
         public string apiVersion { get {
-                return "2015-08-01-preview";
+                return "2016-06-01";
             } }
         public string location { get {
                 return "[resourceGroup().location]";

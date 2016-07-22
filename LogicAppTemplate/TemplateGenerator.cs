@@ -32,17 +32,17 @@ namespace LogicAppTemplate
         public string ResourceGroup;
         [Parameter(
             Mandatory = true,
-            HelpMessage = "Name of the resource group"
+            HelpMessage = "The SubscriptionId"
             )]
         public string SubscriptionId;
         [Parameter(
             Mandatory = false,
-            HelpMessage = "The SubscriptionId"
+            HelpMessage = "Name of the Tenant i.e. contoso.onmicrosoft.com"
             )]
         public string TenantName = "";
         [Parameter(
             Mandatory = false,
-            HelpMessage = "Name of the Tenant i.e. contoso.onmicrosoft.com"
+            HelpMessage = "A Bearer token value"
         )]
         public string Token = "";
         [Parameter(
@@ -70,7 +70,7 @@ namespace LogicAppTemplate
         {
             if (ClaimsDump == null)
             {
-                WriteVerbose("No armclient token piped through.  Attempting to authenticate");
+                // WriteVerbose("No armclient token piped through.  Attempting to authenticate");
                 if (String.IsNullOrEmpty(Token))
                 {
                     string authstring = Constants.AuthString;
@@ -82,13 +82,13 @@ namespace LogicAppTemplate
 
                     var ar = ac.AcquireToken(Constants.ResourceUrl, Constants.ClientId, new Uri(Constants.RedirectUrl), PromptBehavior.Auto);
                     Token = ar.AccessToken;
-                    WriteVerbose("Retrieved Token: " + Token);
+                    // WriteVerbose("Retrieved Token: " + Token);
                 }
             }
             else if (ClaimsDump.Contains("Token copied"))
             {
                 Token = Clipboard.GetText().Replace("Bearer ", "");
-                WriteVerbose("Got token from armclient: " + Token);
+                // WriteVerbose("Got token from armclient: " + Token);
             }
             else
             {
@@ -105,25 +105,25 @@ namespace LogicAppTemplate
             SubscriptionId = subscriptionId;
             ResourceGroup = resourceGroup;
             LogicApp = logicAppName;
-            WriteVerbose("Retrieving Definition....");
-            JObject _definition = await getDefinition();
-            WriteVerbose("Converting definition to template");
+            // WriteVerbose("Retrieving Definition....");
+            JObject _definition = getDefinition();
+            // WriteVerbose("Converting definition to template");
             return await generateDefinition(_definition);
         }
 
-        private async Task<JObject> getDefinition()
+        private JObject getDefinition()
         {
 
-            string url = $"https://management.azure.com/subscriptions/{SubscriptionId}/resourceGroups/{ResourceGroup}/providers/Microsoft.Logic/workflows/{LogicApp}?api-version=2015-08-01-preview";
-            WriteVerbose("Doing a GET to: " + url);
+            string url = $"https://management.azure.com/subscriptions/{SubscriptionId}/resourceGroups/{ResourceGroup}/providers/Microsoft.Logic/workflows/{LogicApp}?api-version=2016-06-01";
+            // WriteVerbose("Doing a GET to: " + url);
             var request = HttpWebRequest.Create(url);
             request.Headers[HttpRequestHeader.Authorization] = "Bearer " + Token;
-
+            
             var logicAppRequest = request.GetResponse();
             var stream = logicAppRequest.GetResponseStream();
             StreamReader reader = new StreamReader(stream);
             var logicApp = reader.ReadToEnd();
-            WriteVerbose("Got definition");
+            // WriteVerbose("Got definition");
             return JObject.Parse(logicApp);
 
         }
@@ -133,9 +133,9 @@ namespace LogicAppTemplate
         {
             workflowTemplateReference = template.resources.Where(t => ((string)t["type"]) == "Microsoft.Logic/workflows").FirstOrDefault();
 
-            WriteVerbose("Upgrading connectionId paramters...");
+            // WriteVerbose("Upgrading connectionId paramters...");
             var modifiedDefinition = definition["properties"]["definition"].ToString().Replace(@"['connectionId']", @"['connectionId']");
-            WriteVerbose("Removing API Host references...");
+            // WriteVerbose("Removing API Host references...");
 
             workflowTemplateReference["properties"]["definition"] = removeApiFromActions(JObject.Parse(modifiedDefinition));
 
@@ -151,14 +151,14 @@ namespace LogicAppTemplate
                 }
             }
 
-            WriteVerbose("Checking connections...");
+            // WriteVerbose("Checking connections...");
             if (connections == null)
                 return JObject.FromObject(template);
 
             workflowTemplateReference["properties"]["parameters"]["$connections"] = new JObject(new JProperty("value", new JObject()));
             foreach (JProperty connectionProperty in connections["value"])
             {
-                WriteVerbose($"Parameterizing {connectionProperty.Name}");
+                // WriteVerbose($"Parameterizing {connectionProperty.Name}");
                 string connectionName = connectionProperty.Name;
                 var conn = (JObject)connectionProperty.Value;
                 var apiId = conn["id"] != null ? conn["id"] :
@@ -173,20 +173,16 @@ namespace LogicAppTemplate
                 });
                 ((JArray)workflowTemplateReference["dependsOn"]).Add($"[resourceId('Microsoft.Web/connections', parameters('{connectionName}Name'))]");
 
-
                 JObject apiResource = await generateConnectionResource(connectionName, (string)apiId);
-                WriteVerbose($"Generating connection resource for {connectionName}....");
+                // WriteVerbose($"Generating connection resource for {connectionName}....");
                 var connectionTemplate = generateConnectionTemplate(connectionName, apiResource, apiIdTemplate((string)apiId));
 
                 template.resources.Insert(1, connectionTemplate);
                 template.parameters.Add(connectionName + "Name", JObject.FromObject(new { type = "string" }));
-
-
-
             }
 
 
-            WriteVerbose("Finalizing Template...");
+            // WriteVerbose("Finalizing Template...");
             return JObject.FromObject(template);
 
         }
@@ -221,8 +217,8 @@ namespace LogicAppTemplate
         private async Task<JObject> generateConnectionResource(string connectionName, string apiId)
         {
 
-            string url = "https://management.azure.com" + apiId + "?api-version=2015-08-01-preview";
-            WriteVerbose("Doing a GET to: " + url);
+            string url = "https://management.azure.com" + apiId + "?api-version=2016-06-01";
+            // WriteVerbose("Doing a GET to: " + url);
             var request = HttpWebRequest.Create(url);
             request.Headers[HttpRequestHeader.Authorization] = "Bearer " + Token;
 
@@ -230,7 +226,7 @@ namespace LogicAppTemplate
             var stream = logicAppRequest.GetResponseStream();
             StreamReader reader = new StreamReader(stream);
             var apiResource = reader.ReadToEnd();
-            WriteVerbose("Got api");
+            // WriteVerbose("Got api");
             return JObject.Parse(apiResource);
 
         }
@@ -243,8 +239,27 @@ namespace LogicAppTemplate
             {
                 if ((string)(parameter.Value)["type"] != "oauthSetting")
                 {
+                    //Filter out gateway stuff - can't export to template yet
+                    //TODO
+                    if ((string)parameter.Value["type"] == "gatewaySetting")
+                        break;
+                    
+                    if (((JArray)parameter.Value["uiDefinition"]["constraints"]["capability"]).Count == 1 
+                        && (string)((JArray)parameter.Value["uiDefinition"]["constraints"]["capability"])[0] == "gateway")
+                        break;
+
                     connectionParameters.Add(parameter.Name, $"[parameters('{connectionName + parameter.Name}')]");
                     template.parameters.Add(connectionName + parameter.Name, JObject.FromObject(new { type = parameter.Value["type"] }));
+                    //If has an enum
+                    if (parameter.Value["allowedValues"] != null)
+                    {
+                        template.parameters[connectionName + parameter.Name]["allowedValues"] = parameter.Value["allowedValues"];
+                    }
+                    //If an optional parameter
+                    if ((bool)(parameter.Value)["uiDefinition"]["constraints"]["required"] == false)
+                    {
+                        template.parameters[connectionName + parameter.Name]["defaultValue"] = "";
+                    }
                 }
             }
             connectionTemplate.properties.parameterValues = connectionParameters;
