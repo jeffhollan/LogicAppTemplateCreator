@@ -136,7 +136,7 @@ namespace LogicAppTemplate
             // WriteVerbose("Upgrading connectionId paramters...");
             var modifiedDefinition = definition["properties"]["definition"].ToString().Replace(@"['connectionId']", @"['connectionId']");
             // WriteVerbose("Removing API Host references...");
-
+            template.parameters["logicAppLocation"]["defaultValue"] = definition["location"];
             workflowTemplateReference["properties"]["definition"] = removeApiFromActions(JObject.Parse(modifiedDefinition));
 
             JObject connections = (JObject)definition["properties"]["parameters"]["$connections"];
@@ -178,7 +178,7 @@ namespace LogicAppTemplate
                 var connectionTemplate = generateConnectionTemplate(connectionName, apiResource, apiIdTemplate((string)apiId));
 
                 template.resources.Insert(1, connectionTemplate);
-                template.parameters.Add(connectionName, JObject.FromObject(new { type = "string", defaultValue = connectionName }));
+                template.parameters.Add(connectionName, JObject.FromObject(new { type = "string", defaultValue = conn["connectionName"] }));
             }
 
 
@@ -208,7 +208,7 @@ namespace LogicAppTemplate
         private string apiIdTemplate(string apiId)
         {
             System.Text.RegularExpressions.Regex r = new System.Text.RegularExpressions.Regex(@"\/locations\/(.*)\/managedApis");
-            apiId = r.Replace(apiId, @"/locations/', resourceGroup().location, '/managedApis");
+            apiId = r.Replace(apiId, @"/locations/', parameters('logicAppLocation'), '/managedApis");
             r = new System.Text.RegularExpressions.Regex(@"(.*)\/providers");
             apiId = r.Replace(apiId, @"subscription().id,'/providers");
             return apiId.Insert(0, "[concat(") + "')]";

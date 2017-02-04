@@ -40,7 +40,7 @@ namespace LogicAppTemplate.Models
                 return "2016-06-01";
             } }
         public string location { get {
-                return "[resourceGroup().location]";
+                return "[parameters('logicAppLocation')]";
             } }
         public string name { get {
                 return $"[parameters('{connectionName}')]";
