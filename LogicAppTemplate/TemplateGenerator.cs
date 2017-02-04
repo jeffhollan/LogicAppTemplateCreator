@@ -169,9 +169,9 @@ namespace LogicAppTemplate
                 workflowTemplateReference["properties"]["parameters"]["$connections"]["value"][connectionName] = JObject.FromObject(new
                 {
                     id = apiIdTemplate((string)apiId),
-                    connectionId = $"[resourceId('Microsoft.Web/connections', parameters('{connectionName}Name'))]"
+                    connectionId = $"[resourceId('Microsoft.Web/connections', parameters('{connectionName}'))]"
                 });
-                ((JArray)workflowTemplateReference["dependsOn"]).Add($"[resourceId('Microsoft.Web/connections', parameters('{connectionName}Name'))]");
+                ((JArray)workflowTemplateReference["dependsOn"]).Add($"[resourceId('Microsoft.Web/connections', parameters('{connectionName}'))]");
 
                 JObject apiResource = await generateConnectionResource(connectionName, (string)apiId);
                 // WriteVerbose($"Generating connection resource for {connectionName}....");
