@@ -178,7 +178,7 @@ namespace LogicAppTemplate
                 var connectionTemplate = generateConnectionTemplate(connectionName, apiResource, apiIdTemplate((string)apiId));
 
                 template.resources.Insert(1, connectionTemplate);
-                template.parameters.Add(connectionName + "Name", JObject.FromObject(new { type = "string" }));
+                template.parameters.Add(connectionName, JObject.FromObject(new { type = "string", defaultValue = connectionName }));
             }
 
 

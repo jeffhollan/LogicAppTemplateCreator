@@ -43,7 +43,7 @@ namespace LogicAppTemplate.Models
                 return "[resourceGroup().location]";
             } }
         public string name { get {
-                return $"[parameters('{connectionName}Name')]";
+                return $"[parameters('{connectionName}')]";
             } }
         public Properties properties { get; set; }
     }
