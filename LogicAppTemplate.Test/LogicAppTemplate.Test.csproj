@@ -71,6 +71,7 @@
     <EmbeddedResource Include="TestFiles\integrationaccount.json" />
     <EmbeddedResource Include="TestFiles\APIMMultipleSame.json" />
     <EmbeddedResource Include="TestFiles\APIMMultipleDiffrent.json" />
+    <EmbeddedResource Include="TestFiles\complex-logicapp-if.json" />
   </ItemGroup>
   <Choose>
     <When Condition="'$(VisualStudioVersion)' == '10.0' And '$(IsCodedUITest)' == 'True'">

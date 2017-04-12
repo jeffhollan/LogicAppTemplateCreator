@@ -11,7 +11,7 @@
     },
     "logicAppLocation": {
       "type": "string",
-      "defaultValue": "westeurope",
+      "defaultValue": "[resourceGroup().location]",
       "allowedValues": [
         "eastasia",
         "southeastasia",
@@ -29,8 +29,7 @@
         "australiaeast",
         "australiasoutheast",
         "westcentralus",
-        "westus2",
-        "[resourceGroup().location]"
+        "westus2"
       ],
       "metadata": {
         "description": "Location of the Logic App."
@@ -48,7 +47,7 @@
       "metadata": {
         "description": "The resource group name that the Integration Account are in"
       },
-      "defaultValue": "[resourceGroup().location]"
+      "defaultValue": "[resourceGroup().id]"
     }
   },
   "variables": {

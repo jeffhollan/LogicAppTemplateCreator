@@ -140,6 +140,22 @@ namespace LogicAppTemplate.Tests
             Assert.AreEqual("[concat('/subscriptions/',subscription().subscriptionId,'/resourceGroups/', parameters('apimLocation'),'/providers/Microsoft.ApiManagement/service/', parameters('apimInstanceName'),'/apis/', parameters('apimApiId'),'')]", defintion["resources"][0]["properties"]["definition"]["actions"]["UploadAttachment3"]["inputs"]["api"]["id"]);
             Assert.AreEqual("[parameters('apimSubscriptionKey')]", defintion["resources"][0]["properties"]["definition"]["actions"]["UploadAttachment3"]["inputs"]["subscriptionKey"]);
         }
+        [TestMethod()]
+        public void TestIFStatements()
+        {
+            var content = GetEmbededFileContent("LogicAppTemplate.Test.TestFiles.complex-logicapp-if.json");
+
+            var generator = new TemplateGenerator();
+
+            var defintion = generator.generateDefinition(JObject.Parse(content)).GetAwaiter().GetResult();
+
+            //check parameters
+            //Assert.AreEqual("resourcegroupname", defintion["parameters"]["INT0014-NewHires-ResourceGroup"]["defaultValue"]);
+
+            //check Upload Attachment
+            //Assert.AreEqual("[concat('/subscriptions/',subscription().subscriptionId,'/resourceGroups/', parameters('INT0014-NewHires-ResourceGroup'),'/providers/Microsoft.Logic/workflows/INT0014-NewHires')]", defintion["resources"][0]["properties"]["definition"]["actions"]["INT0014-NewHires"]["inputs"]["host"]["workflow"]["id"]);
+        }
+
 
         //var resourceName = "LogicAppTemplate.Templates.starterTemplate.json";
         private static string GetEmbededFileContent(string resourceName)

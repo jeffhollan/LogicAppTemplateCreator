@@ -56,6 +56,8 @@ namespace LogicAppTemplate
         private DeploymentTemplate template;
         private JObject workflowTemplateReference;
 
+        private string LogicAppResourceGroup;
+
 
         public TemplateGenerator()
         {
@@ -140,6 +142,10 @@ namespace LogicAppTemplate
 
         public async Task<JObject> generateDefinition(JObject definition)
         {
+            Regex rgx = new Regex(@"\/subscriptions\/(?<subscription>[0-9a-zA-Z-]*)\/resourceGroups\/(?<resourcegroup>[a-zA-Z0-9-]*)");
+            var matches = rgx.Match(definition.Value<string>("id"));
+            LogicAppResourceGroup = matches.Groups["resourcegroup"].Value;
+
             workflowTemplateReference = template.resources.Where(t => ((string)t["type"]) == "Microsoft.Logic/workflows").FirstOrDefault();
 
             // WriteVerbose("Upgrading connectionId paramters...");
@@ -217,9 +223,9 @@ namespace LogicAppTemplate
         {
             foreach (JProperty action in definition["actions"])
             {
-                var type = action.Value.SelectToken("type").Value<string>();
+                var type = action.Value.SelectToken("type").Value<string>().ToLower();
                 //if workflow fix so links are dynamic.
-                if (type == "Workflow")
+                if (type == "workflow")
                 {
                     var curr = ((JObject)definition["actions"][action.Name]["inputs"]["host"]["workflow"]).Value<string>("id");
 
@@ -227,30 +233,42 @@ namespace LogicAppTemplate
                     var matches = rgx.Match(curr);
 
                     curr = curr.Replace(matches.Groups["subscription"].Value, "',subscription().subscriptionId,'");
-                    curr = curr.Replace(matches.Groups["resourcegroup"].Value, "', parameters('"+ AddTemplateParameter(action.Name + "-ResourceGroup", "string", matches.Groups["resourcegroup"].Value) + "'),'");
+
+                    if (LogicAppResourceGroup == matches.Groups["resourcegroup"].Value)
+                    {
+                        curr = curr.Replace(matches.Groups["resourcegroup"].Value, "', resourceGroup().id,'");
+                    }
+                    else
+                    {
+                        curr = curr.Replace(matches.Groups["resourcegroup"].Value, "', parameters('" + AddTemplateParameter(action.Name + "-ResourceGroup", "string", matches.Groups["resourcegroup"].Value) + "'),'");
+                    }
                     curr = "[concat('" + curr + "')]";
 
                     definition["actions"][action.Name]["inputs"]["host"]["workflow"]["id"] = curr;
                     //string result = "[concat('" + rgx.Replace(matches.Groups[1].Value, "',subscription().subscriptionId,'") + + "']";
                 }
-                else if (type == "ApiManagement")
+                else if (type == "apimanagement")
                 {
                     var apiId = ((JObject)definition["actions"][action.Name]["inputs"]["api"]).Value<string>("id");
 
                     Regex rgx = new Regex(@"\/subscriptions\/(?<subscription>[0-9a-zA-Z-]*)\/resourceGroups\/(?<resourcegroup>[a-zA-Z0-9-]*).*\/service\/(?<apim>[a-zA-Z0-9]*)\/apis\/(?<apiId>[0-9a-zA-Z]*)");
                     var matches = rgx.Match(apiId);
 
-                    apiId = apiId.Replace(matches.Groups["subscription"].Value, "',subscription().subscriptionId,'");                    
-                    apiId = apiId.Replace(matches.Groups["resourcegroup"].Value, "', parameters('"+ AddTemplateParameter("apimLocation", "string", matches.Groups["resourcegroup"].Value) + "'),'");
-                    apiId = apiId.Replace(matches.Groups["apim"].Value, "', parameters('"+ AddTemplateParameter("apimInstanceName", "string", matches.Groups["apim"].Value) + "'),'");
-                    apiId = apiId.Replace(matches.Groups["apiId"].Value, "', parameters('"+ AddTemplateParameter("apimApiId", "string", matches.Groups["apiId"].Value) + "'),'");
+                    apiId = apiId.Replace(matches.Groups["subscription"].Value, "',subscription().subscriptionId,'");
+                    apiId = apiId.Replace(matches.Groups["resourcegroup"].Value, "', parameters('" + AddTemplateParameter("apimLocation", "string", matches.Groups["resourcegroup"].Value) + "'),'");
+                    apiId = apiId.Replace(matches.Groups["apim"].Value, "', parameters('" + AddTemplateParameter("apimInstanceName", "string", matches.Groups["apim"].Value) + "'),'");
+                    apiId = apiId.Replace(matches.Groups["apiId"].Value, "', parameters('" + AddTemplateParameter("apimApiId", "string", matches.Groups["apiId"].Value) + "'),'");
                     apiId = "[concat('" + apiId + "')]";
 
                     definition["actions"][action.Name]["inputs"]["api"]["id"] = apiId;
 
                     //handle subscriptionkey
                     var subkey = ((JObject)definition["actions"][action.Name]["inputs"]).Value<string>("subscriptionKey");
-                    definition["actions"][action.Name]["inputs"]["subscriptionKey"] = "[parameters('"+ AddTemplateParameter("apimSubscriptionKey", "string", subkey) + "')]";
+                    definition["actions"][action.Name]["inputs"]["subscriptionKey"] = "[parameters('" + AddTemplateParameter("apimSubscriptionKey", "string", subkey) + "')]";
+                }
+                else if (type == "if" || type == "scope" || type == "foreach" || type == "until" )
+                {
+                    definition["actions"][action.Name]["actions"] = handleActions(definition["actions"][action.Name].ToObject<JObject>());
                 }
                 else
                 {
@@ -261,11 +279,15 @@ namespace LogicAppTemplate
                 }
             }
 
-            foreach (JProperty trigger in definition["triggers"])
+            //when in if statements triggers is not there
+            if (definition["triggers"] != null)
             {
-                var api = trigger.Value.SelectToken("inputs.host.api");
-                if (api != null)
-                    ((JObject)definition["triggers"][trigger.Name]["inputs"]["host"]).Remove("api");
+                foreach (JProperty trigger in definition["triggers"])
+                {
+                    var api = trigger.Value.SelectToken("inputs.host.api");
+                    if (api != null)
+                        ((JObject)definition["triggers"][trigger.Name]["inputs"]["host"]).Remove("api");
+                }
             }
 
             return definition;
