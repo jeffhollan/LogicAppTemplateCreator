@@ -3,23 +3,71 @@
   "contentVersion": "1.0.0.0",
   "parameters": {
     "logicAppName": {
-      "type": "string"
+      "type": "string",
+      "metadata": {
+        "description": "Name of the Logic App."
+      }
+
+    },
+    "logicAppLocation": {
+      "type": "string",
+      "defaultValue": "westeurope",
+      "allowedValues": [
+        "eastasia",
+        "southeastasia",
+        "centralus",
+        "eastus",
+        "eastus2",
+        "westus",
+        "northcentralus",
+        "southcentralus",
+        "northeurope",
+        "westeurope",
+        "japanwest",
+        "japaneast",
+        "brazilsouth",
+        "australiaeast",
+        "australiasoutheast",
+        "westcentralus",
+        "westus2",
+        "[resourceGroup().location]"
+      ],
+      "metadata": {
+        "description": "Location of the Logic App."
+      }
+    },
+    "IntegrationAccountName": {
+      "type": "string",
+      "metadata": {
+        "description": "Name of the Integration Account that should be connected to this Logic App."
+      },
+      "defaultValue": ""
+    },
+    "IntegrationAccountResourceGroupName": {
+      "type": "string",
+      "metadata": {
+        "description": "The resource group name that the Integration Account are in"
+      },
+      "defaultValue": "[resourceGroup().location]"
     }
   },
   "variables": {
   },
   "resources": [
-   {
+    {
       "type": "Microsoft.Logic/workflows",
       "apiVersion": "2016-06-01",
       "name": "[parameters('logicAppName')]",
       "location": "[resourceGroup().location]",
-      "dependsOn": [ ],
+      "dependsOn": [],
       "properties": {
-        "definition": { },
-        "parameters": { }
+        "definition": {},
+        "parameters": {},
+        "integrationAccount": {
+          "id": "[concat('/subscriptions/',subscription().subscriptionId,'/resourcegroups/',parameters('IntegrationAccountResourceGroupName'),'/providers/Microsoft.Logic/integrationAccounts/',parameters('IntegrationAccountName'))]"
+        }
       }
     }
   ],
-  "outputs": { }
+  "outputs": {}
 }

@@ -66,6 +66,11 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
+    <EmbeddedResource Include="TestFiles\WorkflowTest.json" />
+    <EmbeddedResource Include="TestFiles\APIM.json" />
+    <EmbeddedResource Include="TestFiles\integrationaccount.json" />
+    <EmbeddedResource Include="TestFiles\APIMMultipleSame.json" />
+    <EmbeddedResource Include="TestFiles\APIMMultipleDiffrent.json" />
   </ItemGroup>
   <Choose>
     <When Condition="'$(VisualStudioVersion)' == '10.0' And '$(IsCodedUITest)' == 'True'">

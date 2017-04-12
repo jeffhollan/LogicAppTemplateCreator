@@ -12,6 +12,7 @@ using System.Net;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
@@ -58,7 +59,15 @@ namespace LogicAppTemplate
 
         public TemplateGenerator()
         {
-            template = JsonConvert.DeserializeObject<DeploymentTemplate>(Constants.deploymentTemplate);
+            var assembly = System.Reflection.Assembly.GetExecutingAssembly();
+            var resourceName = "LogicAppTemplate.Templates.starterTemplate.json";
+
+            using (Stream stream = assembly.GetManifestResourceStream(resourceName))
+            using (StreamReader reader = new StreamReader(stream))
+            {
+                template = JsonConvert.DeserializeObject<DeploymentTemplate>(reader.ReadToEnd());
+            }
+
         }
 
         public TemplateGenerator(string token) : this()
@@ -118,7 +127,7 @@ namespace LogicAppTemplate
             // WriteVerbose("Doing a GET to: " + url);
             var request = HttpWebRequest.Create(url);
             request.Headers[HttpRequestHeader.Authorization] = "Bearer " + Token;
-            
+
             var logicAppRequest = request.GetResponse();
             var stream = logicAppRequest.GetResponseStream();
             StreamReader reader = new StreamReader(stream);
@@ -137,7 +146,22 @@ namespace LogicAppTemplate
             var modifiedDefinition = definition["properties"]["definition"].ToString().Replace(@"['connectionId']", @"['connectionId']");
             // WriteVerbose("Removing API Host references...");
             template.parameters["logicAppLocation"]["defaultValue"] = definition["location"];
-            workflowTemplateReference["properties"]["definition"] = removeApiFromActions(JObject.Parse(modifiedDefinition));
+
+            workflowTemplateReference["properties"]["definition"] = handleActions(JObject.Parse(modifiedDefinition));
+
+
+
+            if (definition["properties"]["integrationAccount"] == null)
+            {
+                ((JObject)template.resources[0]["properties"]).Remove("integrationAccount");
+                template.parameters.Remove("IntegrationAccountName");
+                template.parameters.Remove("IntegrationAccountResourceGroupName");
+            }else
+            {
+                template.parameters["IntegrationAccountName"]["defaultValue"] = definition["properties"]["integrationAccount"]["name"];
+            }
+
+
 
             JObject connections = (JObject)definition["properties"]["parameters"]["$connections"];
 
@@ -150,6 +174,8 @@ namespace LogicAppTemplate
                     parameter.Value["defaultValue"] = "[parameters('" + name + "')]";
                 }
             }
+
+
 
             // WriteVerbose("Checking connections...");
             if (connections == null)
@@ -187,13 +213,52 @@ namespace LogicAppTemplate
 
         }
 
-        private JToken removeApiFromActions(JObject definition)
+        private JToken handleActions(JObject definition)
         {
             foreach (JProperty action in definition["actions"])
             {
-                var api = action.Value.SelectToken("inputs.host.api");
-                if (api != null)
-                    ((JObject)definition["actions"][action.Name]["inputs"]["host"]).Remove("api");
+                var type = action.Value.SelectToken("type").Value<string>();
+                //if workflow fix so links are dynamic.
+                if (type == "Workflow")
+                {
+                    var curr = ((JObject)definition["actions"][action.Name]["inputs"]["host"]["workflow"]).Value<string>("id");
+
+                    Regex rgx = new Regex(@"\/subscriptions\/(?<subscription>[0-9a-zA-Z-]*)\/resourceGroups\/(?<resourcegroup>[a-zA-Z0-9-]*)");
+                    var matches = rgx.Match(curr);
+
+                    curr = curr.Replace(matches.Groups["subscription"].Value, "',subscription().subscriptionId,'");
+                    curr = curr.Replace(matches.Groups["resourcegroup"].Value, "', parameters('"+ AddTemplateParameter(action.Name + "-ResourceGroup", "string", matches.Groups["resourcegroup"].Value) + "'),'");
+                    curr = "[concat('" + curr + "')]";
+
+                    definition["actions"][action.Name]["inputs"]["host"]["workflow"]["id"] = curr;
+                    //string result = "[concat('" + rgx.Replace(matches.Groups[1].Value, "',subscription().subscriptionId,'") + + "']";
+                }
+                else if (type == "ApiManagement")
+                {
+                    var apiId = ((JObject)definition["actions"][action.Name]["inputs"]["api"]).Value<string>("id");
+
+                    Regex rgx = new Regex(@"\/subscriptions\/(?<subscription>[0-9a-zA-Z-]*)\/resourceGroups\/(?<resourcegroup>[a-zA-Z0-9-]*).*\/service\/(?<apim>[a-zA-Z0-9]*)\/apis\/(?<apiId>[0-9a-zA-Z]*)");
+                    var matches = rgx.Match(apiId);
+
+                    apiId = apiId.Replace(matches.Groups["subscription"].Value, "',subscription().subscriptionId,'");                    
+                    apiId = apiId.Replace(matches.Groups["resourcegroup"].Value, "', parameters('"+ AddTemplateParameter("apimLocation", "string", matches.Groups["resourcegroup"].Value) + "'),'");
+                    apiId = apiId.Replace(matches.Groups["apim"].Value, "', parameters('"+ AddTemplateParameter("apimInstanceName", "string", matches.Groups["apim"].Value) + "'),'");
+                    apiId = apiId.Replace(matches.Groups["apiId"].Value, "', parameters('"+ AddTemplateParameter("apimApiId", "string", matches.Groups["apiId"].Value) + "'),'");
+                    apiId = "[concat('" + apiId + "')]";
+
+                    definition["actions"][action.Name]["inputs"]["api"]["id"] = apiId;
+
+                    //handle subscriptionkey
+                    var subkey = ((JObject)definition["actions"][action.Name]["inputs"]).Value<string>("subscriptionKey");
+                    definition["actions"][action.Name]["inputs"]["subscriptionKey"] = "[parameters('"+ AddTemplateParameter("apimSubscriptionKey", "string", subkey) + "')]";
+                }
+                else
+                {
+                    var api = action.Value.SelectToken("inputs.host.api");
+                    if (api != null)
+                        ((JObject)definition["actions"][action.Name]["inputs"]["host"]).Remove("api");
+                    //get the type:
+                }
             }
 
             foreach (JProperty trigger in definition["triggers"])
@@ -202,7 +267,43 @@ namespace LogicAppTemplate
                 if (api != null)
                     ((JObject)definition["triggers"][trigger.Name]["inputs"]["host"]).Remove("api");
             }
+
             return definition;
+        }
+
+        private string AddTemplateParameter(string paramname,string type, string defaultvalue)
+        {
+            string realParameterName = paramname;
+            JObject param = new JObject();
+            param.Add("type", JToken.FromObject(type));
+            param.Add("defaultValue", JToken.FromObject(defaultvalue));
+
+            if (template.parameters[paramname] == null)
+            {
+                template.parameters.Add(paramname, param);
+            }
+            else
+            {
+                if (template.parameters[paramname].Value<string>("defaultValue") != defaultvalue)
+                {
+                    foreach (var p in template.parameters)
+                    {
+                        if (p.Key.StartsWith(paramname))
+                        {
+                            for (int i = 2; i < 100; i++)
+                            {
+                                realParameterName = paramname + i.ToString();
+                                if (template.parameters[realParameterName] == null)
+                                {
+                                    template.parameters.Add(realParameterName, param);
+                                    return realParameterName;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            return realParameterName;
         }
 
         private string apiIdTemplate(string apiId)
@@ -243,9 +344,9 @@ namespace LogicAppTemplate
                     //TODO
                     if ((string)parameter.Value["type"] == "gatewaySetting")
                         continue;
-                    
+
                     if (((JArray)parameter.Value["uiDefinition"]["constraints"]["capability"]) != null &&
-                        ((JArray)parameter.Value["uiDefinition"]["constraints"]["capability"]).Count == 1 
+                        ((JArray)parameter.Value["uiDefinition"]["constraints"]["capability"]).Count == 1
                         && (string)((JArray)parameter.Value["uiDefinition"]["constraints"]["capability"])[0] == "gateway")
                         continue;
 
