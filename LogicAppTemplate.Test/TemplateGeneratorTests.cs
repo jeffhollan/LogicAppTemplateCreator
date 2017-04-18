@@ -45,10 +45,12 @@ namespace LogicAppTemplate.Tests
             var defintion = generator.generateDefinition(JObject.Parse(content)).GetAwaiter().GetResult();
 
             //check parameters
-            Assert.AreEqual("resourcegroupname", defintion["parameters"]["INT0014-NewHires-ResourceGroup"]["defaultValue"]);            
+            Assert.IsNull(defintion["parameters"]["INT0014-NewHires-ResourceGroup"]);
+            Assert.AreEqual("[resourceGroup().location]", defintion["parameters"]["logicAppLocation"]["defaultValue"]);
+            Assert.AreEqual("INT0014-NewHires-Trigger", defintion["parameters"]["logicAppName"]["defaultValue"]);
 
             //check Upload Attachment
-            Assert.AreEqual("[concat('/subscriptions/',subscription().subscriptionId,'/resourceGroups/', parameters('INT0014-NewHires-ResourceGroup'),'/providers/Microsoft.Logic/workflows/INT0014-NewHires')]", defintion["resources"][0]["properties"]["definition"]["actions"]["INT0014-NewHires"]["inputs"]["host"]["workflow"]["id"]);
+            Assert.AreEqual("[concat('/subscriptions/',subscription().subscriptionId,'/resourceGroups/', resourceGroup().id,'/providers/Microsoft.Logic/workflows/INT0014-NewHires')]", defintion["resources"][0]["properties"]["definition"]["actions"]["INT0014-NewHires"]["inputs"]["host"]["workflow"]["id"]);
         }
 
         [TestMethod()]
@@ -150,10 +152,10 @@ namespace LogicAppTemplate.Tests
             var defintion = generator.generateDefinition(JObject.Parse(content)).GetAwaiter().GetResult();
 
             //check parameters
-            //Assert.AreEqual("resourcegroupname", defintion["parameters"]["INT0014-NewHires-ResourceGroup"]["defaultValue"]);
 
-            //check Upload Attachment
-            //Assert.AreEqual("[concat('/subscriptions/',subscription().subscriptionId,'/resourceGroups/', parameters('INT0014-NewHires-ResourceGroup'),'/providers/Microsoft.Logic/workflows/INT0014-NewHires')]", defintion["resources"][0]["properties"]["definition"]["actions"]["INT0014-NewHires"]["inputs"]["host"]["workflow"]["id"]);
+            Assert.AreEqual("[concat('/subscriptions/',subscription().subscriptionId,'/resourceGroups/', resourceGroup().id,'/providers/Microsoft.Logic/workflows/INT002_Create_Actioncode')]", defintion["resources"][0]["properties"]["definition"]["actions"]["Choose_external_procedure"]["actions"]["actions"]["INT002_Create_Actioncode"]["inputs"]["host"]["workflow"]["id"]);
+            //check nested nested action
+
         }
 
 

@@ -146,12 +146,14 @@ namespace LogicAppTemplate
             var matches = rgx.Match(definition.Value<string>("id"));
             LogicAppResourceGroup = matches.Groups["resourcegroup"].Value;
 
+            template.parameters["logicAppName"]["defaultValue"] = definition.Value<string>("name");
+
             workflowTemplateReference = template.resources.Where(t => ((string)t["type"]) == "Microsoft.Logic/workflows").FirstOrDefault();
 
             // WriteVerbose("Upgrading connectionId paramters...");
             var modifiedDefinition = definition["properties"]["definition"].ToString().Replace(@"['connectionId']", @"['connectionId']");
             // WriteVerbose("Removing API Host references...");
-            template.parameters["logicAppLocation"]["defaultValue"] = definition["location"];
+            //template.parameters["logicAppLocation"]["defaultValue"] = definition["location"];
 
             workflowTemplateReference["properties"]["definition"] = handleActions(JObject.Parse(modifiedDefinition));
 
