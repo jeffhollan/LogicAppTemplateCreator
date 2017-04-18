@@ -12,67 +12,6 @@ namespace LogicAppTemplate
     {
         internal static readonly string deploymentSchema = @"https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#";
      
-
-
-        internal static readonly string deploymentTemplate = @"{
-  ""$schema"": ""https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#"",
-  ""contentVersion"": ""1.0.0.0"",
-  ""parameters"": {
-    ""logicAppName"": {
-      ""type"": ""string""
-    },
-    ""logicAppLocation"": {
-      ""type"": ""string"",
-      ""defaultValue"": ""[resourceGroup().location]"",
-      ""allowedValues"": [
-        ""eastasia"",
-        ""southeastasia"",
-        ""centralus"",
-        ""eastus"",
-        ""eastus2"",
-        ""westus"",
-        ""northcentralus"",
-        ""southcentralus"",
-        ""northeurope"",
-        ""westeurope"",
-        ""japanwest"",
-        ""japaneast"",
-        ""brazilsouth"",
-        ""australiaeast"",
-        ""australiasoutheast"",
-        ""southindia"",
-        ""centralindia"",
-        ""westindia"",
-        ""canadacentral"",
-        ""canadaeast"",
-        ""westcentralus"",
-        ""westus2"",
-        ""[resourceGroup().location]""
-      ],
-      ""metadata"": {
-        ""description"": ""Location of the Logic App.""
-      }
-    }
-  },
-  ""variables"": {
-  },
-  ""resources"": [
-    {
-      ""type"": ""Microsoft.Logic/workflows"",
-      ""apiVersion"": ""2016-06-01"",
-      ""name"": ""[parameters('logicAppName')]"",
-      ""dependsOn"": [],
-      ""location"": ""[parameters('logicAppLocation')]"",
-      ""properties"": {
-        ""definition"": { },
-        ""parameters"": { }
-      }
-    }
-  ],
-  ""outputs"": { }
-}
-";
-
         public static string AuthString = "https://login.windows.net/common/oauth2/authorize";
         public static string ClientId = "1950a258-227b-4e31-a9cf-717495945fc2";
         public static string ResourceUrl = "https://management.core.windows.net/";
