@@ -292,6 +292,31 @@ namespace LogicAppTemplate
                         definition["actions"][action.Name]["cases"][switchcase.Name] = handleActions(definition["actions"][action.Name]["cases"][switchcase.Name].ToObject<JObject>());
                     }
                 }
+                else if (type == "function")
+                {
+                    var curr = ((JObject)definition["actions"][action.Name]["inputs"]["function"]).Value<string>("id");
+
+                    Regex rgx = new Regex(@"\/subscriptions\/(?<subscription>[0-9a-zA-Z-]*)\/resourceGroups\/(?<resourcegroup>[a-zA-Z0-9-]*)\/providers\/Microsoft.Web\/sites\/(?<functionApp>[a-zA-Z0-9-]*)\/functions\/(?<functionName>.*)");
+                    var matches = rgx.Match(curr);
+
+                    curr = curr.Replace(matches.Groups["subscription"].Value, "',subscription().subscriptionId,'");
+
+                    if (LogicAppResourceGroup == matches.Groups["resourcegroup"].Value)
+                    {
+                        curr = curr.Replace(matches.Groups["resourcegroup"].Value, "', resourceGroup().name,'");
+                    }
+                    else
+                    {
+                        curr = curr.Replace(matches.Groups["resourcegroup"].Value, "', parameters('" + AddTemplateParameter(action.Name + "-ResourceGroup", "string", matches.Groups["resourcegroup"].Value) + "'),'");
+                    }
+
+                    curr = curr.Replace(matches.Groups["functionApp"].Value, "', parameters('" + AddTemplateParameter(action.Name + "-FunctionApp", "string", matches.Groups["functionApp"].Value) + "'),'");
+                    curr = curr.Replace(matches.Groups["functionName"].Value, "', parameters('" + AddTemplateParameter(action.Name + "-FunctionName", "string", matches.Groups["functionName"].Value) + "'),'");
+
+                    curr = "[concat('" + curr + "')]";
+
+                    definition["actions"][action.Name]["inputs"]["function"]["id"] = curr;
+                }
                 else
                 {
                     var api = action.Value.SelectToken("inputs.host.api");
