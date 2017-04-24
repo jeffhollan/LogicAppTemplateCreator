@@ -59,6 +59,8 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Constants\Constants.cs" />
+    <Compile Include="Models\ParameterTemplate.cs" />
+    <Compile Include="ParamGenerator.cs" />
     <Compile Include="TemplateGenerator.cs" />
     <Compile Include="Models\ConnectionTemplate.cs" />
     <Compile Include="Models\DeploymentTemplate.cs" />
@@ -66,7 +68,8 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
-    <None Include="Templates\starterTemplate.json" />
+    <EmbeddedResource Include="Templates\starterTemplate.json" />
+    <EmbeddedResource Include="Templates\paramTemplate.json" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

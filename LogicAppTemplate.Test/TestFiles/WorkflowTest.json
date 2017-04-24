@@ -1,0 +1,90 @@
+﻿{
+  "properties": {
+    "provisioningState": "Succeeded",
+    "createdTime": "2017-03-23T12:18:59.9810997Z",
+    "changedTime": "2017-03-23T12:23:36.340751Z",
+    "state": "Enabled",
+    "version": "08587113350694728985",
+    "accessEndpoint": "https://prod-13.westeurope.logic.azure.com:443/workflows/x",
+    "definition": {
+      "$schema": "https://schema.management.azure.com/providers/Microsoft.Logic/schemas/2016-06-01/workflowdefinition.json#",
+      "contentVersion": "1.0.0.0",
+      "parameters": {
+        "$connections": {
+          "defaultValue": {},
+          "type": "Object"
+        }
+      },
+      "triggers": {
+        "Recurrence": {
+          "recurrence": {
+            "frequency": "Hour",
+            "interval": 6
+          },
+          "type": "Recurrence"
+        }
+      },
+      "actions": {
+        "INT0014-NewHires": {
+          "runAfter": { "Parse_JSON": [ "Succeeded" ] },
+          "type": "Workflow",
+          "inputs": {
+            "body": {
+              "Completed_Date_On_or_After": "@{body('Parse_JSON')?['Completed_Date_On_or_After']}",
+              "Completed_Date_On_or_Before": "@{body('Parse_JSON')?['Completed_Date_On_or_Before']}",
+              "Event_Effective_Date_On_or_After": "@{body('Parse_JSON')?['Event_Effective_Date_On_or_After']}",
+              "Event_Effective_Date_On_or_Before": "@{body('Parse_JSON')?['Event_Effective_Date_On_or_Before']}"
+            },
+            "host": {
+              "triggerName": "manual",
+              "workflow": { "id": "/subscriptions/FAKE1e9-15f5-4c85-bb3e-1e108dc79b00/resourceGroups/resourcegroupname/providers/Microsoft.Logic/workflows/INT0014-NewHires" }
+            }
+          }
+        },
+        "Parse_JSON": {
+          "runAfter": { "Get_blob_content": [ "Succeeded" ] },
+          "type": "ParseJson",
+          "inputs": {
+            "content": {
+              "Completed_Date_On_or_After": "@addhours(string(body('Get_blob_content')), -8)",
+              "Completed_Date_On_or_Before": "@addhours(utcnow(), -8)",
+              "Event_Effective_Date_On_or_After": "@startOfMonth(string(body('Get_blob_content')))",
+              "Event_Effective_Date_On_or_Before": "@utcnow()"
+            },
+            "schema": {
+              "properties": {
+                "Completed_Date_On_or_After": { "type": "string" },
+                "Completed_Date_On_or_Before": { "type": "string" },
+                "Event_Effective_Date_On_or_After": { "type": "string" },
+                "Event_Effective_Date_On_or_Before": { "type": "string" }
+              },
+              "type": "object"
+            }
+          }
+        }
+      },
+      "outputs": {}
+    },
+    "parameters": {
+    },
+    "endpointsConfiguration": {
+      "workflow": {
+        "outgoingIpAddresses": [
+          { "address": "40.68.222.65" },
+          { "address": "40.68.209.23" },
+          { "address": "13.95.147.65" }
+        ],
+        "accessEndpointIpAddresses": [
+          { "address": "13.95.155.53" },
+          { "address": "52.174.54.218" },
+          { "address": "52.174.49.6" }
+        ]
+      },
+      "connector": { "outgoingIpAddresses": [ { "address": "40.115.50.13" } ] }
+    }
+  },
+  "id": "/subscriptions/FAKE1e9-15f5-4c85-bb3e-1e108dc79b00/resourceGroups/resourcegroupname/providers/Microsoft.Logic/workflows/INT0014-NewHires-Trigger",
+  "name": "INT0014-NewHires-Trigger",
+  "type": "Microsoft.Logic/workflows",
+  "location": "westeurope"
+}

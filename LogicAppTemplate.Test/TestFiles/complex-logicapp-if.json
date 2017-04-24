@@ -1,0 +1,285 @@
+﻿{
+  "properties": {
+    "provisioningState": "Succeeded",
+    "createdTime": "2016-10-14T10:04:55.2596844Z",
+    "changedTime": "2017-04-10T14:32:03.0365781Z",
+    "state": "Disabled",
+    "version": "08587097721625654344",
+    "accessEndpoint": "https://prod-07.westeurope.logic.azure.com:443/workflows/4b3e8864909844fdbde6173b12a1f805",
+    "integrationAccount": {
+      "name": "Prometera_IA",
+      "id": "/subscriptions/ecda89f1-660a-4585-b4d8-bf5172cb7f70/resourceGroups/rgname/providers/Microsoft.Logic/integrationAccounts/Prometera_IA",
+      "type": "Microsoft.Logic/integrationAccounts"
+    },
+    "definition": {
+      "$schema": "https://schema.management.azure.com/providers/Microsoft.Logic/schemas/2016-06-01/workflowdefinition.json#",
+      "contentVersion": "1.0.0.0",
+      "parameters": {
+        "$connections": {
+          "defaultValue": {},
+          "type": "Object"
+        },
+        "fileConnectorURI": {
+          "defaultValue": "https://fileconnector382fc3e214db444a8bd129da2c4fc7b5.azurewebsites.net",
+          "type": "String"
+        },
+        "logicAppURI": {
+          "defaultValue": "https://prod-01.westeurope.logic.azure.com:443/workflows/b8676f86f60e4dae9b8dd113b23fc9f0/triggers/manual/run?api-version=2016-06-01&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=Pc5uStKvS3FxBIcEZttg2t6s5PpdYqRe8nPYnqbFDUA",
+          "type": "String"
+        }
+      },
+      "triggers": {
+        "request": {
+          "type": "Request",
+          "kind": "Http",
+          "inputs": { "schema": {} }
+        }
+      },
+      "actions": {
+        "Choose_external_procedure": {
+          "actions": {
+            "INT002_Create_Actioncode": {
+              "runAfter": { "INT007_Update_Report_Status": [ "Succeeded" ] },
+              "type": "Workflow",
+              "inputs": {
+                "body": {
+                  "Report_actionCode": "@outputs('Compose')['actioncode']",
+                  "workorderno": "@outputs('Compose')['workorderno']"
+                },
+                "host": {
+                  "triggerName": "request",
+                  "workflow": { "id": "/subscriptions/ecda89f1-660a-4585-b4d8-bf5172cb7f70/resourceGroups/rgname/providers/Microsoft.Logic/workflows/INT002_Create_Actioncode" }
+                }
+              }
+            },
+            "INT007_Update_Report_Status": {
+              "runAfter": {},
+              "type": "Workflow",
+              "inputs": {
+                "body": {
+                  "product": "@{outputs('Compose')['product']}",
+                  "resultcode": "@{outputs('Compose')['resultcode']}",
+                  "workorderno": "@{outputs('Compose')['workorderno']}"
+                },
+                "host": {
+                  "triggerName": "request",
+                  "workflow": { "id": "/subscriptions/ecda89f1-660a-4585-b4d8-bf5172cb7f70/resourceGroups/rgname/providers/Microsoft.Logic/workflows/INT007_Update_Report_Status" }
+                }
+              }
+            }
+          },
+          "runAfter": { "Compose": [ "Succeeded" ] },
+          "expression": "@or(or(not(equals(outputs('Compose')['resultcode'], '')),not(equals(outputs('Compose')['actioncode'], ''))),or(not(equals(outputs('Compose')['product'], '')),not(equals(coalesce(outputs('XML_2_JSON')?['workOrders']?['header']?['Report_components'], ''), ''))))",
+          "type": "If"
+        },
+        "Compose": {
+          "runAfter": { "XML_2_JSON": [ "Succeeded" ] },
+          "type": "Compose",
+          "inputs": {
+            "Report_booking_date": "@coalesce(outputs('XML_2_JSON')['workOrders']['header']?['Report_booking_date'], '')",
+            "actioncode": "@coalesce(outputs('XML_2_JSON')['workOrders']['header']?['Report_actionCodes']?['Report_actionCode'], outputs('XML_2_JSON')['workOrders']['header']?['Report_actionCodes'], '')",
+            "company": "@outputs('XML_2_JSON')['workOrders']['header']['Company']",
+            "filename": "@concat(concat(outputs('XML_2_JSON')['workOrders']['workOrder']['code'],'_'), outputs('XML_2_JSON')['workOrders']['header']['messageDate'])",
+            "messagedate": "@outputs('XML_2_JSON')['workOrders']['header']['messageDate']",
+            "product": "@outputs('XML_2_JSON')['workOrders']['header']['Report_product']",
+            "resultcode": "@coalesce(outputs('XML_2_JSON')['workOrders']['header']?['Report_resultCode'], '')",
+            "statuscomment": "@outputs('XML_2_JSON')['workOrders']['header']['Report_status_comment']",
+            "statusdate": "@outputs('XML_2_JSON')['workOrders']['header']['Report_status_date']",
+            "statusid": "@outputs('XML_2_JSON')['workOrders']['header']['Report_status_ID']",
+            "workorderno": "@outputs('XML_2_JSON')['workOrders']['workOrder']['code']"
+          }
+        },
+        "INT003_Update_Status": {
+          "runAfter": { "Compose": [ "Succeeded" ] },
+          "type": "Workflow",
+          "inputs": {
+            "body": {
+              "bookingdate": "@outputs('Compose')['Report_booking_date']",
+              "statuscomment": "@outputs('Compose')['statuscomment']",
+              "statusdate": "@outputs('Compose')['statusdate']",
+              "statusid": "@outputs('Compose')['statusid']",
+              "workorderid": "@outputs('Compose')['workorderno']"
+            },
+            "host": {
+              "triggerName": "request",
+              "workflow": { "id": "/subscriptions/ecda89f1-660a-4585-b4d8-bf5172cb7f70/resourceGroups/rgname/providers/Microsoft.Logic/workflows/INT003_Update_Status" }
+            }
+          }
+        },
+        "INT005_Add_Attachment": {
+          "runAfter": { "Compose": [ "Succeeded" ] },
+          "type": "Workflow",
+          "inputs": {
+            "body": {
+              "company": null,
+              "fileextension": "xml",
+              "filename": "@outputs('Compose')['filename']",
+              "id": null,
+              "image64": "@base64(triggerbody())",
+              "workorderno": "@outputs('Compose')['workorderno']"
+            },
+            "host": {
+              "triggerName": "request",
+              "workflow": { "id": "/subscriptions/ecda89f1-660a-4585-b4d8-bf5172cb7f70/resourceGroups/rgname/providers/Microsoft.Logic/workflows/INT005_Add_Attachment" }
+            }
+          }
+        },
+        "INT005_Add_Attachment_2": {
+          "runAfter": { "Transform_XML": [ "Succeeded" ] },
+          "type": "Workflow",
+          "inputs": {
+            "body": {
+              "company": null,
+              "fileextension": "html",
+              "filename": "@outputs('Compose')['filename']",
+              "id": null,
+              "image64": "@base64(body('Transform_XML'))",
+              "workorderno": "@outputs('Compose')['workorderno']"
+            },
+            "host": {
+              "triggerName": "request",
+              "workflow": { "id": "/subscriptions/ecda89f1-660a-4585-b4d8-bf5172cb7f70/resourceGroups/rgname/providers/Microsoft.Logic/workflows/INT005_Add_Attachment" }
+            }
+          }
+        },
+        "Send_overall_Response": {
+          "runAfter": { "XML_2_JSON": [ "Succeeded" ] },
+          "type": "Response",
+          "inputs": {
+            "body": "Overall Ok",
+            "statusCode": 200
+          }
+        },
+        "Status_Check": {
+          "actions": {
+            "Company_Check": {
+              "actions": {
+                "Create_file_KNAB": {
+                  "runAfter": {},
+                  "type": "ApiConnection",
+                  "inputs": {
+                    "body": "@body('Workorder_2_Workorder')",
+                    "host": {
+                      "api": { "runtimeUrl": "https://logic-apis-westeurope.azure-apim.net/apim/filesystem" },
+                      "connection": { "name": "@parameters('$connections')['filesystem']['connectionId']" }
+                    },
+                    "method": "post",
+                    "path": "/datasets/default/files",
+                    "queries": {
+                      "folderPath": "//pmfs02/ARBETSORDER/RELACOM_TEST/XML_IMPORT/GenerisKNAB",
+                      "name": "@{concat(concat(guid(),'_'), outputs('Compose')['workorderno'])}.xml"
+                    }
+                  }
+                }
+              },
+              "runAfter": { "Workorder_2_Workorder": [ "Succeeded" ] },
+              "else": {
+                "actions": {
+                  "Create_file_OKAB": {
+                    "runAfter": {},
+                    "type": "ApiConnection",
+                    "inputs": {
+                      "body": "@body('Workorder_2_Workorder')",
+                      "host": {
+                        "api": { "runtimeUrl": "https://logic-apis-westeurope.azure-apim.net/apim/filesystem" },
+                        "connection": { "name": "@parameters('$connections')['filesystem']['connectionId']" }
+                      },
+                      "method": "post",
+                      "path": "/datasets/default/files",
+                      "queries": {
+                        "folderPath": "//pmfs02/ARBETSORDER/RELACOM_TEST/XML_IMPORT/GenerisOKAB",
+                        "name": "@{concat(concat(guid(),'_'), outputs('Compose')['workorderno'])}.xml"
+                      }
+                    }
+                  }
+                }
+              },
+              "expression": "@equals(outputs('Compose')['company'], 'KNAB')",
+              "type": "If"
+            },
+            "Component_check": {
+              "actions": {
+                "INT002_Create_Component": {
+                  "runAfter": {},
+                  "type": "Workflow",
+                  "inputs": {
+                    "body": {
+                      "Report_components": "@outputs('XML_2_JSON')['workOrders']['header']['Report_components']",
+                      "workorderno": "@outputs('Compose')['workorderno']"
+                    },
+                    "host": {
+                      "triggerName": "request",
+                      "workflow": { "id": "/subscriptions/ecda89f1-660a-4585-b4d8-bf5172cb7f70/resourceGroups/rgname/providers/Microsoft.Logic/workflows/INT002_Create_Component" }
+                    }
+                  }
+                }
+              },
+              "runAfter": {},
+              "expression": "@not(equals(coalesce(outputs('XML_2_JSON')?['workOrders']?['header']?['Report_components'], ''), ''))",
+              "type": "If"
+            },
+            "Workorder_2_Workorder": {
+              "runAfter": { "Component_check": [ "Succeeded" ] },
+              "type": "Xslt",
+              "inputs": {
+                "content": "@{triggerBody()}",
+                "integrationAccount": { "map": { "name": "workorder_2_workorder" } }
+              }
+            }
+          },
+          "runAfter": { "Compose": [ "Succeeded" ] },
+          "expression": "@or(equals(outputs('Compose')['statusid'], '60'), equals(outputs('XML_2_JSON')['workOrders']['header']['Report_status_ID'], '70'))",
+          "type": "If"
+        },
+        "Transform_XML": {
+          "runAfter": { "Compose": [ "Succeeded" ] },
+          "type": "Xslt",
+          "inputs": {
+            "content": "@{triggerBody()}",
+            "integrationAccount": { "map": { "name": "workorder_2_html" } }
+          }
+        },
+        "XML_2_JSON": {
+          "runAfter": {},
+          "type": "Compose",
+          "inputs": "@json(triggerbody())"
+        }
+      },
+      "outputs": {
+        "StaticInformation": {
+          "type": "String",
+          "value": "test"
+        },
+        "WorkOrderNumber": {
+          "type": "String",
+          "value": "@outputs('XML_2_JSON')['workOrders']['workOrder']['code']"
+        }
+      }
+    },
+    "parameters": {      
+    },
+    "endpointsConfiguration": {
+      "workflow": {
+        "outgoingIpAddresses": [
+          { "address": "40.68.222.65" },
+          { "address": "40.68.209.23" },
+          { "address": "13.95.147.65" }
+        ],
+        "accessEndpointIpAddresses": [
+          { "address": "13.95.155.53" },
+          { "address": "52.174.54.218" },
+          { "address": "52.174.49.6" }
+        ]
+      },
+      "connector": { "outgoingIpAddresses": [ { "address": "40.115.50.13" } ] }
+    }
+  },
+  "id": "/subscriptions/ecda89f1-660a-4585-b4d8-bf5172cb7f70/resourceGroups/rgname/providers/Microsoft.Logic/workflows/INT002_Update_Work_Order2",
+  "name": "INT002_Update_Work_Order2",
+  "type": "Microsoft.Logic/workflows",
+  "location": "westeurope",
+  "tags": {
+    "INTID": "INT002",
+    "SLA": "C2 - High Priority"
+  }
+}
