@@ -27,3 +27,13 @@ Get-LogicAppTemplate -LogicApp MyApp -ResourceGroup Integrate2016 -SubscriptionI
 | TenantName | Name of the Tenant i.e. contoso.onmicrosoft.com | false |
 | Token | An AAD Token to access the resources - should not include `Bearer`, only the token | false |
 | ClaimsDump | A dump of claims piped in from `armclient` - should not be manually set | false |
+
+
+After extraction a parameters file can be created off the LogicAppTemplate. (works on any ARM template file)
+Get-ParameterTemplate -TemplateFile $filenname | Out-File 'paramfile.json'
+
+### Specifications
+
+| Parameter | Description | Required |
+| --------- | ---------- | -------|
+| TemplateFile | File path to the template file | true |
