@@ -8,7 +8,7 @@
     "accessEndpoint": "https://prod-07.westeurope.logic.azure.com:443/workflows/4b3e8864909844fdbde6173b12a1f805",
     "integrationAccount": {
       "name": "Prometera_IA",
-      "id": "/subscriptions/ecda89f1-660a-4585-b4d8-bf5172cb7f70/resourceGroups/integration-we/providers/Microsoft.Logic/integrationAccounts/Prometera_IA",
+      "id": "/subscriptions/ecda89f1-660a-4585-b4d8-bf5172cb7f70/resourceGroups/rgname/providers/Microsoft.Logic/integrationAccounts/Prometera_IA",
       "type": "Microsoft.Logic/integrationAccounts"
     },
     "definition": {
@@ -48,7 +48,7 @@
                 },
                 "host": {
                   "triggerName": "request",
-                  "workflow": { "id": "/subscriptions/ecda89f1-660a-4585-b4d8-bf5172cb7f70/resourceGroups/integration-we/providers/Microsoft.Logic/workflows/INT002_Create_Actioncode" }
+                  "workflow": { "id": "/subscriptions/ecda89f1-660a-4585-b4d8-bf5172cb7f70/resourceGroups/rgname/providers/Microsoft.Logic/workflows/INT002_Create_Actioncode" }
                 }
               }
             },
@@ -63,7 +63,7 @@
                 },
                 "host": {
                   "triggerName": "request",
-                  "workflow": { "id": "/subscriptions/ecda89f1-660a-4585-b4d8-bf5172cb7f70/resourceGroups/integration-we/providers/Microsoft.Logic/workflows/INT007_Update_Report_Status" }
+                  "workflow": { "id": "/subscriptions/ecda89f1-660a-4585-b4d8-bf5172cb7f70/resourceGroups/rgname/providers/Microsoft.Logic/workflows/INT007_Update_Report_Status" }
                 }
               }
             }
@@ -102,7 +102,7 @@
             },
             "host": {
               "triggerName": "request",
-              "workflow": { "id": "/subscriptions/ecda89f1-660a-4585-b4d8-bf5172cb7f70/resourceGroups/integration-we/providers/Microsoft.Logic/workflows/INT003_Update_Status" }
+              "workflow": { "id": "/subscriptions/ecda89f1-660a-4585-b4d8-bf5172cb7f70/resourceGroups/rgname/providers/Microsoft.Logic/workflows/INT003_Update_Status" }
             }
           }
         },
@@ -120,7 +120,7 @@
             },
             "host": {
               "triggerName": "request",
-              "workflow": { "id": "/subscriptions/ecda89f1-660a-4585-b4d8-bf5172cb7f70/resourceGroups/integration-we/providers/Microsoft.Logic/workflows/INT005_Add_Attachment" }
+              "workflow": { "id": "/subscriptions/ecda89f1-660a-4585-b4d8-bf5172cb7f70/resourceGroups/rgname/providers/Microsoft.Logic/workflows/INT005_Add_Attachment" }
             }
           }
         },
@@ -138,7 +138,7 @@
             },
             "host": {
               "triggerName": "request",
-              "workflow": { "id": "/subscriptions/ecda89f1-660a-4585-b4d8-bf5172cb7f70/resourceGroups/integration-we/providers/Microsoft.Logic/workflows/INT005_Add_Attachment" }
+              "workflow": { "id": "/subscriptions/ecda89f1-660a-4585-b4d8-bf5172cb7f70/resourceGroups/rgname/providers/Microsoft.Logic/workflows/INT005_Add_Attachment" }
             }
           }
         },
@@ -209,7 +209,7 @@
                     },
                     "host": {
                       "triggerName": "request",
-                      "workflow": { "id": "/subscriptions/ecda89f1-660a-4585-b4d8-bf5172cb7f70/resourceGroups/integration-we/providers/Microsoft.Logic/workflows/INT002_Create_Component" }
+                      "workflow": { "id": "/subscriptions/ecda89f1-660a-4585-b4d8-bf5172cb7f70/resourceGroups/rgname/providers/Microsoft.Logic/workflows/INT002_Create_Component" }
                     }
                   }
                 }
@@ -274,7 +274,7 @@
       "connector": { "outgoingIpAddresses": [ { "address": "40.115.50.13" } ] }
     }
   },
-  "id": "/subscriptions/ecda89f1-660a-4585-b4d8-bf5172cb7f70/resourceGroups/integration-we/providers/Microsoft.Logic/workflows/INT002_Update_Work_Order2",
+  "id": "/subscriptions/ecda89f1-660a-4585-b4d8-bf5172cb7f70/resourceGroups/rgname/providers/Microsoft.Logic/workflows/INT002_Update_Work_Order2",
   "name": "INT002_Update_Work_Order2",
   "type": "Microsoft.Logic/workflows",
   "location": "westeurope",

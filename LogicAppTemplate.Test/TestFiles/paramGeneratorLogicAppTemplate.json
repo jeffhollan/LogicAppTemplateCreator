@@ -1,0 +1,130 @@
+﻿{
+  "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "logicAppName": {
+      "type": "string",
+      "defaultValue": "INT0014-NewHires-Trigger",
+      "metadata": {
+        "description": "Name of the Logic App."
+      }
+    },
+    "logicAppLocation": {
+      "type": "string",
+      "defaultValue": "[resourceGroup().location]",
+      "allowedValues": [
+        "eastasia",
+        "southeastasia",
+        "centralus",
+        "eastus",
+        "eastus2",
+        "westus",
+        "northcentralus",
+        "southcentralus",
+        "northeurope",
+        "westeurope",
+        "japanwest",
+        "japaneast",
+        "brazilsouth",
+        "australiaeast",
+        "australiasoutheast",
+        "westcentralus",
+        "westus2"
+      ],
+      "metadata": {
+        "description": "Location of the Logic App."
+      }
+    }
+  },
+  "variables": {},
+  "resources": [
+    {
+      "type": "Microsoft.Logic/workflows",
+      "apiVersion": "2016-06-01",
+      "name": "[parameters('logicAppName')]",
+      "location": "[parameters('logicAppLocation')]",
+      "dependsOn": [],
+      "properties": {
+        "definition": {
+          "$schema": "https://schema.management.azure.com/providers/Microsoft.Logic/schemas/2016-06-01/workflowdefinition.json#",
+          "contentVersion": "1.0.0.0",
+          "parameters": {
+            "$connections": {
+              "defaultValue": {},
+              "type": "Object"
+            }
+          },
+          "triggers": {
+            "Recurrence": {
+              "recurrence": {
+                "frequency": "Hour",
+                "interval": 6
+              },
+              "type": "Recurrence"
+            }
+          },
+          "actions": {
+            "INT0014-NewHires": {
+              "runAfter": {
+                "Parse_JSON": [
+                  "Succeeded"
+                ]
+              },
+              "type": "Workflow",
+              "inputs": {
+                "body": {
+                  "Completed_Date_On_or_After": "@{body('Parse_JSON')?['Completed_Date_On_or_After']}",
+                  "Completed_Date_On_or_Before": "@{body('Parse_JSON')?['Completed_Date_On_or_Before']}",
+                  "Event_Effective_Date_On_or_After": "@{body('Parse_JSON')?['Event_Effective_Date_On_or_After']}",
+                  "Event_Effective_Date_On_or_Before": "@{body('Parse_JSON')?['Event_Effective_Date_On_or_Before']}"
+                },
+                "host": {
+                  "triggerName": "manual",
+                  "workflow": {
+                    "id": "[concat('/subscriptions/',subscription().subscriptionId,'/resourceGroups/', resourceGroup().name,'/providers/Microsoft.Logic/workflows/INT0014-NewHires')]"
+                  }
+                }
+              }
+            },
+            "Parse_JSON": {
+              "runAfter": {
+                "Get_blob_content": [
+                  "Succeeded"
+                ]
+              },
+              "type": "ParseJson",
+              "inputs": {
+                "content": {
+                  "Completed_Date_On_or_After": "@addhours(string(body('Get_blob_content')), -8)",
+                  "Completed_Date_On_or_Before": "@addhours(utcnow(), -8)",
+                  "Event_Effective_Date_On_or_After": "@startOfMonth(string(body('Get_blob_content')))",
+                  "Event_Effective_Date_On_or_Before": "@utcnow()"
+                },
+                "schema": {
+                  "properties": {
+                    "Completed_Date_On_or_After": {
+                      "type": "string"
+                    },
+                    "Completed_Date_On_or_Before": {
+                      "type": "string"
+                    },
+                    "Event_Effective_Date_On_or_After": {
+                      "type": "string"
+                    },
+                    "Event_Effective_Date_On_or_Before": {
+                      "type": "string"
+                    }
+                  },
+                  "type": "object"
+                }
+              }
+            }
+          },
+          "outputs": {}
+        },
+        "parameters": {}
+      }
+    }
+  ],
+  "outputs": {}
+}

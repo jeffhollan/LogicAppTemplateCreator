@@ -164,7 +164,8 @@ namespace LogicAppTemplate
                 ((JObject)template.resources[0]["properties"]).Remove("integrationAccount");
                 template.parameters.Remove("IntegrationAccountName");
                 template.parameters.Remove("IntegrationAccountResourceGroupName");
-            }else
+            }
+            else
             {
                 template.parameters["IntegrationAccountName"]["defaultValue"] = definition["properties"]["integrationAccount"]["name"];
             }
@@ -238,7 +239,7 @@ namespace LogicAppTemplate
 
                     if (LogicAppResourceGroup == matches.Groups["resourcegroup"].Value)
                     {
-                        curr = curr.Replace(matches.Groups["resourcegroup"].Value, "', resourceGroup().id,'");
+                        curr = curr.Replace(matches.Groups["resourcegroup"].Value, "', resourceGroup().name,'");
                     }
                     else
                     {
@@ -257,7 +258,7 @@ namespace LogicAppTemplate
                     var matches = rgx.Match(apiId);
 
                     apiId = apiId.Replace(matches.Groups["subscription"].Value, "',subscription().subscriptionId,'");
-                    apiId = apiId.Replace(matches.Groups["resourcegroup"].Value, "', parameters('" + AddTemplateParameter("apimLocation", "string", matches.Groups["resourcegroup"].Value) + "'),'");
+                    apiId = apiId.Replace(matches.Groups["resourcegroup"].Value, "', parameters('" + AddTemplateParameter("apimResourceGroup", "string", matches.Groups["resourcegroup"].Value) + "'),'");
                     apiId = apiId.Replace(matches.Groups["apim"].Value, "', parameters('" + AddTemplateParameter("apimInstanceName", "string", matches.Groups["apim"].Value) + "'),'");
                     apiId = apiId.Replace(matches.Groups["apiId"].Value, "', parameters('" + AddTemplateParameter("apimApiId", "string", matches.Groups["apiId"].Value) + "'),'");
                     apiId = "[concat('" + apiId + "')]";
@@ -268,9 +269,28 @@ namespace LogicAppTemplate
                     var subkey = ((JObject)definition["actions"][action.Name]["inputs"]).Value<string>("subscriptionKey");
                     definition["actions"][action.Name]["inputs"]["subscriptionKey"] = "[parameters('" + AddTemplateParameter("apimSubscriptionKey", "string", subkey) + "')]";
                 }
-                else if (type == "if" || type == "scope" || type == "foreach" || type == "until" )
+                else if (type == "if")
                 {
-                    definition["actions"][action.Name]["actions"] = handleActions(definition["actions"][action.Name].ToObject<JObject>());
+                    definition["actions"][action.Name] = handleActions(definition["actions"][action.Name].ToObject<JObject>());
+                    //else
+
+                    if (definition["actions"][action.Name]["else"] != null && definition["actions"][action.Name]["else"]["actions"] != null)
+                        definition["actions"][action.Name]["else"] = handleActions(definition["actions"][action.Name]["else"].ToObject<JObject>());
+                }
+                else if (type == "scope" || type == "foreach" || type == "until")
+               {
+                    definition["actions"][action.Name] = handleActions(definition["actions"][action.Name].ToObject<JObject>());
+                }
+                else if (type == "switch")
+                {
+                    //handle default if exists
+                    if (definition["actions"][action.Name]["default"] != null && definition["actions"][action.Name]["default"]["actions"] != null)
+                        definition["actions"][action.Name]["default"] = handleActions(definition["actions"][action.Name]["default"].ToObject<JObject>());
+
+                    foreach (var switchcase in definition["actions"][action.Name]["cases"].Children<JProperty>())
+                    {
+                        definition["actions"][action.Name]["cases"][switchcase.Name] = handleActions(definition["actions"][action.Name]["cases"][switchcase.Name].ToObject<JObject>());
+                    }
                 }
                 else
                 {
@@ -295,7 +315,7 @@ namespace LogicAppTemplate
             return definition;
         }
 
-        private string AddTemplateParameter(string paramname,string type, string defaultvalue)
+        private string AddTemplateParameter(string paramname, string type, string defaultvalue)
         {
             string realParameterName = paramname;
             JObject param = new JObject();

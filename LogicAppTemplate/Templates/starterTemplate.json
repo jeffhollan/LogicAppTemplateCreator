@@ -48,7 +48,7 @@
       "metadata": {
         "description": "The resource group name that the Integration Account are in"
       },
-      "defaultValue": "[resourceGroup().id]"
+      "defaultValue": "[resourceGroup().name]"
     }
   },
   "variables": {
@@ -58,7 +58,7 @@
       "type": "Microsoft.Logic/workflows",
       "apiVersion": "2016-06-01",
       "name": "[parameters('logicAppName')]",
-      "location": "[resourceGroup().location]",
+      "location": "[parameters('logicAppLocation')]",
       "dependsOn": [],
       "properties": {
         "definition": {},
