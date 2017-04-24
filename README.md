@@ -8,13 +8,13 @@ Clone the project, open, and build.
 
 Open PowerShell and Import the module:
 
-`Import-Module C:\{pathToSolution}\LogicAppTemplateCreator\LogicAppTemplate\bin\Debug\ConverterLibrary.dll`
+`Import-Module C:\{pathToSolution}\LogicAppTemplateCreator\LogicAppTemplate\bin\Debug\LogicAppTemplate.dll`
 
 Run the PowerShell command `Get-LogicAppTemplate`.  You can pipe the output as needed, and recommended you pipe in a token from `armclient`
 
 `armclient token 80d4fe69-xxxx-4dd2-a938-9250f1c8ab03 | Get-LogicAppTemplate -LogicApp MyApp -ResourceGroup Integrate2016 -SubscriptionId 80d4fe69-xxxx-4dd2-a938-9250f1c8ab03 -Verbose | Out-File C:\template.json`
 
-Example when user is connected to multitenants
+Example when user is connected to multitenants:
 Get-LogicAppTemplate -LogicApp MyApp -ResourceGroup Integrate2016 -SubscriptionId 80d4fe69-xxxx-4dd2-a938-9250f1c8ab03 -TenantName contoso.onmicrosoft.com
 
 ### Specifications
@@ -29,7 +29,7 @@ Get-LogicAppTemplate -LogicApp MyApp -ResourceGroup Integrate2016 -SubscriptionI
 | ClaimsDump | A dump of claims piped in from `armclient` - should not be manually set | false |
 
 
-After extraction a parameters file can be created off the LogicAppTemplate. (works on any ARM template file)
+After extraction a parameters file can be created off the LogicAppTemplate. (works on any ARM template file):
 Get-ParameterTemplate -TemplateFile $filenname | Out-File 'paramfile.json'
 
 ### Specifications
