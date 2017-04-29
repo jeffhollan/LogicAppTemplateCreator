@@ -364,7 +364,7 @@ namespace LogicAppTemplate
                                     //remove the metadata tag associated with the folderid
                                     var meta = ((JObject)definition["triggers"][trigger.Name]["metadata"]);
                                     meta.Remove(queries.Value<string>("folderId"));
-                                    meta.Add("[base64(parameters('"+ param +"'))]", JToken.Parse("\"[parameters('" + param + "']\""));
+                                    meta.Add("[base64(parameters('"+ param +"'))]", JToken.Parse("\"[parameters('" + param + "')]\""));
 
                                     definition["triggers"][trigger.Name]["inputs"]["queries"]["folderId"] = "[base64(parameters('" + param + "'))]";
                                 }

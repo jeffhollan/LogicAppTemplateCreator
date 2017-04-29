@@ -78,6 +78,7 @@
     <EmbeddedResource Include="TestFiles\Switch.json" />
     <EmbeddedResource Include="TestFiles\paramGeneratorLogicAppTemplate.json" />
     <EmbeddedResource Include="TestFiles\trigger-gateway-file-reccurence.json" />
+    <None Include="TestFiles\ApiSource\filegateway.json" />
   </ItemGroup>
   <Choose>
     <When Condition="'$(VisualStudioVersion)' == '10.0' And '$(IsCodedUITest)' == 'True'">
