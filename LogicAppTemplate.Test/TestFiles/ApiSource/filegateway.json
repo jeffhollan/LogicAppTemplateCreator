@@ -1,3 +1,118 @@
 ﻿{
-
+  "properties": {
+    "name": "filesystem",
+    "connectionParameters": {
+      "rootfolder": {
+        "type": "string",
+        "uiDefinition": {
+          "displayName": "Root folder",
+          "description": "Root folder path (examples: \\\\MACHINE\\myShare or C:\\myShare)",
+          "tooltip": "Root folder path",
+          "constraints": {
+            "tabIndex": 1,
+            "required": "true",
+            "capability": [
+              "gateway"
+            ]
+          }
+        }
+      },
+      "authType": {
+        "type": "string",
+        "allowedValues": [
+          {
+            "value": "windows"
+          }
+        ],
+        "uiDefinition": {
+          "displayName": "Authentication Type",
+          "description": "Authentication type to connect to your gateway computer",
+          "tooltip": "Authentication type to connect to your gateway computer",
+          "constraints": {
+            "tabIndex": 2,
+            "required": "false",
+            "allowedValues": [
+              {
+                "text": "Windows",
+                "value": "windows"
+              }
+            ],
+            "capability": [
+              "gateway"
+            ]
+          }
+        }
+      },
+      "username": {
+        "type": "securestring",
+        "uiDefinition": {
+          "displayName": "Username",
+          "description": "Username credential (e.g. DOMAIN\\Username)",
+          "tooltip": "Username credential",
+          "constraints": {
+            "tabIndex": 3,
+            "clearText": true,
+            "required": "true",
+            "capability": [
+              "gateway"
+            ]
+          }
+        }
+      },
+      "password": {
+        "type": "securestring",
+        "uiDefinition": {
+          "displayName": "Password",
+          "description": "Password credential",
+          "tooltip": "Password credential",
+          "constraints": {
+            "tabIndex": 4,
+            "required": "true",
+            "capability": [
+              "gateway"
+            ]
+          }
+        }
+      },
+      "gateway": {
+        "type": "gatewaySetting",
+        "gatewaySettings": {
+          "dataSourceType": "LOB",
+          "connectionDetails": [
+            "rootfolder"
+          ]
+        },
+        "uiDefinition": {
+          "constraints": {
+            "tabIndex": 5,
+            "required": "false",
+            "capability": [
+              "gateway"
+            ]
+          }
+        }
+      }
+    },
+    "metadata": {
+      "source": "marketplace",
+      "brandColor": "#107C10"
+    },
+    "runtimeUrls": [
+      "https://logic-apis-westeurope.azure-apim.net/apim/filesystem"
+    ],
+    "generalInformation": {
+      "iconUrl": "https://az820139.vo.msecnd.net/icons/file.png",
+      "displayName": "File System",
+      "description": "Connect to File Systems on your local or network machines to read from and write to files using the On-Premises Data Gateway.",
+      "releaseTag": "Preview"
+    },
+    "capabilities": [
+      "gateway",
+      "blob"
+    ]
+  },
+  "id": "/subscriptions/ae53cb73-d0ff-455d-a2bf-eae0b300696d/providers/Microsoft.Web/locations/westeurope/managedApis/filesystem",
+  "name": "filesystem",
+  "type": "Microsoft.Web/locations/managedApis",
+  "location": "westeurope"
 }

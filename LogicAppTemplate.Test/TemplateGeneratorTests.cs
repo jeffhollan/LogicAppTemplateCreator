@@ -186,6 +186,8 @@ namespace LogicAppTemplate.Tests
             //check parameters
             Assert.AreEqual(defintion["parameters"]["When_a_file_is_createdFrequency"]["defaultValue"],"Minute");
             Assert.AreEqual(defintion["parameters"]["When_a_file_is_createdInterval"]["defaultValue"], "3");
+            Assert.AreEqual(defintion["parameters"]["filesystem_1"]["defaultValue"], "filesystem-1");
+
 
             //check nested nested action
             Assert.AreEqual("[parameters('When_a_file_is_createdFrequency')]", defintion["resources"][0]["properties"]["definition"]["triggers"]["When_a_file_is_created"]["recurrence"]["frequency"]);

@@ -193,12 +193,13 @@ namespace LogicAppTemplate
             {
                 // WriteVerbose($"Parameterizing {connectionProperty.Name}");
                 string connectionName = connectionProperty.Name;
+                
                 var conn = (JObject)connectionProperty.Value;
                 var apiId = conn["id"] != null ? conn["id"] :
                             conn["api"]["id"] != null ? conn["api"]["id"] : null;
                 if (apiId == null)
                     throw new NullReferenceException($"Connection {connectionName} is missing an id");
-
+                connectionName = AddTemplateParameter(connectionName, "string", conn.Value<string>("connectionId").Split('/').Last());
                 workflowTemplateReference["properties"]["parameters"]["$connections"]["value"][connectionName] = JObject.FromObject(new
                 {
                     id = apiIdTemplate((string)apiId),
@@ -209,11 +210,16 @@ namespace LogicAppTemplate
                 if (generateConnection)
                 {
                     JObject apiResource = await generateConnectionResource(connectionName, (string)apiId);
-                    // WriteVerbose($"Generating connection resource for {connectionName}....");
-                    var connectionTemplate = generateConnectionTemplate(connectionName, apiResource, apiIdTemplate((string)apiId));
 
-                    template.resources.Insert(1, connectionTemplate);
-                    template.parameters.Add(connectionName, JObject.FromObject(new { type = "string", defaultValue = conn["connectionName"] }));
+                    //skip gateway for now since it's not finished and will just "mess upp" if there is a connection set
+                    if (!(((string)apiResource["properties"]["capabilities"]?[0]) == "gateway"))
+                    {
+                        // WriteVerbose($"Generating connection resource for {connectionName}....");
+                        var connectionTemplate = generateConnectionTemplate(connectionName, apiResource, apiIdTemplate((string)apiId));
+
+                        template.resources.Insert(1, connectionTemplate);
+                        //template.parameters.Add(connectionName, JObject.FromObject(new { type = "string", defaultValue = conn["connectionName"] }));
+                    }
                 }
             }
 
