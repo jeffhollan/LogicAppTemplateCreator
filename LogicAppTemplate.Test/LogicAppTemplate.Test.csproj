@@ -77,6 +77,7 @@
     <EmbeddedResource Include="TestFiles\complex-logicapp-if.json" />
     <EmbeddedResource Include="TestFiles\Switch.json" />
     <EmbeddedResource Include="TestFiles\paramGeneratorLogicAppTemplate.json" />
+    <EmbeddedResource Include="TestFiles\trigger-gateway-file-reccurence.json" />
   </ItemGroup>
   <Choose>
     <When Condition="'$(VisualStudioVersion)' == '10.0' And '$(IsCodedUITest)' == 'True'">
@@ -98,6 +99,11 @@
   </Choose>
   <Import Project="$(VSToolsPath)\TeamTest\Microsoft.TestTools.targets" Condition="Exists('$(VSToolsPath)\TeamTest\Microsoft.TestTools.targets')" />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <ProjectExtensions>
+    <VisualStudio>
+      <UserProperties TestFiles_4trigger-gateway-file-reccurence_1json__JSONSchema="http://json.schemastore.org/apple-app-site-association" />
+    </VisualStudio>
+  </ProjectExtensions>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
   <Target Name="BeforeBuild">

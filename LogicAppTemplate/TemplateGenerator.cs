@@ -58,7 +58,6 @@ namespace LogicAppTemplate
 
         private string LogicAppResourceGroup;
 
-
         public TemplateGenerator()
         {
             var assembly = System.Reflection.Assembly.GetExecutingAssembly();
@@ -139,8 +138,7 @@ namespace LogicAppTemplate
 
         }
 
-
-        public async Task<JObject> generateDefinition(JObject definition)
+        public async Task<JObject> generateDefinition(JObject definition, bool generateConnection = true)
         {
             Regex rgx = new Regex(@"\/subscriptions\/(?<subscription>[0-9a-zA-Z-]*)\/resourceGroups\/(?<resourcegroup>[a-zA-Z0-9-]*)");
             var matches = rgx.Match(definition.Value<string>("id"));
@@ -155,7 +153,7 @@ namespace LogicAppTemplate
             // WriteVerbose("Removing API Host references...");
             //template.parameters["logicAppLocation"]["defaultValue"] = definition["location"];
 
-            workflowTemplateReference["properties"]["definition"] = handleActions(JObject.Parse(modifiedDefinition));
+            workflowTemplateReference["properties"]["definition"] = handleActions(JObject.Parse(modifiedDefinition),(JObject)definition["properties"]["parameters"]);
 
 
 
@@ -208,12 +206,15 @@ namespace LogicAppTemplate
                 });
                 ((JArray)workflowTemplateReference["dependsOn"]).Add($"[resourceId('Microsoft.Web/connections', parameters('{connectionName}'))]");
 
-                JObject apiResource = await generateConnectionResource(connectionName, (string)apiId);
-                // WriteVerbose($"Generating connection resource for {connectionName}....");
-                var connectionTemplate = generateConnectionTemplate(connectionName, apiResource, apiIdTemplate((string)apiId));
+                if (generateConnection)
+                {
+                    JObject apiResource = await generateConnectionResource(connectionName, (string)apiId);
+                    // WriteVerbose($"Generating connection resource for {connectionName}....");
+                    var connectionTemplate = generateConnectionTemplate(connectionName, apiResource, apiIdTemplate((string)apiId));
 
-                template.resources.Insert(1, connectionTemplate);
-                template.parameters.Add(connectionName, JObject.FromObject(new { type = "string", defaultValue = conn["connectionName"] }));
+                    template.resources.Insert(1, connectionTemplate);
+                    template.parameters.Add(connectionName, JObject.FromObject(new { type = "string", defaultValue = conn["connectionName"] }));
+                }
             }
 
 
@@ -222,7 +223,7 @@ namespace LogicAppTemplate
 
         }
 
-        private JToken handleActions(JObject definition)
+        private JToken handleActions(JObject definition,JObject parameters)
         {
             foreach (JProperty action in definition["actions"])
             {
@@ -271,25 +272,25 @@ namespace LogicAppTemplate
                 }
                 else if (type == "if")
                 {
-                    definition["actions"][action.Name] = handleActions(definition["actions"][action.Name].ToObject<JObject>());
+                    definition["actions"][action.Name] = handleActions(definition["actions"][action.Name].ToObject<JObject>(),parameters);
                     //else
 
                     if (definition["actions"][action.Name]["else"] != null && definition["actions"][action.Name]["else"]["actions"] != null)
-                        definition["actions"][action.Name]["else"] = handleActions(definition["actions"][action.Name]["else"].ToObject<JObject>());
+                        definition["actions"][action.Name]["else"] = handleActions(definition["actions"][action.Name]["else"].ToObject<JObject>(), parameters);
                 }
                 else if (type == "scope" || type == "foreach" || type == "until")
                {
-                    definition["actions"][action.Name] = handleActions(definition["actions"][action.Name].ToObject<JObject>());
+                    definition["actions"][action.Name] = handleActions(definition["actions"][action.Name].ToObject<JObject>(), parameters);
                 }
                 else if (type == "switch")
                 {
                     //handle default if exists
                     if (definition["actions"][action.Name]["default"] != null && definition["actions"][action.Name]["default"]["actions"] != null)
-                        definition["actions"][action.Name]["default"] = handleActions(definition["actions"][action.Name]["default"].ToObject<JObject>());
+                        definition["actions"][action.Name]["default"] = handleActions(definition["actions"][action.Name]["default"].ToObject<JObject>(), parameters);
 
                     foreach (var switchcase in definition["actions"][action.Name]["cases"].Children<JProperty>())
                     {
-                        definition["actions"][action.Name]["cases"][switchcase.Name] = handleActions(definition["actions"][action.Name]["cases"][switchcase.Name].ToObject<JObject>());
+                        definition["actions"][action.Name]["cases"][switchcase.Name] = handleActions(definition["actions"][action.Name]["cases"][switchcase.Name].ToObject<JObject>(), parameters);
                     }
                 }
                 else if (type == "function")
@@ -331,9 +332,54 @@ namespace LogicAppTemplate
             {
                 foreach (JProperty trigger in definition["triggers"])
                 {
+                    //handle api 
                     var api = trigger.Value.SelectToken("inputs.host.api");
                     if (api != null)
                         ((JObject)definition["triggers"][trigger.Name]["inputs"]["host"]).Remove("api");
+
+                    //handle connection
+                    var connection = trigger.Value.SelectToken("inputs.host.connection");
+                    if(connection != null)
+                    {
+                        //try to find the connection and understand special handling
+                        var name = connection.Value<string>("name");
+                        if (name != null && name.StartsWith("@parameters('$connections')"))
+                        {
+                            var match = Regex.Match(name, @"@parameters\('\$connections'\)\['(?<connectionname>\w*)");
+                            if (match.Success)
+                            {
+                                var path = "$connections.value." + match.Groups["connectionname"].Value;
+                                var paramConnection = parameters.SelectToken(path);
+                                //if filesystem the path is base64 necoded and need to be set as parameter
+                                if (paramConnection.Value<string>("id").EndsWith("filesystem"))
+                                {
+                                    var queries = trigger.Value.SelectToken("inputs.queries");
+                                    
+                                    //get the path from the base64 decoded value
+                                    byte[] data = Convert.FromBase64String(queries.Value<string>("folderId"));
+                                    var triggerFolderPath = Encoding.UTF8.GetString(data);
+
+                                    var param = AddTemplateParameter(trigger.Name + "-folderPath", "string", triggerFolderPath);
+
+                                    //remove the metadata tag associated with the folderid
+                                    var meta = ((JObject)definition["triggers"][trigger.Name]["metadata"]);
+                                    meta.Remove(queries.Value<string>("folderId"));
+                                    meta.Add("[base64(parameters('"+ param +"'))]", JToken.Parse("\"[parameters('" + param + "']\""));
+
+                                    definition["triggers"][trigger.Name]["inputs"]["queries"]["folderId"] = "[base64(parameters('" + param + "'))]";
+                                }
+
+                            }
+                        }
+                    }
+
+                    //promote parameters for reccurence settings
+                    var recurrence = trigger.Value.SelectToken("recurrence");
+                    if (recurrence != null )
+                    {
+                        definition["triggers"][trigger.Name]["recurrence"]["frequency"] = "[parameters('"+ this.AddTemplateParameter(trigger.Name + "Frequency", "string", recurrence.Value<string>("frequency")) + "')]";
+                        definition["triggers"][trigger.Name]["recurrence"]["interval"] = "[parameters('" + this.AddTemplateParameter(trigger.Name + "Interval", "int", recurrence.Value<string>("interval")) + "')]";
+                    }
                 }
             }
 

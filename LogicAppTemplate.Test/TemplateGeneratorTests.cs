@@ -175,6 +175,28 @@ namespace LogicAppTemplate.Tests
 
         }
 
+        [TestMethod()]
+        public void TestTriggerWithGateway()
+        {
+            var content = GetEmbededFileContent("LogicAppTemplate.Test.TestFiles.trigger-gateway-file-reccurence.json");
+
+            var generator = new TemplateGenerator();
+            var defintion = generator.generateDefinition(JObject.Parse(content),false).GetAwaiter().GetResult();
+
+            //check parameters
+            Assert.AreEqual(defintion["parameters"]["When_a_file_is_createdFrequency"]["defaultValue"],"Minute");
+            Assert.AreEqual(defintion["parameters"]["When_a_file_is_createdInterval"]["defaultValue"], "3");
+
+            //check nested nested action
+            Assert.AreEqual("[parameters('When_a_file_is_createdFrequency')]", defintion["resources"][0]["properties"]["definition"]["triggers"]["When_a_file_is_created"]["recurrence"]["frequency"]);
+            Assert.AreEqual("[parameters('When_a_file_is_createdInterval')]", defintion["resources"][0]["properties"]["definition"]["triggers"]["When_a_file_is_created"]["recurrence"]["interval"]);
+
+            //File trigger parameters and base64 handling
+            Assert.IsNotNull(defintion["resources"][0]["properties"]["definition"]["triggers"]["When_a_file_is_created"]["metadata"]["[base64(parameters('When_a_file_is_created-folderPath'))]"]);
+            Assert.AreEqual("[parameters('When_a_file_is_created-folderPath']", defintion["resources"][0]["properties"]["definition"]["triggers"]["When_a_file_is_created"]["metadata"]["[base64(parameters('When_a_file_is_created-folderPath'))]"]);
+            Assert.AreEqual("[base64(parameters('When_a_file_is_created-folderPath'))]", defintion["resources"][0]["properties"]["definition"]["triggers"]["When_a_file_is_created"]["inputs"]["queries"]["folderId"]);
+        }
+
 
         //var resourceName = "LogicAppTemplate.Templates.starterTemplate.json";
         private static string GetEmbededFileContent(string resourceName)
