@@ -205,15 +205,19 @@ namespace LogicAppTemplate
                     id = apiIdTemplate((string)apiId),
                     connectionId = $"[resourceId('Microsoft.Web/connections', parameters('{connectionName}'))]"
                 });
-                ((JArray)workflowTemplateReference["dependsOn"]).Add($"[resourceId('Microsoft.Web/connections', parameters('{connectionName}'))]");
+                
 
                 if (generateConnection)
                 {
+                    
                     JObject apiResource = await generateConnectionResource(connectionName, (string)apiId);
 
                     //skip gateway for now since it's not finished and will just "mess upp" if there is a connection set
                     if (!(((string)apiResource["properties"]["capabilities"]?[0]) == "gateway"))
                     {
+                        //add depends on to make sure that the api connection is created before the Logic App
+                        ((JArray)workflowTemplateReference["dependsOn"]).Add($"[resourceId('Microsoft.Web/connections', parameters('{connectionName}'))]");
+                        
                         // WriteVerbose($"Generating connection resource for {connectionName}....");
                         var connectionTemplate = generateConnectionTemplate(connectionName, apiResource, apiIdTemplate((string)apiId));
 
