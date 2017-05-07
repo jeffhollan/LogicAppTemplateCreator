@@ -54,6 +54,24 @@ namespace LogicAppTemplate.Tests
         }
 
         [TestMethod()]
+        public void TestWorkflowOtherResourceGroup()
+        {
+            var content = GetEmbededFileContent("LogicAppTemplate.Test.TestFiles.WorkflowTestOtherResourcegroup.json");
+
+            var generator = new TemplateGenerator();
+
+            var defintion = generator.generateDefinition(JObject.Parse(content)).GetAwaiter().GetResult();
+
+            //check parameters
+            Assert.IsNotNull(defintion["parameters"]["INT0014-NewHires-ResourceGroup"]);
+            Assert.AreEqual("[resourceGroup().location]", defintion["parameters"]["logicAppLocation"]["defaultValue"]);
+            Assert.AreEqual("INT0014-NewHires-Trigger", defintion["parameters"]["logicAppName"]["defaultValue"]);
+
+            //check Upload Attachment
+            Assert.AreEqual("[concat('/subscriptions/',subscription().subscriptionId,'/resourceGroups/', parameters('INT0014-NewHires-ResourceGroup'),'/providers/Microsoft.Logic/workflows/INT0014-NewHires')]", defintion["resources"][0]["properties"]["definition"]["actions"]["INT0014-NewHires"]["inputs"]["host"]["workflow"]["id"]);
+        }
+
+        [TestMethod()]
         public void TestAPIM()
         {
             var content = GetEmbededFileContent("LogicAppTemplate.Test.TestFiles.APIM.json");
@@ -161,7 +179,7 @@ namespace LogicAppTemplate.Tests
         [TestMethod()]
         public void TestSwitchStatements()
         {
-            var content = GetEmbededFileContent("LogicAppTemplate.Test.TestFiles.Switch.json");
+            var content = GetEmbededFileContent("LogicAppTemplate.Test.TestFiles.complex-logicapp-switch.json");
 
             var generator = new TemplateGenerator();
 
@@ -176,16 +194,53 @@ namespace LogicAppTemplate.Tests
         }
 
         [TestMethod()]
+        public void ParameterTestTypeObject()
+        {
+            var content = GetEmbededFileContent("LogicAppTemplate.Test.TestFiles.parameter-test-object.json");
+
+            var generator = new TemplateGenerator();
+
+            var defintion = generator.generateDefinition(JObject.Parse(content)).GetAwaiter().GetResult();
+
+            Assert.IsNull(defintion["parameters"]["ShouldNotExist"]);
+
+            Assert.IsNotNull(defintion["parameters"]["paramismanager"]);
+            Assert.AreEqual(572, (int)defintion["parameters"]["paramismanager"]["defaultValue"]["0"]);
+            Assert.AreEqual(571, (int)defintion["parameters"]["paramismanager"]["defaultValue"]["1"]);
+            Assert.AreEqual(572, (int)defintion["parameters"]["paramismanager"]["defaultValue"]["No"]);
+            Assert.AreEqual(571, (int)defintion["parameters"]["paramismanager"]["defaultValue"]["Yes"]);
+            Assert.AreEqual("Object", defintion["parameters"]["paramismanager"]["type"]);
+            /*
+            dynamic obj = new System.Dynamic.ExpandoObject();
+            obj.type = "Object";
+            obj.defaultValue = new System.Dynamic.ExpandoObject();
+            ((IDictionary<string, object>)obj.defaultValue)["0"] = 572;
+            ((IDictionary<string, object>)obj.defaultValue)["1"] = 571;
+            obj.defaultValue.No = 572;
+            obj.defaultValue.Yes = 571;
+
+    var p = new JProperty("paramismanager", JObject.FromObject(obj));
+            Assert.AreEqual(JObject.FromObject(obj), (JObject)defintion["parameters"]["paramismanager"]); */
+            //check parameters
+            
+            
+            //Assert.AreEqual("[concat('/subscriptions/',subscription().subscriptionId,'/resourceGroups/', parameters('apimResourceGroup'),'/providers/Microsoft.ApiManagement/service/', parameters('apimInstanceName'),'/apis/', parameters('apimApiId'),'')]", defintion["resources"][0]["properties"]["definition"]["actions"]["Condition"]["actions"]["Switch"]["default"]["actions"]["INT002_Create_Actioncode_2"]["inputs"]["api"]["id"]);
+            //Assert.AreEqual("[concat('/subscriptions/',subscription().subscriptionId,'/resourceGroups/', parameters('apimResourceGroup'),'/providers/Microsoft.ApiManagement/service/', parameters('apimInstanceName'),'/apis/', parameters('apimApiId'),'')]", defintion["resources"][0]["properties"]["definition"]["actions"]["Condition"]["actions"]["Switch"]["cases"]["Case"]["actions"]["For_each"]["actions"]["INT002_Create_Actioncode"]["inputs"]["api"]["id"]);
+            //check nested nested action
+
+        }
+
+        [TestMethod()]
         public void TestTriggerWithGateway()
         {
-            var content = GetEmbededFileContent("LogicAppTemplate.Test.TestFiles.trigger-gateway-file-reccurence.json");
+            var content = GetEmbededFileContent("LogicAppTemplate.Test.TestFiles.file-test-trigger-gateway.json");
 
             var generator = new TemplateGenerator();
             var defintion = generator.generateDefinition(JObject.Parse(content),false).GetAwaiter().GetResult();
 
             //check parameters
             Assert.AreEqual(defintion["parameters"]["When_a_file_is_createdFrequency"]["defaultValue"],"Minute");
-            Assert.AreEqual(defintion["parameters"]["When_a_file_is_createdInterval"]["defaultValue"], "3");
+            Assert.AreEqual(defintion["parameters"]["When_a_file_is_createdInterval"]["defaultValue"], 3);
             Assert.AreEqual(defintion["parameters"]["filesystem_1"]["defaultValue"], "filesystem-1");
 
 
@@ -202,6 +257,32 @@ namespace LogicAppTemplate.Tests
             Assert.AreEqual("[base64(parameters('When_a_file_is_created-folderPath'))]", defintion["resources"][0]["properties"]["definition"]["triggers"]["When_a_file_is_created"]["inputs"]["queries"]["folderId"]);
         }
 
+        [TestMethod()]
+        public void TestFileLogicApp()
+        {
+            var content = GetEmbededFileContent("LogicAppTemplate.Test.TestFiles.file-test-readfolder.json");
+
+            var generator = new TemplateGenerator();
+            var defintion = generator.generateDefinition(JObject.Parse(content), false).GetAwaiter().GetResult();
+
+            //check parameters
+            Assert.AreEqual(defintion["parameters"]["RecurrenceFrequency"]["defaultValue"], "Minute");
+            Assert.AreEqual(defintion["parameters"]["RecurrenceInterval"]["defaultValue"], 3);
+            Assert.AreEqual(defintion["parameters"]["filesystem_1"]["defaultValue"], "filesystem-1");
+
+
+            //check nested nested action
+            Assert.AreEqual("[parameters('RecurrenceFrequency')]", defintion["resources"][0]["properties"]["definition"]["triggers"]["Recurrence"]["recurrence"]["frequency"]);
+            Assert.AreEqual("[parameters('RecurrenceInterval')]", defintion["resources"][0]["properties"]["definition"]["triggers"]["Recurrence"]["recurrence"]["interval"]);
+
+            //make sure no depends on is added
+            Assert.AreEqual(0, defintion["resources"][0]["dependsOn"].Count());
+
+            //File trigger parameters and base64 handling
+            Assert.IsNotNull(defintion["resources"][0]["properties"]["definition"]["actions"]["List_files_in_folder"]["metadata"]["[base64(parameters('List_files_in_folder-folderPath'))]"]);
+            Assert.AreEqual("[parameters('List_files_in_folder-folderPath')]", defintion["resources"][0]["properties"]["definition"]["actions"]["List_files_in_folder"]["metadata"]["[base64(parameters('List_files_in_folder-folderPath'))]"]);
+            //Assert.AreEqual("[base64(parameters('When_a_file_is_created-folderPath'))]", defintion["resources"][0]["properties"]["definition"]["triggers"]["When_a_file_is_created"]["inputs"]["queries"]["folderId"]);
+        }
 
         //var resourceName = "LogicAppTemplate.Templates.starterTemplate.json";
         private static string GetEmbededFileContent(string resourceName)

@@ -104,8 +104,8 @@ namespace LogicAppTemplate
             {
                 return;
             }
-            var result = ConvertWithToken(SubscriptionId, ResourceGroup, LogicApp, Token).Result;
 
+            var result = ConvertWithToken(SubscriptionId, ResourceGroup, LogicApp, Token).Result;
             WriteObject(result.ToString());
         }
 
@@ -153,7 +153,7 @@ namespace LogicAppTemplate
             // WriteVerbose("Removing API Host references...");
             //template.parameters["logicAppLocation"]["defaultValue"] = definition["location"];
 
-            workflowTemplateReference["properties"]["definition"] = handleActions(JObject.Parse(modifiedDefinition),(JObject)definition["properties"]["parameters"]);
+            workflowTemplateReference["properties"]["definition"] = handleActions(JObject.Parse(modifiedDefinition), (JObject)definition["properties"]["parameters"]);
 
 
 
@@ -193,7 +193,7 @@ namespace LogicAppTemplate
             {
                 // WriteVerbose($"Parameterizing {connectionProperty.Name}");
                 string connectionName = connectionProperty.Name;
-                
+
                 var conn = (JObject)connectionProperty.Value;
                 var apiId = conn["id"] != null ? conn["id"] :
                             conn["api"]["id"] != null ? conn["api"]["id"] : null;
@@ -205,11 +205,11 @@ namespace LogicAppTemplate
                     id = apiIdTemplate((string)apiId),
                     connectionId = $"[resourceId('Microsoft.Web/connections', parameters('{connectionName}'))]"
                 });
-                
+
 
                 if (generateConnection)
                 {
-                    
+
                     JObject apiResource = await generateConnectionResource(connectionName, (string)apiId);
 
                     //skip gateway for now since it's not finished and will just "mess upp" if there is a connection set
@@ -217,7 +217,7 @@ namespace LogicAppTemplate
                     {
                         //add depends on to make sure that the api connection is created before the Logic App
                         ((JArray)workflowTemplateReference["dependsOn"]).Add($"[resourceId('Microsoft.Web/connections', parameters('{connectionName}'))]");
-                        
+
                         // WriteVerbose($"Generating connection resource for {connectionName}....");
                         var connectionTemplate = generateConnectionTemplate(connectionName, apiResource, apiIdTemplate((string)apiId));
 
@@ -233,7 +233,7 @@ namespace LogicAppTemplate
 
         }
 
-        private JToken handleActions(JObject definition,JObject parameters)
+        private JToken handleActions(JObject definition, JObject parameters)
         {
             foreach (JProperty action in definition["actions"])
             {
@@ -282,14 +282,14 @@ namespace LogicAppTemplate
                 }
                 else if (type == "if")
                 {
-                    definition["actions"][action.Name] = handleActions(definition["actions"][action.Name].ToObject<JObject>(),parameters);
+                    definition["actions"][action.Name] = handleActions(definition["actions"][action.Name].ToObject<JObject>(), parameters);
                     //else
 
                     if (definition["actions"][action.Name]["else"] != null && definition["actions"][action.Name]["else"]["actions"] != null)
                         definition["actions"][action.Name]["else"] = handleActions(definition["actions"][action.Name]["else"].ToObject<JObject>(), parameters);
                 }
                 else if (type == "scope" || type == "foreach" || type == "until")
-               {
+                {
                     definition["actions"][action.Name] = handleActions(definition["actions"][action.Name].ToObject<JObject>(), parameters);
                 }
                 else if (type == "switch")
@@ -333,7 +333,37 @@ namespace LogicAppTemplate
                     var api = action.Value.SelectToken("inputs.host.api");
                     if (api != null)
                         ((JObject)definition["actions"][action.Name]["inputs"]["host"]).Remove("api");
+
                     //get the type:
+                    //handle connection
+                    var connection = action.Value.SelectToken("inputs.host.connection");
+                    if (connection != null)
+                    {
+                        var getConnectionNameType = this.GetConnectionTypeName(connection, parameters);
+
+                        switch (getConnectionNameType)
+                        {
+                            case "filesystem":
+                                {
+                                    var metadata = action.Value.SelectToken("metadata");
+                                    if (metadata != null)
+                                    {
+
+                                        byte[] data = Convert.FromBase64String(((JProperty)metadata.First).Name);
+                                        var folderpath = Encoding.UTF8.GetString(data);
+
+                                        var param = AddTemplateParameter(action.Name + "-folderPath", "string", folderpath);
+                                        //remove the metadata tag associated with the folderid
+                                        var meta = ((JObject)definition["actions"][action.Name]["metadata"]);
+                                        meta.Remove(((JProperty)metadata.First).Name);
+                                        meta.Add("[base64(parameters('" + param + "'))]", JToken.Parse("\"[parameters('" + param + "')]\""));
+
+                                        definition["actions"][action.Name]["inputs"]["path"] = "[concat('/datasets/default/folders/@{encodeURIComponent(''',base64(parameters('" + param + "')),''')}')]";
+                                    }
+                                    break;
+                                }
+                        }
+                    }
                 }
             }
 
@@ -349,22 +379,16 @@ namespace LogicAppTemplate
 
                     //handle connection
                     var connection = trigger.Value.SelectToken("inputs.host.connection");
-                    if(connection != null)
+                    if (connection != null)
                     {
-                        //try to find the connection and understand special handling
-                        var name = connection.Value<string>("name");
-                        if (name != null && name.StartsWith("@parameters('$connections')"))
+                        var getConnectionNameType = this.GetConnectionTypeName(connection, parameters);
+
+                        switch (getConnectionNameType)
                         {
-                            var match = Regex.Match(name, @"@parameters\('\$connections'\)\['(?<connectionname>\w*)");
-                            if (match.Success)
-                            {
-                                var path = "$connections.value." + match.Groups["connectionname"].Value;
-                                var paramConnection = parameters.SelectToken(path);
-                                //if filesystem the path is base64 necoded and need to be set as parameter
-                                if (paramConnection.Value<string>("id").EndsWith("filesystem"))
+                            case "filesystem":
                                 {
                                     var queries = trigger.Value.SelectToken("inputs.queries");
-                                    
+
                                     //get the path from the base64 decoded value
                                     byte[] data = Convert.FromBase64String(queries.Value<string>("folderId"));
                                     var triggerFolderPath = Encoding.UTF8.GetString(data);
@@ -374,21 +398,21 @@ namespace LogicAppTemplate
                                     //remove the metadata tag associated with the folderid
                                     var meta = ((JObject)definition["triggers"][trigger.Name]["metadata"]);
                                     meta.Remove(queries.Value<string>("folderId"));
-                                    meta.Add("[base64(parameters('"+ param +"'))]", JToken.Parse("\"[parameters('" + param + "')]\""));
+                                    meta.Add("[base64(parameters('" + param + "'))]", JToken.Parse("\"[parameters('" + param + "')]\""));
 
                                     definition["triggers"][trigger.Name]["inputs"]["queries"]["folderId"] = "[base64(parameters('" + param + "'))]";
-                                }
 
-                            }
+                                    break;
+                                }
                         }
                     }
 
                     //promote parameters for reccurence settings
                     var recurrence = trigger.Value.SelectToken("recurrence");
-                    if (recurrence != null )
+                    if (recurrence != null)
                     {
-                        definition["triggers"][trigger.Name]["recurrence"]["frequency"] = "[parameters('"+ this.AddTemplateParameter(trigger.Name + "Frequency", "string", recurrence.Value<string>("frequency")) + "')]";
-                        definition["triggers"][trigger.Name]["recurrence"]["interval"] = "[parameters('" + this.AddTemplateParameter(trigger.Name + "Interval", "int", recurrence.Value<string>("interval")) + "')]";
+                        definition["triggers"][trigger.Name]["recurrence"]["frequency"] = "[parameters('" + this.AddTemplateParameter(trigger.Name + "Frequency", "string", recurrence.Value<string>("frequency")) + "')]";
+                        definition["triggers"][trigger.Name]["recurrence"]["interval"] = "[parameters('" + this.AddTemplateParameter(trigger.Name + "Interval", "int", new JProperty("defaultValue", recurrence.Value<int>("interval"))) + "')]";
                     }
                 }
             }
@@ -396,12 +420,42 @@ namespace LogicAppTemplate
             return definition;
         }
 
+        private string GetConnectionTypeName(JToken ConnectionToken, JObject parameters)
+        {
+            //try to find the connection and understand special handling
+            var name = ConnectionToken.Value<string>("name");
+            if (name != null && name.StartsWith("@parameters('$connections')"))
+            {
+                var match = Regex.Match(name, @"@parameters\('\$connections'\)\['(?<connectionname>\w*)");
+                if (match.Success)
+                {
+                    var path = "$connections.value." + match.Groups["connectionname"].Value;
+                    var paramConnection = parameters.SelectToken(path);
+                    if (paramConnection != null)
+                    {
+                        //if filesystem the path is base64 necoded and need to be set as parameter
+                        var id = paramConnection.Value<string>("id");
+                        if (!string.IsNullOrEmpty(id))
+                            return id.Split('/').Last();
+                    }
+                }
+            }
+
+            return null;
+        }
+
         private string AddTemplateParameter(string paramname, string type, string defaultvalue)
+        {
+            return AddTemplateParameter(paramname, type, new JProperty("defaultValue", defaultvalue));
+        }
+
+
+        private string AddTemplateParameter(string paramname, string type, JProperty defaultvalue)
         {
             string realParameterName = paramname;
             JObject param = new JObject();
             param.Add("type", JToken.FromObject(type));
-            param.Add("defaultValue", JToken.FromObject(defaultvalue));
+            param.Add(defaultvalue);
 
             if (template.parameters[paramname] == null)
             {
@@ -409,7 +463,7 @@ namespace LogicAppTemplate
             }
             else
             {
-                if (template.parameters[paramname].Value<string>("defaultValue") != defaultvalue)
+                if (!template.parameters[paramname].Value<string>("defaultValue").Equals(defaultvalue.Value.ToString()))
                 {
                     foreach (var p in template.parameters)
                     {
