@@ -1,0 +1,94 @@
+﻿{
+  "properties": {
+    "provisioningState": "Succeeded",
+    "createdTime": "2017-04-05T13:37:33.9500719Z",
+    "changedTime": "2017-04-28T13:37:07.0766057Z",
+    "state": "Enabled",
+    "version": "08587082202584220452",
+    "accessEndpoint": "https://prod-03.westeurope.logic.azure.com:443/workflows/539a7a46165947b580c4ff915b5cf630",
+    "definition": {
+      "$schema": "https://schema.management.azure.com/providers/Microsoft.Logic/schemas/2016-06-01/workflowdefinition.json#",
+      "contentVersion": "1.0.0.0",
+      "parameters": {
+        "$connections": {
+          "defaultValue": {},
+          "type": "Object"
+        },
+        "filePath": {
+          "defaultValue": "//server/ARBETSORDER/env/XML_EXPORT/GenerisKNAB",
+          "type": "String"
+        }
+      },
+      "triggers": {
+        "When_a_file_is_created": {
+          "recurrence": {
+            "frequency": "Minute",
+            "interval": 3
+          },
+          "metadata": { "Ly9wbWZzMDIvQVJCRVRTT1JERVIvUkVMQUNPTV9QUk9EL1hNTF9FWFBPUlQvR2VuZXJpc0tOQUI=": "@parameters('filePath')" },
+          "type": "ApiConnection",
+          "inputs": {
+            "host": { "connection": { "name": "@parameters('$connections')['filesystem_1']['connectionId']" } },
+            "method": "get",
+            "path": "/datasets/default/triggers/onnewfile",
+            "queries": { "folderId": "Ly9wbWZzMDIvQVJCRVRTT1JERVIvUkVMQUNPTV9QUk9EL1hNTF9FWFBPUlQvR2VuZXJpc0tOQUI=" }
+          }
+        }
+      },
+      "actions": {
+        "Delete_file": {
+          "runAfter": { "INT001_Work_Order": [ "Succeeded", "Failed" ] },
+          "type": "ApiConnection",
+          "inputs": {
+            "host": { "connection": { "name": "@parameters('$connections')['filesystem_1']['connectionId']" } },
+            "method": "delete",
+            "path": "/datasets/default/files/@{encodeURIComponent(encodeURIComponent(triggerOutputs()['headers']['x-ms-file-path']))}"
+          }
+        },
+        "INT001_Work_Order": {
+          "runAfter": {},
+          "type": "Workflow",
+          "inputs": {
+            "body": "@triggerBody()",
+            "headers": { "x-ms-client-tracking-id": "WorkOrderNumber @{xpath(xml(triggerBody()), 'string(/*[local-name()=\"workOrders\"]/*[local-name()=\"header\"]/*[local-name()=\"messageId\" and namespace-uri()=\"\"])')} @{utcnow()} " },
+            "host": {
+              "triggerName": "manual",
+              "workflow": { "id": "/subscriptions/fakeb73-d0ff-455d-a2bf-eae0b300696d/resourceGroups/resgroup/providers/Microsoft.Logic/workflows/INT001_Work_Order" }
+            },
+            "retryPolicy": { "type": "None" }
+          }
+        }
+      },
+      "outputs": {}
+    },
+    "parameters": {
+      "$connections": {
+        "value": {
+          "filesystem_1": {
+            "id": "/subscriptions/fakeb73-d0ff-455d-a2bf-eae0b300696d/providers/Microsoft.Web/locations/westeurope/managedApis/filesystem",
+            "connectionId": "/subscriptions/fakeb73-d0ff-455d-a2bf-eae0b300696d/resourceGroups/resgroup/providers/Microsoft.Web/connections/filesystem-1"
+          }
+        }
+      }
+    },
+    "endpointsConfiguration": {
+      "workflow": {
+        "outgoingIpAddresses": [
+          { "address": "40.68.222.65" },
+          { "address": "40.68.209.23" },
+          { "address": "13.95.147.65" }
+        ],
+        "accessEndpointIpAddresses": [
+          { "address": "13.95.155.53" },
+          { "address": "52.174.54.218" },
+          { "address": "52.174.49.6" }
+        ]
+      },
+      "connector": { "outgoingIpAddresses": [ { "address": "40.115.50.13" } ] }
+    }
+  },
+  "id": "/subscriptions/fakeb73-d0ff-455d-a2bf-eae0b300696d/resourceGroups/resgroup/providers/Microsoft.Logic/workflows/INT001A_Work_Order_KNAB",
+  "name": "INT001A_Work_Order_KNAB",
+  "type": "Microsoft.Logic/workflows",
+  "location": "westeurope"
+}

@@ -1,0 +1,182 @@
+﻿{
+  "properties": {
+    "provisioningState": "Succeeded",
+    "createdTime": "2017-04-05T13:37:33.9500719Z",
+    "changedTime": "2017-05-03T11:14:23.4376964Z",
+    "state": "Enabled",
+    "version": "08587077968220672495",
+    "accessEndpoint": "https://prod-03.westeurope.logic.azure.com:443/workflows/539a7a46165947b580c4ff915b5cf630",
+    "definition": {
+      "$schema": "https://schema.management.azure.com/providers/Microsoft.Logic/schemas/2016-06-01/workflowdefinition.json#",
+      "contentVersion": "1.0.0.0",
+      "parameters": {
+        "$connections": {
+          "defaultValue": {},
+          "type": "Object"
+        }
+      },
+      "triggers": {
+        "Recurrence": {
+          "recurrence": {
+            "frequency": "Minute",
+            "interval": 3
+          },
+          "type": "Recurrence"
+        }
+      },
+      "actions": {
+        "Filter_array": {
+          "runAfter": {
+            "List_files_in_folder": [
+              "Succeeded"
+            ]
+          },
+          "type": "Query",
+          "inputs": {
+            "from": "@body('List_files_in_folder')",
+            "where": "@equals(item()?['IsFolder'], false)"
+          }
+        },
+        "For_each": {
+          "foreach": "@body('Filter_array')",
+          "actions": {
+            "Delete_file": {
+              "runAfter": {
+                "INT001_Work_Order": [
+                  "Succeeded",
+                  "Failed"
+                ]
+              },
+              "type": "ApiConnection",
+              "inputs": {
+                "host": {
+                  "api": {
+                    "runtimeUrl": "https://logic-apis-westeurope.azure-apim.net/apim/filesystem"
+                  },
+                  "connection": {
+                    "name": "@parameters('$connections')['filesystem_1']['connectionId']"
+                  }
+                },
+                "method": "delete",
+                "path": "/datasets/default/files/@{encodeURIComponent(encodeURIComponent(item()?['Path']))}"
+              }
+            },
+            "Get_file_content_using_path": {
+              "runAfter": {},
+              "type": "ApiConnection",
+              "inputs": {
+                "host": {
+                  "api": {
+                    "runtimeUrl": "https://logic-apis-westeurope.azure-apim.net/apim/filesystem"
+                  },
+                  "connection": {
+                    "name": "@parameters('$connections')['filesystem_1']['connectionId']"
+                  }
+                },
+                "method": "get",
+                "path": "/datasets/default/GetFileContentByPath",
+                "queries": {
+                  "path": "@{item()?['Path']}"
+                }
+              }
+            },
+            "INT001_Work_Order": {
+              "runAfter": {
+                "Get_file_content_using_path": [
+                  "Succeeded"
+                ]
+              },
+              "type": "Workflow",
+              "inputs": {
+                "body": "@body('Get_file_content_using_path')",
+                "host": {
+                  "triggerName": "manual",
+                  "workflow": {
+                    "id": "/subscriptions/fakeecb73-d0ff-455d-a2bf-eae0b300696d/resourceGroups/integration-we/providers/Microsoft.Logic/workflows/INT001_Work_Order"
+                  }
+                },
+                "retryPolicy": {
+                  "type": "None"
+                }
+              }
+            }
+          },
+          "runAfter": {
+            "Filter_array": [
+              "Succeeded"
+            ]
+          },
+          "type": "Foreach"
+        },
+        "List_files_in_folder": {
+          "runAfter": {},
+          "metadata": {
+            "Ly9wbWZzMDIvQVJCRVRTT1JERVIvUkVMQUNPTV9QUk9EL1hNTF9FWFBPUlQvR2VuZXJpc0tOQUI=": "//pmfs02/ARBETSORDER/RELACOM_PROD/XML_EXPORT/GenerisKNAB"
+          },
+          "type": "ApiConnection",
+          "inputs": {
+            "host": {
+              "api": {
+                "runtimeUrl": "https://logic-apis-westeurope.azure-apim.net/apim/filesystem"
+              },
+              "connection": {
+                "name": "@parameters('$connections')['filesystem_1']['connectionId']"
+              }
+            },
+            "method": "get",
+            "path": "/datasets/default/folders/@{encodeURIComponent(encodeURIComponent('Ly9wbWZzMDIvQVJCRVRTT1JERVIvUkVMQUNPTV9QUk9EL1hNTF9FWFBPUlQvR2VuZXJpc0tOQUI='))}"
+          }
+        }
+      },
+      "outputs": {}
+    },
+    "parameters": {
+      "$connections": {
+        "value": {
+          "filesystem_1": {
+            "connectionId": "/subscriptions/fakeecb73-d0ff-455d-a2bf-eae0b300696d/resourceGroups/integration-we/providers/Microsoft.Web/connections/filesystem-1",
+            "connectionName": "filesystem-1",
+            "id": "/subscriptions/fakeecb73-d0ff-455d-a2bf-eae0b300696d/providers/Microsoft.Web/locations/westeurope/managedApis/filesystem"
+          }
+        }
+      }
+    },
+    "endpointsConfiguration": {
+      "workflow": {
+        "outgoingIpAddresses": [
+          {
+            "address": "40.68.222.65"
+          },
+          {
+            "address": "40.68.209.23"
+          },
+          {
+            "address": "13.95.147.65"
+          }
+        ],
+        "accessEndpointIpAddresses": [
+          {
+            "address": "13.95.155.53"
+          },
+          {
+            "address": "52.174.54.218"
+          },
+          {
+            "address": "52.174.49.6"
+          }
+        ]
+      },
+      "connector": {
+        "outgoingIpAddresses": [
+          {
+            "address": "40.115.50.13"
+          }
+        ]
+      }
+    }
+  },
+  "id": "/subscriptions/fakeecb73-d0ff-455d-a2bf-eae0b300696d/resourceGroups/integration-we/providers/Microsoft.Logic/workflows/INT001A_Work_Order_KNAB",
+  "name": "INT001A_Work_Order_KNAB",
+  "type": "Microsoft.Logic/workflows",
+  "location": "westeurope"
+}

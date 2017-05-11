@@ -1,0 +1,396 @@
+﻿{
+  "properties": {
+    "provisioningState": "Succeeded",
+    "createdTime": "2017-05-03T17:21:19.7829436Z",
+    "changedTime": "2017-05-07T06:18:26.9717973Z",
+    "state": "Enabled",
+    "version": "08587074689787463751",
+    "accessEndpoint": "https://prod-23.westeurope.logic.azure.com:443/workflows/d1693117c2304a319d4f4e93a9bc8226",
+    "definition": {
+      "$schema": "https://schema.management.azure.com/providers/Microsoft.Logic/schemas/2016-06-01/workflowdefinition.json#",
+      "contentVersion": "1.0.0.0",
+      "parameters": {
+        "fuseUrl": {
+          "defaultValue": "https://scandictest.fusion-universal.com",
+          "type": "String"
+        },
+        "ismanager": {
+          "defaultValue": {
+            "0": 572,
+            "1": 571,
+            "No": 572,
+            "Yes": 571
+          },
+          "type": "Object"
+        },
+        "jobfamily": {
+          "defaultValue": {
+            "ACCOUNTING & LEDGER CONTROL": 492,
+            "APPLICATION MANAGEMENT": 471,
+            "ART/GDM": 506,
+            "BOOKING": 466,
+            "BRAND & DIGITAL DEVELOPMENT": 478,
+            "BUSINESS DEVELOPMENT": 500,
+            "CEO & PRESIDENT": 494,
+            "CONFERENCE & BANQUETING": 465,
+            "CONTROLLING": 487,
+            "COUNTRY & GROUP COMMUNICATION": 485,
+            "COUNTRY FINANCE LEADERSHIP": 489,
+            "COUNTRY REVENUE MANAGEMENT": 509,
+            "COUNTRY TECHNICAL SERVICES": 514,
+            "COUNTRY VP": 495,
+            "DISABILITY": 510,
+            "ECOMMERCE": 476,
+            "EXECUTIVE ASSISTANCE": 476,
+            "F&B MANAGEMENT": 464,
+            "FINANCE OTHER": 493,
+            "FRONT OFFICE": 470,
+            "GROUP COMMUNICATION": 485,
+            "GROUP FUNCTIONS VP": 496,
+            "GROUP PROCUREMENT": 504,
+            "GROUP TECHNICAL SERVICES": 512,
+            "GROUP TREASURY": 490,
+            "HOTEL MANAGEMENT": 469,
+            "HOTEL TECHNICAL SERVICES": 513,
+            "HOUSEKEEPING": 468,
+            "HR DEVELOPMENT": 497,
+            "HUMAN RESOURCES": 498,
+            "IT MANAGEMENT/LEADERSHIP": 473,
+            "IT OPERATIONS": 474,
+            "IT PROCESS & PORTFOLIO": 475,
+            "IT SERVICES": 472,
+            "KITCHEN": 462,
+            "LEARNING & DEVELOPMENT": 499,
+            "LOYALTY": 480,
+            "MARKETING": 479,
+            "NULL": null,
+            "OFFICE SERVICES": 477,
+            "OPENINGS": 503,
+            "OPERATIONAL DEVELOPMENT": 502,
+            "PAYROLL": 491,
+            "PRICING MANAGEMENT": 507,
+            "PROP & OP DEV LEADERSHIP": 501,
+            "PURCHASING": 505,
+            "RESTAURANT": 463,
+            "REVENUE DEVELOPMENT": 508,
+            "SALES": 483,
+            "SALES & MARKETING": 482,
+            "SPA": 467,
+            "SPONSORSHIPS & PARTNERSHIPS": 484,
+            "SUSTAINABILITY": 511,
+            "TEST": 604,
+            "TREASURY": 488
+          },
+          "type": "Object"
+        },
+        "jobgroup": {
+          "defaultValue": {
+            "ADMINISTRATION": 451,
+            "COMMERCIAL": 452,
+            "COMMUNICATION": 602,
+            "FINANCE": 453,
+            "FOOD & BEVERAGE": 454,
+            "GROUP MANAGEMENT TEAM": 455,
+            "HOTEL OPERATIONS": 449,
+            "HR": 456,
+            "IT": 450,
+            "NULL": null,
+            "PROPERTY & OPERATIONAL DEVELOPMENT": 457,
+            "PURCHASING / PROCUREMENT": 458,
+            "REVENUE MANAGEMENT & DISTRIBUTION": 459,
+            "SUSTAINABILITY & DISABILITY": 460,
+            "TECHNICAL SERVICES": 461,
+            "TEST": 605
+          },
+          "type": "Object"
+        },
+        "jobprofile": {
+          "defaultValue": {
+            "APPLICATION ARCHITECT": 587,
+            "APPLICATION MANAGEMENT EXECUTIVE": 588,
+            "APPRENTICE - FRONT OFFICE": 560,
+            "APPRENTICE - HOTEL": 561,
+            "APPRENTICE - HOUSEKEEPING": 552,
+            "APPRENTICE - KITCHEN": 515,
+            "APPRENTICE - RESTAURANT": 523,
+            "BAR ASSISTANT": 524,
+            "BAR MANAGER": 525,
+            "BARTENDER": 526,
+            "BELL BOY": 562,
+            "BOOKING": 545,
+            "BOOKING ASSISTANT": 546,
+            "BOOKING MANAGER": 547,
+            "BREAKFAST HOST": 527,
+            "BREAKFAST MANAGER": 528,
+            "CHEF": 516,
+            "CIO & DIRECTOR IT": 597,
+            "CONCIERGE": 563,
+            "CONFERENCE MANAGER": 540,
+            "COUNTRY HEAD CHEF": 536,
+            "DISTRICT DIRECTOR": 557,
+            "DISTRICT F&B MANAGER": 537,
+            "F&B DIRECTOR": 538,
+            "F&B MANAGER": 539,
+            "FRONT OFFICE MANAGER": 564,
+            "GENERAL MANAGER": 558,
+            "HEAD CHEF": 517,
+            "HEAD WAITER": 529,
+            "HOST": 541,
+            "HOTEL AND RESTAURANT EMPLOYEE - FRONT OFFICE": 565,
+            "HOTEL AND RESTAURANT EMPLOYEE - HOUSEKEEPING": 553,
+            "HOTEL AND RESTAURANT EMPLOYEE - KITCHEN": 518,
+            "HOTEL AND RESTAURANT EMPLOYEE - POOL": 549,
+            "HOTEL AND RESTAURANT EMPLOYEE - RESTAURANT": 530,
+            "HOTEL MANAGER": 559,
+            "HOUSEKEEPER": 554,
+            "HOUSEKEEPING MANAGER": 555,
+            "HOUSEMAN": 542,
+            "HR DEVELOPMENT DIRECTOR": 577,
+            "HR DIRECTOR": 578,
+            "HR MANAGER": 579,
+            "HR SPECIALIST": 580,
+            "INCIDENT MANAGER": 593,
+            "IT OPERATIONS EXECUTIVE": 600,
+            "IT OPERATIONS EXPERT": 598,
+            "IT PORTFOLIO EXECUTIVE": 601,
+            "IT SUPPORT EXECUTIVE": 594,
+            "KITCHEN ASSISTANT": 519,
+            "LEARNING & DEVELOPMENT EXECUTIVE": 581,
+            "MANAGER DISABILITY": 585,
+            "MANAGER SUSTAINABILITY": 586,
+            "MICE SALES": 543,
+            "NIGHT RECEPTIONIST": 566,
+            "NULL": null,
+            "POOL ASSISTANT": 550,
+            "PORTER": 567,
+            "PROJECT MANAGER IT": 599,
+            "RECEPTIONIST": 568,
+            "RESTAURANT ASSISTANT": 531,
+            "RESTAURANT MANAGER": 532,
+            "RESTAURANT SUPERVISOR": 533,
+            "SERVICE DELIVERY MANAGER": 595,
+            "SHIFT LEADER BREAKFAST": 534,
+            "SHIFT LEADER CONFERENCE & BANQUETING": 544,
+            "SHIFT LEADER FRONT OFFICE": 569,
+            "SHIFT LEADER HOUSEKEEPING": 556,
+            "SHIFT LEADER RESTAURANT": 535,
+            "SHIFTLEADER KITCHEN": 520,
+            "SIGGE": 570,
+            "SOUS CHEF": 521,
+            "SPA HOST": 548,
+            "SPA THERAPIST": 551,
+            "STEWARD": 522,
+            "SUPPORT TECHNICIAN": 596,
+            "SYSTEM MANAGER": 589,
+            "SYSTEM SPECIALIST": 590,
+            "TEAM LEADER APPLICATION MANAGEMENT": 591,
+            "TRAINING CONSULTANT": 582,
+            "TRAINING COORDINATOR": 583,
+            "TRAINING MANAGER": 584,
+            "WEB ARCHITECT": 592
+          },
+          "type": "Object"
+        },
+        "login_name": {
+          "defaultValue": "loginname",
+          "type": "String"
+        },
+        "newstarter": {
+          "defaultValue": {
+            "0": 574,
+            "1": 573,
+            "No": 574,
+            "Yes": 573
+          },
+          "type": "Object"
+        },
+        "password": {
+          "defaultValue": "password",
+          "type": "String"
+        },
+        "prehire": {
+          "defaultValue": {
+            "0": 576,
+            "1": 575,
+            "No": 576,
+            "Yes": 575
+          },
+          "type": "Object"
+        },
+        "workdayPassword": {
+          "defaultValue": "password",
+          "type": "String"
+        },
+        "workdayUrl": {
+          "defaultValue": "https://wd3-impl-services1.workday.com/ccx/service/",
+          "type": "String"
+        },
+        "workdayUser": {
+          "defaultValue": "user",
+          "type": "String"
+        }
+      },
+      "triggers": {
+        "Recurrence": {
+          "recurrence": {
+            "frequency": "Day",
+            "interval": 1
+          },
+          "type": "Recurrence",
+          "operationOptions": "SingleInstance"
+        }
+      },
+      "actions": {
+        "For_each": {
+          "foreach": "@take(body('INT0020-Split-Array'),max(div(length(body('INT0020-Split-Array')),2)))",
+          "actions": {
+            "INT0020-Update-Fuse-Users": {
+              "runAfter": {},
+              "type": "Function",
+              "inputs": {
+                "body": {
+                  "auth_token": "@{body('GET_FUSE_TOKEN')['auth_token']}",
+                  "ismanager": "@parameters('ismanager')",
+                  "jobfamily": "@parameters('jobfamily')",
+                  "jobgroup": "@parameters('jobgroup')",
+                  "jobprofile": "@parameters('jobprofile')",
+                  "newstarter": "@parameters('newstarter')",
+                  "prehire": "@parameters('prehire')",
+                  "url": "@parameters('fuseUrl')",
+                  "workday": "@item()"
+                },
+                "function": {
+                  "id": "/subscriptions/fakeecb73-15f5-4c85-bb3e-fakeecb73/resourceGroups/myresourcegrp/providers/Microsoft.Web/sites/myfunctionapp/functions/INT0020-Update-Fuse-Users-Compare"
+                }
+              }
+            }
+          },
+          "runAfter": {
+            "GET_FUSE_TOKEN": [
+              "Succeeded"
+            ]
+          },
+          "type": "Foreach",
+          "operationOptions": "Sequential"
+        },
+        "For_each_2": {
+          "foreach": "@skip(body('INT0020-Split-Array'),max(div(length(body('INT0020-Split-Array')),2)))",
+          "actions": {
+            "INT0020-Update-Fuse-Users2": {
+              "runAfter": {},
+              "type": "Function",
+              "inputs": {
+                "body": {
+                  "auth_token": "@{body('GET_FUSE_TOKEN')['auth_token']}",
+                  "ismanager": "@parameters('ismanager')",
+                  "jobfamily": "@parameters('jobfamily')",
+                  "jobgroup": "@parameters('jobgroup')",
+                  "jobprofile": "@parameters('jobprofile')",
+                  "newstarter": "@parameters('newstarter')",
+                  "prehire": "@parameters('prehire')",
+                  "url": "@parameters('fuseUrl')",
+                  "workday": "@item()"
+                },
+                "function": {
+                  "id": "/subscriptions/fakeecb73-15f5-4c85-bb3e-fakeecb73/resourceGroups/myresourcegrp/providers/Microsoft.Web/sites/myfunctionapp/functions/INT0020-Update-Fuse-Users-Compare"
+                }
+              }
+            }
+          },
+          "runAfter": {
+            "GET_FUSE_TOKEN": [
+              "Succeeded"
+            ]
+          },
+          "type": "Foreach",
+          "operationOptions": "Sequential"
+        },
+        "GET_FUSE_TOKEN": {
+          "runAfter": {
+            "INT0020-Split-Array": [
+              "Succeeded"
+            ]
+          },
+          "type": "Http",
+          "inputs": {
+            "body": "login_name=@{parameters('login_name')}&password=@{parameters('password')}",
+            "headers": {
+              "Content-Type": "application/x-www-form-urlencoded"
+            },
+            "method": "POST",
+            "uri": "@{parameters('fuseUrl')}/api/v1.8/token"
+          }
+        },
+        "Get_All_Workday_Users": {
+          "runAfter": {},
+          "type": "Http",
+          "inputs": {
+            "authentication": {
+              "password": "@{parameters('workdayPassword')}",
+              "type": "Basic",
+              "username": "@{parameters('workdayUser')}"
+            },
+            "method": "GET",
+            "uri": "@{parameters('workdayUrl')}"
+          }
+        },
+        "INT0020-Split-Array": {
+          "runAfter": {
+            "Get_All_Workday_Users": [
+              "Succeeded"
+            ]
+          },
+          "type": "Function",
+          "inputs": {
+            "body": {
+              "arrayToSplit": "@body('Get_All_Workday_Users')['Report_Entry']",
+              "countInSplit": 30
+            },
+            "function": {
+              "id": "/subscriptions/fakeecb73-15f5-4c85-bb3e-fakeecb73/resourceGroups/myresourcegrp/providers/Microsoft.Web/sites/myfunctionapp/functions/INT0020-Split-Array"
+            }
+          }
+        }
+      },
+      "outputs": {}
+    },
+    "parameters": {},
+    "endpointsConfiguration": {
+      "workflow": {
+        "outgoingIpAddresses": [
+          {
+            "address": "40.68.222.65"
+          },
+          {
+            "address": "40.68.209.23"
+          },
+          {
+            "address": "13.95.147.65"
+          }
+        ],
+        "accessEndpointIpAddresses": [
+          {
+            "address": "13.95.155.53"
+          },
+          {
+            "address": "52.174.54.218"
+          },
+          {
+            "address": "52.174.49.6"
+          }
+        ]
+      },
+      "connector": {
+        "outgoingIpAddresses": [
+          {
+            "address": "40.115.50.13"
+          }
+        ]
+      }
+    }
+  },
+  "id": "/subscriptions/fakeecb73-15f5-4c85-bb3e-fakeecb73/resourceGroups/myresourcegrp/providers/Microsoft.Logic/workflows/INT0020-All-Users-Batch2",
+  "name": "INT0020-All-Users-Batch2",
+  "type": "Microsoft.Logic/workflows",
+  "location": "westeurope"
+}

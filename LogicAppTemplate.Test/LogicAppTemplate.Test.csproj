@@ -35,6 +35,7 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Microsoft.CSharp" />
     <Reference Include="Newtonsoft.Json, Version=9.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
       <HintPath>..\packages\Newtonsoft.Json.9.0.1\lib\net45\Newtonsoft.Json.dll</HintPath>
       <Private>True</Private>
@@ -75,8 +76,13 @@
     <EmbeddedResource Include="TestFiles\APIMMultipleSame.json" />
     <EmbeddedResource Include="TestFiles\APIMMultipleDiffrent.json" />
     <EmbeddedResource Include="TestFiles\complex-logicapp-if.json" />
-    <EmbeddedResource Include="TestFiles\Switch.json" />
+    <EmbeddedResource Include="TestFiles\complex-logicapp-switch.json" />
     <EmbeddedResource Include="TestFiles\paramGeneratorLogicAppTemplate.json" />
+    <EmbeddedResource Include="TestFiles\file-test-trigger-gateway.json" />
+    <None Include="TestFiles\ApiSource\filegateway.json" />
+    <EmbeddedResource Include="TestFiles\WorkflowTestOtherResourcegroup.json" />
+    <EmbeddedResource Include="TestFiles\file-test-readfolder.json" />
+    <EmbeddedResource Include="TestFiles\parameter-test-object.json" />
   </ItemGroup>
   <Choose>
     <When Condition="'$(VisualStudioVersion)' == '10.0' And '$(IsCodedUITest)' == 'True'">
@@ -98,6 +104,7 @@
   </Choose>
   <Import Project="$(VSToolsPath)\TeamTest\Microsoft.TestTools.targets" Condition="Exists('$(VSToolsPath)\TeamTest\Microsoft.TestTools.targets')" />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <ProjectExtensions />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
   <Target Name="BeforeBuild">
