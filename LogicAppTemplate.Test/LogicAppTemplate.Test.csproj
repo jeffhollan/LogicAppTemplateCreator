@@ -83,6 +83,9 @@
     <EmbeddedResource Include="TestFiles\WorkflowTestOtherResourcegroup.json" />
     <EmbeddedResource Include="TestFiles\file-test-readfolder.json" />
     <EmbeddedResource Include="TestFiles\parameter-test-object.json" />
+    <EmbeddedResource Include="TestFiles\IntegrationAccount-FlatFileAndTransform.json" />
+    <EmbeddedResource Include="TestFiles\HTTP-Authentication.json" />
+    <EmbeddedResource Include="TestFiles\HTTP-basic.json" />
   </ItemGroup>
   <Choose>
     <When Condition="'$(VisualStudioVersion)' == '10.0' And '$(IsCodedUITest)' == 'True'">

@@ -209,24 +209,7 @@ namespace LogicAppTemplate.Tests
             Assert.AreEqual(571, (int)defintion["parameters"]["paramismanager"]["defaultValue"]["1"]);
             Assert.AreEqual(572, (int)defintion["parameters"]["paramismanager"]["defaultValue"]["No"]);
             Assert.AreEqual(571, (int)defintion["parameters"]["paramismanager"]["defaultValue"]["Yes"]);
-            Assert.AreEqual("Object", defintion["parameters"]["paramismanager"]["type"]);
-            /*
-            dynamic obj = new System.Dynamic.ExpandoObject();
-            obj.type = "Object";
-            obj.defaultValue = new System.Dynamic.ExpandoObject();
-            ((IDictionary<string, object>)obj.defaultValue)["0"] = 572;
-            ((IDictionary<string, object>)obj.defaultValue)["1"] = 571;
-            obj.defaultValue.No = 572;
-            obj.defaultValue.Yes = 571;
-
-    var p = new JProperty("paramismanager", JObject.FromObject(obj));
-            Assert.AreEqual(JObject.FromObject(obj), (JObject)defintion["parameters"]["paramismanager"]); */
-            //check parameters
-            
-            
-            //Assert.AreEqual("[concat('/subscriptions/',subscription().subscriptionId,'/resourceGroups/', parameters('apimResourceGroup'),'/providers/Microsoft.ApiManagement/service/', parameters('apimInstanceName'),'/apis/', parameters('apimApiId'),'')]", defintion["resources"][0]["properties"]["definition"]["actions"]["Condition"]["actions"]["Switch"]["default"]["actions"]["INT002_Create_Actioncode_2"]["inputs"]["api"]["id"]);
-            //Assert.AreEqual("[concat('/subscriptions/',subscription().subscriptionId,'/resourceGroups/', parameters('apimResourceGroup'),'/providers/Microsoft.ApiManagement/service/', parameters('apimInstanceName'),'/apis/', parameters('apimApiId'),'')]", defintion["resources"][0]["properties"]["definition"]["actions"]["Condition"]["actions"]["Switch"]["cases"]["Case"]["actions"]["For_each"]["actions"]["INT002_Create_Actioncode"]["inputs"]["api"]["id"]);
-            //check nested nested action
+            Assert.AreEqual("Object", defintion["parameters"]["paramismanager"]["type"]);           
 
         }
 
@@ -282,6 +265,68 @@ namespace LogicAppTemplate.Tests
             Assert.IsNotNull(defintion["resources"][0]["properties"]["definition"]["actions"]["List_files_in_folder"]["metadata"]["[base64(parameters('List_files_in_folder-folderPath'))]"]);
             Assert.AreEqual("[parameters('List_files_in_folder-folderPath')]", defintion["resources"][0]["properties"]["definition"]["actions"]["List_files_in_folder"]["metadata"]["[base64(parameters('List_files_in_folder-folderPath'))]"]);
             //Assert.AreEqual("[base64(parameters('When_a_file_is_created-folderPath'))]", defintion["resources"][0]["properties"]["definition"]["triggers"]["When_a_file_is_created"]["inputs"]["queries"]["folderId"]);
+        }
+
+        [TestMethod()]
+        public void TestIntegrationAccount()
+        {
+            var content = GetEmbededFileContent("LogicAppTemplate.Test.TestFiles.IntegrationAccount-FlatFileAndTransform.json");
+
+            var generator = new TemplateGenerator();
+
+            var defintion = generator.generateDefinition(JObject.Parse(content)).GetAwaiter().GetResult();
+
+            //check parameters
+            Assert.AreEqual(defintion["parameters"]["IntegrationAccountName"]["defaultValue"], "ia");
+            Assert.AreEqual(defintion["parameters"]["IntegrationAccountResourceGroupName"]["defaultValue"], "[resourceGroup().name]");
+            Assert.AreEqual(defintion["parameters"]["Flat_File_Decoding-SchemaName"]["defaultValue"], "TEST-INT0021.Scorpio.DailyStatistics");
+            Assert.AreEqual(defintion["parameters"]["Flat_File_Encoding-SchemaName"]["defaultValue"], "TEST-INT0021.Intime.DailyStatistics");
+            Assert.AreEqual(defintion["parameters"]["Transform_XML-MapName"]["defaultValue"], "TEST-INT0021.DailyStatistics.Scorpio.To.Intime");
+
+
+            //check nested nested action
+
+        }
+
+
+        [TestMethod()]
+        public void TestHTTP()
+        {
+            var content = GetEmbededFileContent("LogicAppTemplate.Test.TestFiles.HTTP-basic.json");
+
+            var generator = new TemplateGenerator();
+
+            var defintion = generator.generateDefinition(JObject.Parse(content)).GetAwaiter().GetResult();
+
+            //check parameters
+            Assert.AreEqual(defintion["parameters"]["HTTP-URI"]["defaultValue"], "http://google.se");
+
+
+        }
+
+        [TestMethod()]
+        public void TestHTTPAuthentication()
+        {
+            var content = GetEmbededFileContent("LogicAppTemplate.Test.TestFiles.HTTP-Authentication.json");
+
+            var generator = new TemplateGenerator();
+
+            var defintion = generator.generateDefinition(JObject.Parse(content)).GetAwaiter().GetResult();
+
+            //check parameters basic auth
+            Assert.AreEqual(defintion["parameters"]["HTTP-Password"]["defaultValue"], "bbb");
+            Assert.AreEqual(defintion["parameters"]["HTTP-Username"]["defaultValue"], "aa");
+
+            //check parameters certificate auth
+            Assert.AreEqual(defintion["parameters"]["HTTP_2-Password"]["defaultValue"], "mypassword");
+            Assert.AreEqual(defintion["parameters"]["HTTP_2-Pfx"]["defaultValue"], "pfxcontent");
+
+            //check parameters oauth AAD
+            Assert.AreEqual(defintion["parameters"]["HTTP_3-Audience"]["defaultValue"], "myaudience");
+            Assert.AreEqual(defintion["parameters"]["HTTP_3-Authority"]["defaultValue"], "https://login.microsoft.com/my");
+            Assert.AreEqual(defintion["parameters"]["HTTP_3-ClientId"]["defaultValue"], "myclientid");
+            Assert.AreEqual(defintion["parameters"]["HTTP_3-Secret"]["defaultValue"], "mysecret");
+            Assert.AreEqual(defintion["parameters"]["HTTP_3-Tenant"]["defaultValue"], "mytenant");
         }
 
         //var resourceName = "LogicAppTemplate.Templates.starterTemplate.json";

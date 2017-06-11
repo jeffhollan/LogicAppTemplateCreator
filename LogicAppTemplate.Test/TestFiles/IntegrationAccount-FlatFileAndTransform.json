@@ -1,0 +1,106 @@
+﻿{
+  "properties": {
+    "provisioningState": "Succeeded",
+    "createdTime": "2017-06-05T09:56:26.864665Z",
+    "changedTime": "2017-06-06T08:23:14.5491032Z",
+    "state": "Enabled",
+    "version": "08587048694909839703",
+    "accessEndpoint": "https://prod-25.northeurope.logic.azure.com:443/workflows/65001140d5f2483199aec36e78d4fc2e",
+    "integrationAccount": {
+      "name": "ia",
+      "id": "/subscriptions/FAKE1e9-15f5-6c85-bc3e-1e108de79b00/resourcegroups/myrggroup/providers/Microsoft.Logic/integrationAccounts/ia",
+      "type": "Microsoft.Logic/integrationAccounts"
+    },
+    "definition": {
+      "$schema": "https://schema.management.azure.com/providers/Microsoft.Logic/schemas/2016-06-01/workflowdefinition.json#",
+      "contentVersion": "1.0.0.0",
+      "parameters": {},
+      "triggers": {
+        "manual": {
+          "type": "Request",
+          "kind": "Http",
+          "inputs": {
+            "schema": {}
+          }
+        }
+      },
+      "actions": {
+        "Flat_File_Decoding": {
+          "runAfter": {},
+          "type": "FlatFileDecoding",
+          "inputs": {
+            "content": "@{triggerBody()}",
+            "integrationAccount": {
+              "schema": {
+                "name": "TEST-INT0021.Scorpio.DailyStatistics"
+              }
+            }
+          }
+        },
+        "Flat_File_Encoding": {
+          "runAfter": {
+            "Transform_XML": [
+              "Succeeded"
+            ]
+          },
+          "type": "FlatFileEncoding",
+          "inputs": {
+            "content": "@{body('Transform_XML')}",
+            "integrationAccount": {
+              "schema": {
+                "name": "TEST-INT0021.Intime.DailyStatistics"
+              }
+            }
+          }
+        },
+        "Response": {
+          "runAfter": {
+            "Flat_File_Encoding": [
+              "Succeeded"
+            ]
+          },
+          "type": "Response",
+          "inputs": {
+            "body": "@body('Flat_File_Encoding')",
+            "statusCode": 200
+          }
+        },
+        "Transform_XML": {
+          "runAfter": {
+            "Flat_File_Decoding": [
+              "Succeeded"
+            ]
+          },
+          "type": "Xslt",
+          "inputs": {
+            "content": "@{body('Flat_File_Decoding')}",
+            "integrationAccount": {
+              "map": {
+                "name": "TEST-INT0021.DailyStatistics.Scorpio.To.Intime"
+              }
+            }
+          }
+        }
+      },
+      "outputs": {}
+    },
+    "parameters": {},
+    "endpointsConfiguration": {
+      "workflow": {
+        
+        
+      },
+      "connector": {
+        "outgoingIpAddresses": [
+          {
+            "address": "104.45.93.9"
+          }
+        ]
+      }
+    }
+  },
+  "id": "/subscriptions/FAKE1e9-15f5-6c85-bc3e-1e108de79b00/resourceGroups/myrggroup/providers/Microsoft.Logic/workflows/INT0021-DailyStatistics",
+  "name": "INT0021-DailyStatistics",
+  "type": "Microsoft.Logic/workflows",
+  "location": "northeurope"
+}
