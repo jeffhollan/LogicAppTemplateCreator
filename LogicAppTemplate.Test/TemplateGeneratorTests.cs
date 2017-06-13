@@ -327,6 +327,9 @@ namespace LogicAppTemplate.Tests
             Assert.AreEqual(defintion["parameters"]["HTTP_3-ClientId"]["defaultValue"], "myclientid");
             Assert.AreEqual(defintion["parameters"]["HTTP_3-Secret"]["defaultValue"], "mysecret");
             Assert.AreEqual(defintion["parameters"]["HTTP_3-Tenant"]["defaultValue"], "mytenant");
+
+            //check parameters Raw
+            Assert.AreEqual(defintion["parameters"]["HTTP_4-Raw"]["defaultValue"], "myauthheader");            
         }
 
         //var resourceName = "LogicAppTemplate.Templates.starterTemplate.json";

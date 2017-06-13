@@ -97,6 +97,22 @@
             }
           ]
         },
+        "HTTP_4": {
+          "type": "Http",
+          "inputs": {
+            "authentication": {
+              "type": "Raw",
+              "value": "myauthheader"
+            },
+            "method": "POST",
+            "uri": "http://google.se"
+          },
+          "conditions": [
+            {
+              "dependsOn": "HTTP_3"
+            }
+          ]
+        },
         "Response": {
           "type": "Response",
           "inputs": {
@@ -105,7 +121,7 @@
           },
           "conditions": [
             {
-              "dependsOn": "HTTP_3"
+              "dependsOn": "HTTP_4"
             }
           ]
         }
