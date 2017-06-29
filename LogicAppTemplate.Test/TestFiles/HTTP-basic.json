@@ -1,0 +1,113 @@
+﻿{
+  "properties": {
+    "provisioningState": "Succeeded",
+    "createdTime": "2016-03-29T11:46:20.905923Z",
+    "changedTime": "2017-06-11T10:47:39.040243Z",
+    "state": "Disabled",
+    "version": "08587044288264688388",
+    "accessEndpoint": "https://prod-05.northeurope.logic.azure.com:443/workflows/05b414ebdcc1445ab66c964899d5c488",
+    "sku": {
+      "name": "Free",
+      "plan": {
+        "name": "Default1",
+        "id": "/subscriptions/FAKE9af-ec2b-4d0f-8cf8-105fa828600a/resourceGroups/Default-Web-NorthEurope/providers/Microsoft.Web/serverFarms/Default1",
+        "type": "Microsoft.Web/ServerFarms"
+      }
+    },
+    "definition": {
+      "$schema": "https://schema.management.azure.com/providers/Microsoft.Logic/schemas/2015-08-01-preview/workflowdefinition.json#",
+      "contentVersion": "1.0.0.0",
+      "parameters": {},
+      "triggers": {
+        "manual": {
+          "type": "Manual",
+          "inputs": {
+            "schema": {
+              "properties": {
+                "test": {
+                  "properties": {
+                    "data": {
+                      "properties": {
+                        "tredje": {
+                          "type": "string"
+                        }
+                      },
+                      "type": "object"
+                    }
+                  },
+                  "type": "object"
+                }
+              },
+              "type": "object"
+            }
+          }
+        }
+      },
+      "actions": {
+        "HTTP": {
+          "type": "Http",
+          "inputs": {
+            "body": {
+              "test": "data"
+            },
+            "method": "POST",
+            "uri": "http://google.se"
+          },
+          "conditions": []
+        },
+       
+        "Response": {
+          "type": "Response",
+          "inputs": {
+            "body": "@coalesce(triggerBody()?['test']?['data']?['tredje'],'nullat')",
+            "statusCode": 200
+          },
+          "conditions": [
+            {
+              "dependsOn": "HTTP_3"
+            }
+          ]
+        }
+      },
+      "outputs": {}
+    },
+    "parameters": {},
+    "endpointsConfiguration": {
+      "workflow": {
+        "outgoingIpAddresses": [
+          {
+            "address": "40.113.12.95"
+          },
+          {
+            "address": "52.178.165.215"
+          },
+          {
+            "address": "52.178.166.21"
+          }
+        ],
+        "accessEndpointIpAddresses": [
+          {
+            "address": "13.79.173.49"
+          },
+          {
+            "address": "52.169.218.253"
+          },
+          {
+            "address": "52.169.220.174"
+          }
+        ]
+      },
+      "connector": {
+        "outgoingIpAddresses": [
+          {
+            "address": "104.45.93.9"
+          }
+        ]
+      }
+    }
+  },
+  "id": "/subscriptions/FAKE9af-ec2b-4d0f-8cf8-105fa828600a/resourceGroups/Default-Web-NorthEurope/providers/Microsoft.Logic/workflows/test",
+  "name": "test",
+  "type": "Microsoft.Logic/workflows",
+  "location": "northeurope"
+}
