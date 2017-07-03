@@ -79,13 +79,16 @@
     <EmbeddedResource Include="TestFiles\complex-logicapp-switch.json" />
     <EmbeddedResource Include="TestFiles\paramGeneratorLogicAppTemplate.json" />
     <EmbeddedResource Include="TestFiles\file-test-trigger-gateway.json" />
-    <None Include="TestFiles\ApiSource\filegateway.json" />
+    <EmbeddedResource Include="TestFiles\ApiSource\filegateway.json" />
     <EmbeddedResource Include="TestFiles\WorkflowTestOtherResourcegroup.json" />
     <EmbeddedResource Include="TestFiles\file-test-readfolder.json" />
     <EmbeddedResource Include="TestFiles\parameter-test-object.json" />
     <EmbeddedResource Include="TestFiles\IntegrationAccount-FlatFileAndTransform.json" />
     <EmbeddedResource Include="TestFiles\HTTP-Authentication.json" />
     <EmbeddedResource Include="TestFiles\HTTP-basic.json" />
+    <EmbeddedResource Include="TestFiles\ApiSource\filegatewayInstance.json" />
+    <EmbeddedResource Include="TestFiles\ApiSource\sqlgateway.json" />
+    <EmbeddedResource Include="TestFiles\ApiSource\sqlgatewayInstance.json" />
   </ItemGroup>
   <Choose>
     <When Condition="'$(VisualStudioVersion)' == '10.0' And '$(IsCodedUITest)' == 'True'">

@@ -18,7 +18,7 @@ namespace LogicAppTemplate.Models
         public Properties(string name, string apiId)
         {
             displayName = name;
-            api = new Api { id = apiId };
+            api = new Api { id = string.Format("[concat('/subscriptions/', subscription().subscriptionId, '/providers/Microsoft.Web/locations/', parameters('logicAppLocation'), '/managedApis/', '{0}')]", apiId.Split('/').Last()) };
         }
         public Api api { get; set; }
         public string displayName { get; set; }

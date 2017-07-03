@@ -68,6 +68,7 @@ namespace LogicAppTemplate
             {
                 template = JsonConvert.DeserializeObject<DeploymentTemplate>(reader.ReadToEnd());
             }
+            //WriteInformation("Starting up instance",new string[0]);
 
         }
 
@@ -209,21 +210,18 @@ namespace LogicAppTemplate
 
                 if (generateConnection)
                 {
-
+                    //get api definition
                     JObject apiResource = await generateConnectionResource(connectionName, (string)apiId);
+                    var splitted = ((string)apiId).Split('/');
+                    //get api instance data, sub,group,provider,name
+                    JObject apiResourceInstance = await generateConnectionResource(connectionName, string.Format("/subscriptions/{0}/resourceGroups/{1}/providers/{2}/connections/{3}", splitted[2], this.ResourceGroup, splitted[4], splitted.Last()));
+                    //add depends on to make sure that the api connection is created before the Logic App
+                    ((JArray)workflowTemplateReference["dependsOn"]).Add($"[resourceId('Microsoft.Web/connections', parameters('{connectionName}'))]");
 
-                    //skip gateway for now since it's not finished and will just "mess upp" if there is a connection set
-                    if (!(((string)apiResource["properties"]["capabilities"]?[0]) == "gateway"))
-                    {
-                        //add depends on to make sure that the api connection is created before the Logic App
-                        ((JArray)workflowTemplateReference["dependsOn"]).Add($"[resourceId('Microsoft.Web/connections', parameters('{connectionName}'))]");
+                    // WriteVerbose($"Generating connection resource for {connectionName}....");
+                    var connectionTemplate = generateConnectionTemplate(apiResource, apiResourceInstance, (string)apiId);
 
-                        // WriteVerbose($"Generating connection resource for {connectionName}....");
-                        var connectionTemplate = generateConnectionTemplate(connectionName, apiResource, apiIdTemplate((string)apiId));
-
-                        template.resources.Insert(1, connectionTemplate);
-                        //template.parameters.Add(connectionName, JObject.FromObject(new { type = "string", defaultValue = conn["connectionName"] }));
-                    }
+                    template.resources.Insert(1, connectionTemplate);
                 }
             }
 
@@ -307,7 +305,7 @@ namespace LogicAppTemplate
                 {
                     definition["actions"][action.Name]["inputs"]["integrationAccount"]["schema"]["name"] = "[parameters('" + AddTemplateParameter(action.Name + "-SchemaName", "string", ((JObject)definition["actions"][action.Name]["inputs"]["integrationAccount"]["schema"]).Value<string>("name")) + "')]";
                 }
-                else if(type == "xslt")
+                else if (type == "xslt")
                 {
                     definition["actions"][action.Name]["inputs"]["integrationAccount"]["map"]["name"] = "[parameters('" + AddTemplateParameter(action.Name + "-MapName", "string", ((JObject)definition["actions"][action.Name]["inputs"]["integrationAccount"]["map"]).Value<string>("name")) + "')]";
                 }
@@ -316,10 +314,10 @@ namespace LogicAppTemplate
                     definition["actions"][action.Name]["inputs"]["uri"] = "[parameters('" + AddTemplateParameter(action.Name + "-URI", "string", ((JObject)definition["actions"][action.Name]["inputs"]).Value<string>("uri")) + "')]";
 
                     var authenticationObj = (JObject)definition["actions"][action.Name]["inputs"]["authentication"];
-                    if(authenticationObj != null)
+                    if (authenticationObj != null)
                     {
                         var authType = authenticationObj.Value<string>("type");
-                        if("Basic".Equals(authType,StringComparison.CurrentCultureIgnoreCase))
+                        if ("Basic".Equals(authType, StringComparison.CurrentCultureIgnoreCase))
                         {
                             definition["actions"][action.Name]["inputs"]["authentication"]["password"] = "[parameters('" + AddTemplateParameter(action.Name + "-Password", "string", ((JObject)definition["actions"][action.Name]["inputs"]["authentication"]).Value<string>("password")) + "')]";
                             definition["actions"][action.Name]["inputs"]["authentication"]["username"] = "[parameters('" + AddTemplateParameter(action.Name + "-Username", "string", ((JObject)definition["actions"][action.Name]["inputs"]["authentication"]).Value<string>("username")) + "')]";
@@ -335,10 +333,11 @@ namespace LogicAppTemplate
                             definition["actions"][action.Name]["inputs"]["authentication"]["authority"] = "[parameters('" + AddTemplateParameter(action.Name + "-Authority", "string", ((JObject)definition["actions"][action.Name]["inputs"]["authentication"]).Value<string>("authority")) + "')]";
                             definition["actions"][action.Name]["inputs"]["authentication"]["clientId"] = "[parameters('" + AddTemplateParameter(action.Name + "-ClientId", "string", ((JObject)definition["actions"][action.Name]["inputs"]["authentication"]).Value<string>("clientId")) + "')]";
                             definition["actions"][action.Name]["inputs"]["authentication"]["secret"] = "[parameters('" + AddTemplateParameter(action.Name + "-Secret", "string", ((JObject)definition["actions"][action.Name]["inputs"]["authentication"]).Value<string>("secret")) + "')]";
-                            definition["actions"][action.Name]["inputs"]["authentication"]["tenant"] = "[parameters('" + AddTemplateParameter(action.Name + "-Tenant", "string", ((JObject)definition["actions"][action.Name]["inputs"]["authentication"]).Value<string>("tenant")) + "')]";                            
-                        }else if ("Raw".Equals(authType, StringComparison.CurrentCultureIgnoreCase))
+                            definition["actions"][action.Name]["inputs"]["authentication"]["tenant"] = "[parameters('" + AddTemplateParameter(action.Name + "-Tenant", "string", ((JObject)definition["actions"][action.Name]["inputs"]["authentication"]).Value<string>("tenant")) + "')]";
+                        }
+                        else if ("Raw".Equals(authType, StringComparison.CurrentCultureIgnoreCase))
                         {
-                            definition["actions"][action.Name]["inputs"]["authentication"]["value"] = "[parameters('" + AddTemplateParameter(action.Name + "-Raw", "string", ((JObject)definition["actions"][action.Name]["inputs"]["authentication"]).Value<string>("value")) + "')]";                            
+                            definition["actions"][action.Name]["inputs"]["authentication"]["value"] = "[parameters('" + AddTemplateParameter(action.Name + "-Raw", "string", ((JObject)definition["actions"][action.Name]["inputs"]["authentication"]).Value<string>("value")) + "')]";
                         }
                     }
                 }
@@ -496,6 +495,17 @@ namespace LogicAppTemplate
             param.Add("type", JToken.FromObject(type));
             param.Add(defaultvalue);
 
+            if (!string.IsNullOrEmpty(defaultvalue.Value.ToString()))
+            {
+                foreach (var c in template.parameters)
+                {
+                    if (c.Value.Value<string>("defaultValue").Equals(defaultvalue.Value.ToString()))
+                    {
+                        return c.Key;
+                    }
+                }
+            }
+
             if (template.parameters[paramname] == null)
             {
                 template.parameters.Add(paramname, param);
@@ -541,7 +551,7 @@ namespace LogicAppTemplate
             var request = HttpWebRequest.Create(url);
             request.Headers[HttpRequestHeader.Authorization] = "Bearer " + Token;
 
-            var logicAppRequest = request.GetResponse();
+            var logicAppRequest =  await request.GetResponseAsync();
             var stream = logicAppRequest.GetResponseStream();
             StreamReader reader = new StreamReader(stream);
             var apiResource = reader.ReadToEnd();
@@ -550,42 +560,69 @@ namespace LogicAppTemplate
 
         }
 
-        private JObject generateConnectionTemplate(string connectionName, JObject connectionResource, string apiId)
+        public JObject generateConnectionTemplate(JObject connectionResource, JObject connectionInstance, string apiId)
         {
-            var connectionTemplate = new Models.ConnectionTemplate(connectionName, apiId);
+            //create template
+            string connectionName = apiId.Split('/').Last();            
+            var connectionTemplate = new Models.ConnectionTemplate(AddTemplateParameter(connectionName + "name", "string", (string)connectionInstance["name"]), apiId);
+            //displayName            
+            connectionTemplate.properties.displayName = $"[parameters('{AddTemplateParameter(connectionName + "displayName", "string", (string)connectionInstance["properties"]["displayName"])}')]";
+
+            //add all parameters
             JObject connectionParameters = new JObject();
             foreach (JProperty parameter in connectionResource["properties"]["connectionParameters"])
             {
                 if ((string)(parameter.Value)["type"] != "oauthSetting")
                 {
-                    //Filter out gateway stuff - can't export to template yet
-                    //TODO
+                    //we are not handling parameter gatewaySetting
                     if ((string)parameter.Value["type"] == "gatewaySetting")
                         continue;
 
-                    if (((JArray)parameter.Value["uiDefinition"]["constraints"]["capability"]) != null &&
-                        ((JArray)parameter.Value["uiDefinition"]["constraints"]["capability"]).Count == 1
-                        && (string)((JArray)parameter.Value["uiDefinition"]["constraints"]["capability"])[0] == "gateway")
-                        continue;
-
-                    connectionParameters.Add(parameter.Name, $"[parameters('{connectionName + parameter.Name}')]");
-                    template.parameters.Add(connectionName + parameter.Name, JObject.FromObject(new { type = parameter.Value["type"] }));
+                    var currentvalue = (string)connectionInstance["properties"]["nonSecretParameterValues"][parameter.Name] ?? "";
+                    var addedparam = AddTemplateParameter(connectionName + parameter.Name, (string)(parameter.Value)["type"], currentvalue);
+                    connectionParameters.Add(parameter.Name, $"[parameters('{addedparam}')]");
+                    //template.parameters.Add(connectionName + parameter.Name, JObject.FromObject(new { type = parameter.Value["type"] }));
                     //If has an enum
                     if (parameter.Value["allowedValues"] != null)
                     {
-                        template.parameters[connectionName + parameter.Name]["allowedValues"] = parameter.Value["allowedValues"];
+                        var array = new JArray();
+                        foreach (var allowedValue in parameter.Value["allowedValues"]) {
+                            array.Add(allowedValue["value"]);
+                        }
+                        template.parameters[addedparam]["allowedValues"] = array;
+                        if (parameter.Value["allowedValues"].Count() == 1)
+                        {
+                            template.parameters[addedparam]["defaultValue"] = parameter.Value["allowedValues"][0]["value"];
+                        }
                     }
                     //If an optional parameter
-                    if ((bool)(parameter.Value)["uiDefinition"]["constraints"]["required"] == false)
+                    if (parameter.Value["uiDefinition"]["description"] != null)
                     {
-                        template.parameters[connectionName + parameter.Name]["defaultValue"] = "";
+                        //add meta data
+                        template.parameters[addedparam]["metadata"] = new JObject();
+                        template.parameters[addedparam]["metadata"]["description"] = parameter.Value["uiDefinition"]["description"];
                     }
                 }
             }
+
+            if (connectionInstance["properties"]["nonSecretParameterValues"]["gateway"] != null)
+            {
+                var currentvalue = (string)connectionInstance["properties"]["nonSecretParameterValues"]["gateway"]["id"];
+                var addedparam = AddTemplateParameter(connectionName + "gateway", "string", currentvalue);
+                var gatewayobject = new JObject();
+                gatewayobject["id"] = $"[parameters('{addedparam}')]";
+                connectionParameters.Add("gateway", gatewayobject);
+                
+            }
+
             connectionTemplate.properties.parameterValues = connectionParameters;
             return JObject.FromObject(connectionTemplate);
         }
 
+        public DeploymentTemplate GetTemplate()
+        {
+            return template;
+        }
 
     }
 }

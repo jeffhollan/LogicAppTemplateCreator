@@ -14,6 +14,7 @@
       "type": "string",
       "defaultValue": "[resourceGroup().location]",
       "allowedValues": [
+        "[resourceGroup().location]",
         "eastasia",
         "southeastasia",
         "centralus",
