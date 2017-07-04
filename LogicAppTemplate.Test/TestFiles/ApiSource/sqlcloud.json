@@ -1,0 +1,147 @@
+﻿{
+  "properties": {
+    "name": "sql",
+    "connectionParameters": {
+      "server": {
+        "type": "string",
+        "uiDefinition": {
+          "displayName": "SQL server name",
+          "description": "SQL server name",
+          "tooltip": "SQL server name",
+          "constraints": {
+            "tabIndex": 1,
+            "required": "true",
+            "capability": [
+              "gateway",
+              "cloud"
+            ]
+          }
+        }
+      },
+      "database": {
+        "type": "string",
+        "uiDefinition": {
+          "displayName": "SQL database name",
+          "description": "SQL database name",
+          "tooltip": "SQL database name",
+          "constraints": {
+            "tabIndex": 2,
+            "required": "true",
+            "capability": [
+              "gateway",
+              "cloud"
+            ]
+          }
+        }
+      },
+      "authType": {
+        "type": "string",
+        "allowedValues": [
+          {
+            "value": "windows"
+          },
+          {
+            "value": "basic"
+          }
+        ],
+        "uiDefinition": {
+          "displayName": "Authentication Type",
+          "description": "Authentication type to connect to your database",
+          "tooltip": "Authentication type to connect to your database",
+          "constraints": {
+            "tabIndex": 3,
+            "required": "false",
+            "allowedValues": [
+              {
+                "text": "Windows",
+                "value": "windows"
+              },
+              {
+                "text": "Basic",
+                "value": "basic"
+              }
+            ],
+            "capability": [
+              "gateway"
+            ]
+          }
+        }
+      },
+      "username": {
+        "type": "securestring",
+        "uiDefinition": {
+          "displayName": "Username",
+          "description": "Username credential",
+          "tooltip": "Username credential",
+          "constraints": {
+            "tabIndex": 4,
+            "clearText": true,
+            "required": "true",
+            "capability": [
+              "gateway",
+              "cloud"
+            ]
+          }
+        }
+      },
+      "password": {
+        "type": "securestring",
+        "uiDefinition": {
+          "displayName": "Password",
+          "description": "Password credential",
+          "tooltip": "Password credential",
+          "constraints": {
+            "tabIndex": 5,
+            "required": "true",
+            "capability": [
+              "gateway",
+              "cloud"
+            ]
+          }
+        }
+      },
+      "gateway": {
+        "type": "gatewaySetting",
+        "gatewaySettings": {
+          "dataSourceType": "sql",
+          "connectionDetails": [
+            "server",
+            "database"
+          ]
+        },
+        "uiDefinition": {
+          "constraints": {
+            "tabIndex": 6,
+            "required": "false",
+            "capability": [
+              "gateway"
+            ]
+          }
+        }
+      }
+    },
+    "metadata": {
+      "allowSharing": true,
+      "source": "marketplace",
+      "brandColor": "#ba141a"
+    },
+    "runtimeUrls": [
+      "https://logic-apis-northeurope.azure-apim.net/apim/sql"
+    ],
+    "generalInformation": {
+      "iconUrl": "https://az818438.vo.msecnd.net/icons/sql.png",
+      "displayName": "SQL Server",
+      "description": "Microsoft SQL Server is a relational database management system developed by Microsoft. Connect to SQL Server to manage data. You can perform various actions such as create, update, get, and delete on rows in a table.",
+      "releaseTag": "Production"
+    },
+    "capabilities": [
+      "tabular",
+      "gateway",
+      "cloud"
+    ]
+  },
+  "id": "/subscriptions/c107df29-a4af-4bc9-a733-f88f0eaa4296/providers/Microsoft.Web/locations/northeurope/managedApis/sql",
+  "name": "sql",
+  "type": "Microsoft.Web/locations/managedApis",
+  "location": "northeurope"
+}
