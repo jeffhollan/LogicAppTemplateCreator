@@ -583,10 +583,12 @@ namespace LogicAppTemplate
                     //we are not handling parameter gatewaySetting
                     if ((string)parameter.Value["type"] == "gatewaySetting")
                         continue;
-
-                    var match = parameter.Value["uiDefinition"]["constraints"]["capability"].FirstOrDefault( cc => (string)cc == "gateway" && useGateway || (string)cc == "cloud" && !useGateway);
-                    if (match == null)
-                        continue;
+                    if (parameter.Value["uiDefinition"]["constraints"]["capability"] != null)
+                    {
+                        var match = parameter.Value["uiDefinition"]["constraints"]["capability"].FirstOrDefault(cc => (string)cc == "gateway" && useGateway || (string)cc == "cloud" && !useGateway);
+                        if (match == null)
+                            continue;
+                    }
 
                     var currentvalue = (string)connectionInstance["properties"]["nonSecretParameterValues"][parameter.Name] ?? "";
                     var addedparam = AddTemplateParameter($"{connectionName}_{parameter.Name}", (string)(parameter.Value)["type"], currentvalue);
