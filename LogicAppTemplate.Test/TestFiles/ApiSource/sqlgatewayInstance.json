@@ -1,0 +1,39 @@
+﻿{
+  "properties": {
+    "displayName": "SQL server OnPrem",
+    "statuses": [
+      {
+        "status": "Connected"
+      }
+    ],
+    "customParameterValues": {},
+    "nonSecretParameterValues": {
+      "server": ".",
+      "database": "InvoiceDatabase",
+      "authType": "windows",
+      "gateway": {
+        "name": "Malos-LogicApp2015",
+        "id": "/subscriptions/c107df29-a4af-4bc9-a733-f88f0eaa4296/resourceGroups/OnPremDataGateway/providers/Microsoft.Web/connectionGateways/Malos-LogicApp2015",
+        "type": "Microsoft.Web/connectionGateways"
+      }
+    },
+    "createdTime": "2017-07-03T09:11:58.9632869Z",
+    "changedTime": "2017-07-03T09:16:27.4412706Z",
+    "api": {
+      "name": "sql",
+      "location": "northeurope",
+      "id": "/subscriptions/c107df29-a4af-4bc9-a733-f88f0eaa4296/providers/Microsoft.Web/locations/northeurope/managedApis/sql",
+      "type": "Microsoft.Web/locations/managedApis"
+    },
+    "testLinks": [
+      {
+        "requestUri": "https://management.azure.com:443/subscriptions/c107df29-a4af-4bc9-a733-f88f0eaa4296/resourceGroups/OnPremDataGateway/providers/Microsoft.Web/connections/sql/extensions/proxy/testconnection?api-version=2016-06-01",
+        "method": "get"
+      }
+    ]
+  },
+  "id": "/subscriptions/c107df29-a4af-4bc9-a733-f88f0eaa4296/resourceGroups/OnPremDataGateway/providers/Microsoft.Web/connections/sql",
+  "name": "sql",
+  "type": "Microsoft.Web/connections",
+  "location": "northeurope"
+}

@@ -1,0 +1,33 @@
+﻿{
+  "properties": {
+    "displayName": "SQL Azure",
+    "statuses": [
+      {
+        "status": "Connected"
+      }
+    ],
+    "customParameterValues": {},
+    "nonSecretParameterValues": {
+      "server": "dummyserverone.database.windows.net",
+      "database": "dummydatabase"
+    },
+    "createdTime": "2017-07-03T17:36:35.0288053Z",
+    "changedTime": "2017-07-03T17:36:35.0288053Z",
+    "api": {
+      "name": "sql",
+      "location": "northeurope",
+      "id": "/subscriptions/c107df29-a4af-4bc9-a733-f88f0eaa4296/providers/Microsoft.Web/locations/northeurope/managedApis/sql",
+      "type": "Microsoft.Web/locations/managedApis"
+    },
+    "testLinks": [
+      {
+        "requestUri": "https://management.azure.com:443/subscriptions/c107df29-a4af-4bc9-a733-f88f0eaa4296/resourceGroups/OnPremDataGateway/providers/Microsoft.Web/connections/sql-1/extensions/proxy/testconnection?api-version=2016-06-01",
+        "method": "get"
+      }
+    ]
+  },
+  "id": "/subscriptions/c107df29-a4af-4bc9-a733-f88f0eaa4296/resourceGroups/OnPremDataGateway/providers/Microsoft.Web/connections/sql-1",
+  "name": "sql-1",
+  "type": "Microsoft.Web/connections",
+  "location": "northeurope"
+}

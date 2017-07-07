@@ -32,8 +32,12 @@ Get-LogicAppTemplate -LogicApp MyApp -ResourceGroup Integrate2016 -SubscriptionI
 After extraction a parameters file can be created off the LogicAppTemplate. (works on any ARM template file):
 Get-ParameterTemplate -TemplateFile $filenname | Out-File 'paramfile.json'
 
+For extraction with KeyVault reference liks created use: (only static reference)
+Get-ParameterTemplate -TemplateFile $filenname -KeyVault Static | Out-File $filennameparam
+
 ### Specifications
 
 | Parameter | Description | Required |
 | --------- | ---------- | -------|
 | TemplateFile | File path to the template file | true |
+| KeyVault | Enum describing how to hanndle KeyVault possible values Static Noce, default None | false |

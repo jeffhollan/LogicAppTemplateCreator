@@ -27,11 +27,11 @@ namespace LogicAppTemplate.Tests
         [TestMethod()]
         public void ConvertWithTokenTest()
         {
-            LogicAppTemplate.TemplateGenerator generator = new TemplateGenerator(armtoken);
+           /* LogicAppTemplate.TemplateGenerator generator = new TemplateGenerator(armtoken);
             var result = generator.ConvertWithToken(subscriptionId: "80d4fe69-c95b-4dd2-a938-9250f1c8ab03", resourceGroup: "Foo", logicAppName: "Bar", bearerToken: armtoken).Result;
             Console.WriteLine(result.ToString(Newtonsoft.Json.Formatting.Indented));
             Assert.IsInstanceOfType(result, typeof(JObject));
-            Assert.IsNotNull(result);
+            Assert.IsNotNull(result);*/
         }
 
 
@@ -224,7 +224,7 @@ namespace LogicAppTemplate.Tests
             //check parameters
             Assert.AreEqual(defintion["parameters"]["When_a_file_is_createdFrequency"]["defaultValue"],"Minute");
             Assert.AreEqual(defintion["parameters"]["When_a_file_is_createdInterval"]["defaultValue"], 3);
-            Assert.AreEqual(defintion["parameters"]["filesystem_1"]["defaultValue"], "filesystem-1");
+            Assert.AreEqual(defintion["parameters"]["filesystem-1_name"]["defaultValue"], "filesystem-1");
 
 
             //check nested nested action
@@ -251,7 +251,7 @@ namespace LogicAppTemplate.Tests
             //check parameters
             Assert.AreEqual(defintion["parameters"]["RecurrenceFrequency"]["defaultValue"], "Minute");
             Assert.AreEqual(defintion["parameters"]["RecurrenceInterval"]["defaultValue"], 3);
-            Assert.AreEqual(defintion["parameters"]["filesystem_1"]["defaultValue"], "filesystem-1");
+            Assert.AreEqual(defintion["parameters"]["filesystem-1_name"]["defaultValue"], "filesystem-1");
 
 
             //check nested nested action
@@ -316,10 +316,13 @@ namespace LogicAppTemplate.Tests
             //check parameters basic auth
             Assert.AreEqual(defintion["parameters"]["HTTP-Password"]["defaultValue"], "bbb");
             Assert.AreEqual(defintion["parameters"]["HTTP-Username"]["defaultValue"], "aa");
+            Assert.AreEqual(defintion["parameters"]["HTTP-URI"]["defaultValue"], "http://google.se");
+            Assert.AreEqual(defintion["resources"][0]["properties"]["definition"]["actions"]["HTTP"]["inputs"]["uri"], "[parameters('HTTP-URI')]");
 
             //check parameters certificate auth
             Assert.AreEqual(defintion["parameters"]["HTTP_2-Password"]["defaultValue"], "mypassword");
             Assert.AreEqual(defintion["parameters"]["HTTP_2-Pfx"]["defaultValue"], "pfxcontent");
+            Assert.AreEqual(defintion["resources"][0]["properties"]["definition"]["actions"]["HTTP_2"]["inputs"]["uri"], "[parameters('HTTP-URI')]");
 
             //check parameters oauth AAD
             Assert.AreEqual(defintion["parameters"]["HTTP_3-Audience"]["defaultValue"], "myaudience");
@@ -327,9 +330,95 @@ namespace LogicAppTemplate.Tests
             Assert.AreEqual(defintion["parameters"]["HTTP_3-ClientId"]["defaultValue"], "myclientid");
             Assert.AreEqual(defintion["parameters"]["HTTP_3-Secret"]["defaultValue"], "mysecret");
             Assert.AreEqual(defintion["parameters"]["HTTP_3-Tenant"]["defaultValue"], "mytenant");
+            Assert.AreEqual(defintion["parameters"]["HTTP_3-URI"]["defaultValue"], "http://google.se/w2");
+            Assert.AreEqual(defintion["resources"][0]["properties"]["definition"]["actions"]["HTTP_3"]["inputs"]["uri"], "[parameters('HTTP_3-URI')]");
 
             //check parameters Raw
-            Assert.AreEqual(defintion["parameters"]["HTTP_4-Raw"]["defaultValue"], "myauthheader");            
+            Assert.AreEqual(defintion["parameters"]["HTTP_4-Raw"]["defaultValue"], "myauthheader");
+            Assert.AreEqual(defintion["resources"][0]["properties"]["definition"]["actions"]["HTTP_4"]["inputs"]["uri"], "[parameters('HTTP-URI')]");
+        }
+        [TestMethod]
+        public void GenerateFileSystemGatewayConnectionTemplate()
+        {
+            var apiresource = JObject.Parse(GetEmbededFileContent("LogicAppTemplate.Test.TestFiles.ApiSource.filegateway.json"));
+            var apiresourceInstance = JObject.Parse(GetEmbededFileContent("LogicAppTemplate.Test.TestFiles.ApiSource.filegatewayInstance.json"));
+            var generator = new TemplateGenerator();
+
+            var defintion = generator.generateConnectionTemplate(apiresource, apiresourceInstance, (string)apiresource["id"]);
+
+            var template = generator.GetTemplate();
+            Assert.AreEqual("windows", template.parameters["filesystem_authType"]["defaultValue"]);
+            Assert.AreEqual("Root folder path (examples: \\\\MACHINE\\myShare or C:\\myShare)", template.parameters["filesystem_rootfolder"]["metadata"]["description"]);
+
+            Assert.AreEqual("[parameters('filesystem_rootfolder')]", defintion["properties"]["parameterValues"]["rootfolder"]);
+            Assert.AreEqual("[parameters('filesystem_authType')]", defintion["properties"]["parameterValues"]["authType"]);
+            Assert.AreEqual("[parameters('filesystem_username')]", defintion["properties"]["parameterValues"]["username"]);
+            Assert.AreEqual("[parameters('filesystem_password')]", defintion["properties"]["parameterValues"]["password"]);
+            Assert.AreEqual("[concat('subscriptions/',subscription().subscriptionId,'/resourceGroups/',parameters('filesystem_gatewayresourcegroup'),'/providers/Microsoft.Web/connectionGateways/',parameters('filesystem_gatewayname'))]", defintion["properties"]["parameterValues"]["gateway"]["id"]);
+
+            Assert.AreEqual("[parameters('filesystem_name')]", defintion["name"]);
+            Assert.AreEqual("[parameters('filesystem_displayName')]", defintion["properties"]["displayName"]);
+
+            Assert.AreEqual("File System", template.parameters["filesystem_displayName"]["defaultValue"]);
+            Assert.AreEqual("[concat('/subscriptions/', subscription().subscriptionId, '/providers/Microsoft.Web/locations/', parameters('logicAppLocation'), '/managedApis/', 'filesystem')]", defintion["properties"]["api"]["id"]);
+
+        }
+
+        [TestMethod]
+        public void GenerateSQLGatewayConnectionTemplate()
+        {
+            var apiresource = JObject.Parse(GetEmbededFileContent("LogicAppTemplate.Test.TestFiles.ApiSource.sqlgateway.json"));
+            var apiresourceInstance = JObject.Parse(GetEmbededFileContent("LogicAppTemplate.Test.TestFiles.ApiSource.sqlgatewayInstance.json"));
+            var generator = new TemplateGenerator();
+
+            var defintion = generator.generateConnectionTemplate(apiresource, apiresourceInstance, (string)apiresource["id"]);
+
+            var template = generator.GetTemplate();
+            Assert.AreEqual("windows", template.parameters["sql_authType"]["defaultValue"]);
+            Assert.AreEqual("windows", template.parameters["sql_authType"]["allowedValues"][0]);
+            Assert.AreEqual("Username credential", template.parameters["sql_username"]["metadata"]["description"]);
+
+            Assert.AreEqual("[parameters('sql_server')]", defintion["properties"]["parameterValues"]["server"]);
+            Assert.AreEqual("[parameters('sql_database')]", defintion["properties"]["parameterValues"]["database"]);
+            Assert.AreEqual("[parameters('sql_authType')]", defintion["properties"]["parameterValues"]["authType"]);
+            Assert.AreEqual("[parameters('sql_username')]", defintion["properties"]["parameterValues"]["username"]);
+            Assert.AreEqual("[parameters('sql_password')]", defintion["properties"]["parameterValues"]["password"]);
+            Assert.AreEqual("[concat('subscriptions/',subscription().subscriptionId,'/resourceGroups/',parameters('sql_gatewayresourcegroup'),'/providers/Microsoft.Web/connectionGateways/',parameters('sql_gatewayname'))]", defintion["properties"]["parameterValues"]["gateway"]["id"]);
+
+            Assert.AreEqual("[parameters('sql_name')]", defintion["name"]);
+            Assert.AreEqual("[parameters('sql_displayName')]", defintion["properties"]["displayName"]);
+            
+            Assert.AreEqual("SQL server OnPrem", template.parameters["sql_displayName"]["defaultValue"]);
+            Assert.AreEqual("[concat('/subscriptions/', subscription().subscriptionId, '/providers/Microsoft.Web/locations/', parameters('logicAppLocation'), '/managedApis/', 'sql')]", defintion["properties"]["api"]["id"]);
+
+        }
+
+        [TestMethod]
+        public void GenerateSQLCloudConnectionTemplate()
+        {
+            var apiresource = JObject.Parse(GetEmbededFileContent("LogicAppTemplate.Test.TestFiles.ApiSource.sqlcloud.json"));
+            var apiresourceInstance = JObject.Parse(GetEmbededFileContent("LogicAppTemplate.Test.TestFiles.ApiSource.sqlcloudInstance.json"));
+            var generator = new TemplateGenerator();
+
+            var defintion = generator.generateConnectionTemplate(apiresource, apiresourceInstance, (string)apiresource["id"]);
+
+            var template = generator.GetTemplate();
+            Assert.IsNull(template.parameters["sql-1_authType"]);           
+            Assert.AreEqual("Username credential", template.parameters["sql-1_username"]["metadata"]["description"]);
+
+            Assert.AreEqual("[parameters('sql-1_server')]", defintion["properties"]["parameterValues"]["server"]);
+            Assert.AreEqual("[parameters('sql-1_database')]", defintion["properties"]["parameterValues"]["database"]);
+            Assert.IsNull(defintion["properties"]["parameterValues"]["authType"]);
+            Assert.AreEqual("[parameters('sql-1_username')]", defintion["properties"]["parameterValues"]["username"]);
+            Assert.AreEqual("[parameters('sql-1_password')]", defintion["properties"]["parameterValues"]["password"]);
+            Assert.IsNull(defintion["properties"]["parameterValues"]["gateway"]);
+
+            Assert.AreEqual("[parameters('sql-1_name')]", defintion["name"]);
+            Assert.AreEqual("[parameters('sql-1_displayName')]", defintion["properties"]["displayName"]);
+
+            Assert.AreEqual("SQL Azure", template.parameters["sql-1_displayName"]["defaultValue"]);
+            Assert.AreEqual("[concat('/subscriptions/', subscription().subscriptionId, '/providers/Microsoft.Web/locations/', parameters('logicAppLocation'), '/managedApis/', 'sql')]", defintion["properties"]["api"]["id"]);
+
         }
 
         //var resourceName = "LogicAppTemplate.Templates.starterTemplate.json";

@@ -1,0 +1,33 @@
+﻿{
+  "properties": {
+    "displayName": "File System",
+    "statuses": [
+      {
+        "status": "Connected"
+      }
+    ],
+    "customParameterValues": {},
+    "nonSecretParameterValues": {
+      "rootfolder": "C:\\temp\\LogicApp",
+      "authType": "windows",
+      "gateway": {
+        "name": "Malos-LogicApp2015",
+        "id": "/subscriptions/c107df29-a4af-4bc9-a733-f88f0eaa4296/resourceGroups/OnPremDataGateway/providers/Microsoft.Web/connectionGateways/Malos-LogicApp2015",
+        "type": "Microsoft.Web/connectionGateways"
+      }
+    },
+    "createdTime": "2017-07-01T22:12:53.2697076Z",
+    "changedTime": "2017-07-01T22:18:36.9508066Z",
+    "api": {
+      "name": "filesystem",
+      "location": "northeurope",
+      "id": "/subscriptions/c107df29-a4af-4bc9-a733-f88f0eaa4296/providers/Microsoft.Web/locations/northeurope/managedApis/filesystem",
+      "type": "Microsoft.Web/locations/managedApis"
+    },
+    "testLinks": []
+  },
+  "id": "/subscriptions/c107df29-a4af-4bc9-a733-f88f0eaa4296/resourceGroups/OnPremDataGateway/providers/Microsoft.Web/connections/filesystem",
+  "name": "filesystem",
+  "type": "Microsoft.Web/connections",
+  "location": "northeurope"
+}
