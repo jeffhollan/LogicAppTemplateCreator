@@ -194,20 +194,22 @@ namespace LogicAppTemplate
             {
                 // WriteVerbose($"Parameterizing {connectionProperty.Name}");
                 string connectionName = connectionProperty.Name;
+                
 
                 var conn = (JObject)connectionProperty.Value;
+                
                 var apiId = conn["id"] != null ? conn["id"] :
                             conn["api"]["id"] != null ? conn["api"]["id"] : null;
                 if (apiId == null)
                     throw new NullReferenceException($"Connection {connectionName} is missing an id");
-
+                string connectionNameProperty = (string)conn["connectionName"] ?? ((string)conn["connectionId"]).Split('/').Last();
                 workflowTemplateReference["properties"]["parameters"]["$connections"]["value"][connectionName] = JObject.FromObject(new
                 {
                     id = apiIdTemplate((string)apiId),
-                    connectionId = $"[resourceId('Microsoft.Web/connections', parameters('{(string)conn["connectionName"]}_name'))]",
-                    connectionName = $"[parameters('{(string)conn["connectionName"]}_name')]"
+                    connectionId = $"[resourceId('Microsoft.Web/connections', parameters('{connectionNameProperty}_name'))]",
+                    connectionName = $"[parameters('{connectionNameProperty}_name')]"
                 });
-
+                AddTemplateParameter($"{connectionNameProperty}_name", "string", (string)connectionNameProperty);
 
                 if (generateConnection)
                 {
@@ -218,7 +220,7 @@ namespace LogicAppTemplate
                     //get api instance data, sub,group,provider,name
                     JObject apiResourceInstance = await generateConnectionResource(connectionId);
                     //add depends on to make sure that the api connection is created before the Logic App
-                    ((JArray)workflowTemplateReference["dependsOn"]).Add($"[resourceId('Microsoft.Web/connections', parameters('{(string)conn["connectionName"]}_name'))]");
+                    ((JArray)workflowTemplateReference["dependsOn"]).Add($"[resourceId('Microsoft.Web/connections', parameters('{connectionName}_name'))]");
 
                     // WriteVerbose($"Generating connection resource for {connectionName}....");
                     var connectionTemplate = generateConnectionTemplate(apiResource, apiResourceInstance, (string)apiId);
@@ -620,9 +622,14 @@ namespace LogicAppTemplate
             if (useGateway)
             {
                 var currentvalue = (string)connectionInstance["properties"]["nonSecretParameterValues"]["gateway"]["id"];
-                var addedparam = AddTemplateParameter($"{connectionName}_gateway", "string", currentvalue);
+                ///subscriptions/c107df29-a4af-4bc9-a733-f88f0eaa4296/resourceGroups/OnPremDataGateway/providers/Microsoft.Web/connectionGateways/Malos-LogicApp2015
+                Regex rgx = new Regex(@"\/subscriptions\/(?<subscription>[0-9a-zA-Z-]*)\/resourceGroups\/(?<resourcegroup>[a-zA-Z0-9-]*)\/providers\/Microsoft.Web\/connectionGateways\/(?<gatewayname>[a-zA-Z0-9-]*)");
+                var matches = rgx.Match(currentvalue);
+
+                var gatewayname = AddTemplateParameter($"{connectionName}_gatewayname", "string", matches.Groups["gatewayname"].Value);
+                var resourcegroup = AddTemplateParameter($"{connectionName}_gatewayresourcegroup", "string", matches.Groups["resourcegroup"].Value);
                 var gatewayobject = new JObject();
-                gatewayobject["id"] = $"[parameters('{addedparam}')]";
+                gatewayobject["id"] = $"[concat('subscriptions/',subscription().subscriptionId,'/resourceGroups/',parameters('{resourcegroup}'),'/providers/Microsoft.Web/connectionGateways/',parameters('{gatewayname}'))]";
                 connectionParameters.Add("gateway", gatewayobject);
                 useGateway = true;
             }

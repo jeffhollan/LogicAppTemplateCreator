@@ -3,6 +3,7 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
+using System.Dynamic;
 using System.IO;
 using System.Linq;
 using System.Management.Automation;
@@ -20,6 +21,17 @@ namespace LogicAppTemplate
             )]
         public string TemplateFile;
 
+        [Parameter(
+            Mandatory = false,
+            HelpMessage = "How to handle KeyVault integration, default is None, available options None or Static, Static will generate parameters for static reference to KeyVault"
+            )]
+        public KeyVaultUsage KeyVault = KeyVaultUsage.None;
+
+        public enum KeyVaultUsage
+        {
+            None,
+            Static
+        }
 
         private ParameterTemplate paramTemplate;
         public ParamGenerator()
@@ -49,7 +61,17 @@ namespace LogicAppTemplate
             foreach(var param in logicAppTemplate["parameters"].Children<JProperty>())
             {
                 var obj = new JObject();
-                obj["value"] = logicAppTemplate["parameters"][param.Name]["defaultValue"];
+                if ( KeyVaultUsage.Static == KeyVault && (string)logicAppTemplate["parameters"][param.Name]["type"] == "securestring")
+                {
+                    dynamic k = new ExpandoObject();
+                    k.keyVault = new ExpandoObject();
+                    k.keyVault.id = "/subscriptions/{subscriptionid}/resourceGroups/{resourcegroupname}/providers/Microsoft.KeyVault/vaults/{vault-name}";
+                    k.secretName = param.Name;
+                    obj["reference"] = JObject.FromObject(k);                    
+                }
+                else {
+                    obj["value"] = logicAppTemplate["parameters"][param.Name]["defaultValue"];
+                }
                 paramTemplate.parameters.Add(param.Name, obj);
             }
 

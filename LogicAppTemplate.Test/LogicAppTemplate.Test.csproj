@@ -91,6 +91,7 @@
     <EmbeddedResource Include="TestFiles\ApiSource\sqlgatewayInstance.json" />
     <EmbeddedResource Include="TestFiles\ApiSource\sqlcloud.json" />
     <EmbeddedResource Include="TestFiles\ApiSource\sqlcloudInstance.json" />
+    <EmbeddedResource Include="TestFiles\paramGenerator-securestring.json" />
   </ItemGroup>
   <Choose>
     <When Condition="'$(VisualStudioVersion)' == '10.0' And '$(IsCodedUITest)' == 'True'">
