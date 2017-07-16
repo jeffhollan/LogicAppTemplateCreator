@@ -15,7 +15,8 @@ Run the PowerShell command `Get-LogicAppTemplate`.  You can pipe the output as n
 `armclient token 80d4fe69-xxxx-4dd2-a938-9250f1c8ab03 | Get-LogicAppTemplate -LogicApp MyApp -ResourceGroup Integrate2016 -SubscriptionId 80d4fe69-xxxx-4dd2-a938-9250f1c8ab03 -Verbose | Out-File C:\template.json`
 
 Example when user is connected to multitenants:
-Get-LogicAppTemplate -LogicApp MyApp -ResourceGroup Integrate2016 -SubscriptionId 80d4fe69-xxxx-4dd2-a938-9250f1c8ab03 -TenantName contoso.onmicrosoft.com
+
+`Get-LogicAppTemplate -LogicApp MyApp -ResourceGroup Integrate2016 -SubscriptionId 80d4fe69-xxxx-4dd2-a938-9250f1c8ab03 -TenantName contoso.onmicrosoft.com`
 
 ### Specifications
 
@@ -30,10 +31,12 @@ Get-LogicAppTemplate -LogicApp MyApp -ResourceGroup Integrate2016 -SubscriptionI
 
 
 After extraction a parameters file can be created off the LogicAppTemplate. (works on any ARM template file):
-Get-ParameterTemplate -TemplateFile $filenname | Out-File 'paramfile.json'
+
+`Get-ParameterTemplate -TemplateFile $filenname | Out-File 'paramfile.json'`
 
 For extraction with KeyVault reference liks created use: (only static reference)
-Get-ParameterTemplate -TemplateFile $filenname -KeyVault Static | Out-File $filennameparam
+
+`Get-ParameterTemplate -TemplateFile $filenname -KeyVault Static | Out-File $filennameparam`
 
 ### Specifications
 
