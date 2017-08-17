@@ -24,24 +24,31 @@ param([string] $subscriptionname, [string] $tenantname, [string] $resourcegroup,
 $module = resolve-path ".\..\bin\Debug\LogicAppTemplate.dll"
 Import-Module $module
 
-# Creates the Parames folder location #
-$paramdestination = [IO.Path]::GetFullPath((Join-Path $destination "\params\"))
-
 # Create required folders #
 md -Force $destination | Out-Null
-md -Force $paramdestination | Out-Null
 
 # Select the correct subscription #
 Get-AzureRmSubscription -SubscriptionName $subscriptionname | Select-AzureRmSubscription | Out-Null
 
 Write-Host
 
-# Gets a list of logic apps and generates the associated ARM template, saving on $destination #
-Find-AzureRmResource -ResourceGroupNameContains $resourcegroup -ResourceType Microsoft.Logic/workflows | ForEach-Object { Write-Host $("Creating {0} Logic App Template" -f $_.Name) | armclient token $_.SubscriptionId | Get-LogicAppTemplate -LogicApp $_.Name -ResourceGroup $_.ResourceGroupName -SubscriptionId $_.SubscriptionId -TenantName $tenantname -Verbose | Out-File $(Join-path $destination ($_.Name + ".json")) -Force}
+# Gets a list of logic app
+Find-AzureRmResource -ResourceGroupNameContains $resourcegroup -ResourceType Microsoft.Logic/workflows | ForEach-Object{ 
+
+	Write-Host $("Creating {0} Logic App Template" -f $_.Name)
+
+	# Define the destination folder #
+	$logicappfolder = [IO.Path]::GetFullPath((Join-Path $destination $_.Name))
+	md $logicappfolder -Force | Out-Null
+	
+	# Define the destination file names #
+	$destinationfile = $(Join-path $logicappfolder ($_.Name + ".json"))
+	$destinationparmfile = $(Join-path $logicappfolder ($_.Name + ".param.json"))
+	
+	# Create Logic App Template #
+	armclient token $_.SubscriptionId |	Get-LogicAppTemplate -LogicApp $_.Name -ResourceGroup $_.ResourceGroupName -SubscriptionId $_.SubscriptionId -TenantName $tenantname -Verbose | Out-File $destinationfile -Force
+	
+	# Generate the Parameter File #
+	Get-ParameterTemplate -TemplateFile $destinationfile | Out-File $destinationparmfile -Force}
 
 Write-Host
-
-# Parses the generated ARM Template files and generate the templates #
-Get-ChildItem -Path $destination -File |ForEach-Object {Write-Host $("Creating {0} Logic App parms file" -f $_.Name) ; Get-ParameterTemplate -TemplateFile $_.FullName | Out-File $(Join-path $paramdestination ("param_" + $_.Name)) -Force}
-
-write-Host
