@@ -1,0 +1,17 @@
+﻿{
+  "name": "",
+  "type": "Microsoft.Resources/deployments",
+  "apiVersion": "2016-09-01",
+  "dependsOn": [],
+  "properties": {
+    "mode": "Incremental",
+    "templateLink": {
+      "contentVersion": "1.0.0.0",
+      "uri": ""
+    },
+    "parametersLink": {
+      "uri": "",
+      "contentVersion": "1.0.0.0"
+    }
+  }
+}
