@@ -68,8 +68,6 @@ namespace LogicAppTemplate
             {
                 template = JsonConvert.DeserializeObject<DeploymentTemplate>(reader.ReadToEnd());
             }
-            //WriteInformation("Starting up instance",new string[0]);
-
         }
 
         public TemplateGenerator(string token) : this()

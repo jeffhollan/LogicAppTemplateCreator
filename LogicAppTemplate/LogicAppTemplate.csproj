@@ -59,6 +59,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Constants\Constants.cs" />
+    <Compile Include="EmptyParameterTemplateGenerator.cs" />
     <Compile Include="Models\NestedResourceTemplate.cs" />
     <Compile Include="Models\ParameterTemplate.cs" />
     <Compile Include="NestedTemplateGenerator.cs" />
