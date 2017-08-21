@@ -43,7 +43,7 @@ Find-AzureRmResource -ResourceGroupNameContains $resourcegroup -ResourceType Mic
 	
 	# Define the destination file names #
 	$destinationfile = $(Join-path $logicappfolder ($_.Name + ".json"))
-	$destinationparmfile = $(Join-path $logicappfolder ($_.Name + ".param.json"))
+	$destinationparmfile = $(Join-path $logicappfolder ($_.Name + ".parameters.json"))
 	
 	# Create Logic App Template #
 	armclient token $_.SubscriptionId |	Get-LogicAppTemplate -LogicApp $_.Name -ResourceGroup $_.ResourceGroupName -SubscriptionId $_.SubscriptionId -TenantName $tenantname -Verbose | Out-File $destinationfile -Force
@@ -52,3 +52,23 @@ Find-AzureRmResource -ResourceGroupNameContains $resourcegroup -ResourceType Mic
 	Get-ParameterTemplate -TemplateFile $destinationfile | Out-File $destinationparmfile -Force}
 
 Write-Host
+# Initialize Azure Deploy nested Templates variable #
+$azuredeploytemplate = ""
+
+Write-Host "Creating AzureDeploy ARM Template"
+
+# Gets a list of resources to add to the nested template #
+Get-ChildItem $destination -Directory | ForEach-object {
+
+    # Adds the resource to the nested templates #
+    $azuredeploytemplate = Get-NestedResourceTemplate -ResourceName $_.Name -Template $azuredeploytemplate}
+
+#Save nested template to destination #
+$azuredeploytemplate | Out-File $(Join-path $destination "azuredeploy.json") -Force
+
+Write-Host
+
+Write-Host "Creating AzureDeploy ARM Template"
+
+#Generate an empty Azure Deploy Parameter
+Get-EmptyParameterTemplate | Out-File $(Join-path $destination "azuredeploy.parameters.json") -Force
