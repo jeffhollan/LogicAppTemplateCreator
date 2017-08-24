@@ -1,0 +1,31 @@
+﻿{
+  "properties": {
+    "displayName": "azureblob",
+    "statuses": [
+      {
+        "status": "Connected"
+      }
+    ],
+    "customParameterValues": {},
+    "nonSecretParameterValues": {
+      "accountName": "myblobaccountname"
+    },
+    "createdTime": "2017-03-06T13:11:21.757194Z",
+    "changedTime": "2017-08-21T12:53:01.588968Z",
+    "api": {
+      "name": "azureblob",
+      "id": "/subscriptions/fakeee-15f5-4c85-bb3e-1e108dc79b00/providers/Microsoft.Web/locations/westeurope/managedApis/azureblob",
+      "type": "Microsoft.Web/locations/managedApis"
+    },
+    "testLinks": [
+      {
+        "requestUri": "https://management.azure.com:443/subscriptions/fakeee-15f5-4c85-bb3e-1e108dc79b00/resourceGroups/resourcegroupname/providers/Microsoft.Web/connections/azureblob/extensions/proxy/testconnection?api-version=2016-06-01",
+        "method": "get"
+      }
+    ]
+  },
+  "id": "/subscriptions/fakeee-15f5-4c85-bb3e-1e108dc79b00/resourceGroups/resourcegroupname/providers/Microsoft.Web/connections/azureblob",
+  "name": "azureblob",
+  "type": "Microsoft.Web/connections",
+  "location": "westeurope"
+}

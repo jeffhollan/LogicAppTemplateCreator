@@ -91,7 +91,7 @@ namespace LogicAppTemplate
                     }
                     AuthenticationContext ac = new AuthenticationContext(authstring, true);
 
-                    var ar = ac.AcquireToken(Constants.ResourceUrl, Constants.ClientId, new Uri(Constants.RedirectUrl), PromptBehavior.Auto);
+                    var ar = ac.AcquireTokenAsync(Constants.ResourceUrl, Constants.ClientId, new Uri(Constants.RedirectUrl), new PlatformParameters(PromptBehavior.Auto)).GetAwaiter().GetResult();
                     Token = ar.AccessToken;
                     // WriteVerbose("Retrieved Token: " + Token);
                 }
@@ -194,10 +194,10 @@ namespace LogicAppTemplate
             {
                 // WriteVerbose($"Parameterizing {connectionProperty.Name}");
                 string connectionName = connectionProperty.Name;
-                
+
 
                 var conn = (JObject)connectionProperty.Value;
-                
+
                 var apiId = conn["id"] != null ? conn["id"] :
                             conn["api"]["id"] != null ? conn["api"]["id"] : null;
                 if (apiId == null)
@@ -387,20 +387,24 @@ namespace LogicAppTemplate
                         {
                             case "filesystem":
                                 {
-                                    var metadata = action.Value.SelectToken("metadata");
-                                    if (metadata != null)
+                                    //var metadata = action.Value.SelectToken("metadata");
+                                    var meta = ((JObject)definition["actions"][action.Name]["metadata"]);
+                                    if (meta != null)
                                     {
-
-                                        byte[] data = Convert.FromBase64String(((JProperty)metadata.First).Name);
-                                        var folderpath = Encoding.UTF8.GetString(data);
-
-                                        var param = AddTemplateParameter(action.Name + "-folderPath", "string", folderpath);
-                                        //remove the metadata tag associated with the folderid
-                                        var meta = ((JObject)definition["actions"][action.Name]["metadata"]);
-                                        meta.Remove(((JProperty)metadata.First).Name);
-                                        meta.Add("[base64(parameters('" + param + "'))]", JToken.Parse("\"[parameters('" + param + "')]\""));
-
-                                        definition["actions"][action.Name]["inputs"]["path"] = "[concat('/datasets/default/folders/@{encodeURIComponent(''',base64(parameters('" + param + "')),''')}')]";
+                                        var base64string = ((JProperty)meta.First).Name;
+                                        var param = AddParameterForMetadataBase64(meta, action.Name + "-folderPath");
+                                        meta.Parent.Parent["inputs"]["path"] = action.Value.SelectToken("inputs.path").ToString().Replace($"'{base64string}'", "base64(parameters('" + param + "'))");                           
+                                    }
+                                    break;
+                                }
+                            case "azureblob":
+                                {
+                                    var meta = ((JObject)definition["actions"][action.Name]["metadata"]);
+                                    if (meta != null)
+                                    {
+                                        var base64string = ((JProperty)meta.First).Name;
+                                        var param = AddParameterForMetadataBase64(meta, action.Name + "-path");
+                                        meta.Parent.Parent["inputs"]["path"] = action.Value.SelectToken("inputs.path").ToString().Replace($"'{base64string}'", "base64(parameters('" + param + "'))");
                                     }
                                     break;
                                 }
@@ -429,21 +433,13 @@ namespace LogicAppTemplate
                         {
                             case "filesystem":
                                 {
-                                    var queries = trigger.Value.SelectToken("inputs.queries");
-
-                                    //get the path from the base64 decoded value
-                                    byte[] data = Convert.FromBase64String(queries.Value<string>("folderId"));
-                                    var triggerFolderPath = Encoding.UTF8.GetString(data);
-
-                                    var param = AddTemplateParameter(trigger.Name + "-folderPath", "string", triggerFolderPath);
-
-                                    //remove the metadata tag associated with the folderid
-                                    var meta = ((JObject)definition["triggers"][trigger.Name]["metadata"]);
-                                    meta.Remove(queries.Value<string>("folderId"));
-                                    meta.Add("[base64(parameters('" + param + "'))]", JToken.Parse("\"[parameters('" + param + "')]\""));
-
-                                    definition["triggers"][trigger.Name]["inputs"]["queries"]["folderId"] = "[base64(parameters('" + param + "'))]";
-
+                                    var meta = ((JObject)trigger.Value["metadata"]);
+                                    if (meta != null)
+                                    {
+                                        var base64string = ((JProperty)meta.First).Name;
+                                        var param = AddParameterForMetadataBase64(meta, trigger.Name + "-folderPath");
+                                        meta.Parent.Parent["inputs"]["queries"]["folderId"] = "[base64(parameters('" + param + "'))]";
+                                    }                                   
                                     break;
                                 }
                         }
@@ -455,12 +451,61 @@ namespace LogicAppTemplate
                     {
                         definition["triggers"][trigger.Name]["recurrence"]["frequency"] = "[parameters('" + this.AddTemplateParameter(trigger.Name + "Frequency", "string", recurrence.Value<string>("frequency")) + "')]";
                         definition["triggers"][trigger.Name]["recurrence"]["interval"] = "[parameters('" + this.AddTemplateParameter(trigger.Name + "Interval", "int", new JProperty("defaultValue", recurrence.Value<int>("interval"))) + "')]";
+                        if (recurrence["startTime"] != null)
+                        {
+                            string value = recurrence.Value<string>("startTime");
+                            DateTime date;
+                            if(DateTime.TryParse(value,out date))
+                            {
+                                value = date.ToString("O");
+                            }
+                            definition["triggers"][trigger.Name]["recurrence"]["startTime"] = "[parameters('" + this.AddTemplateParameter(trigger.Name + "StartTime", "string", value) + "')]";
+                        }
+                        if (recurrence["timeZone"] != null)
+                        {
+                            definition["triggers"][trigger.Name]["recurrence"]["timeZone"] = "[parameters('" + this.AddTemplateParameter(trigger.Name + "TimeZone", "string", recurrence.Value<string>("timeZone")) + "')]";
+                        }
+                        if (recurrence["schedule"] != null)
+                        {
+                            definition["triggers"][trigger.Name]["recurrence"]["schedule"] = "[parameters('" + this.AddTemplateParameter(trigger.Name + "Schedule", "Object", new JProperty("defaultValue", recurrence["schedule"])) + "')]";                            
+                        }
                     }
                 }
             }
 
             return definition;
         }
+
+        private string AddParameterForMetadataBase64(JObject meta,string parametername)
+        {
+            var base64string = ((JProperty)meta.First).Name;
+            var path = Encoding.UTF8.GetString(Convert.FromBase64String(base64string));
+            var param = AddTemplateParameter(parametername, "string", path);
+            meta.Remove(((JProperty)meta.First).Name);
+            meta.Add("[base64(parameters('" + param + "'))]", JToken.Parse("\"[parameters('" + param + "')]\""));
+            
+            return param;
+        }
+
+        private void HandledMetaDataFilePaths(JObject definition,JProperty action)
+        {
+            var metadata = action.Value.SelectToken("metadata");
+            if (metadata != null)
+            {
+
+                byte[] data = Convert.FromBase64String(((JProperty)metadata.First).Name);
+                var folderpath = Encoding.UTF8.GetString(data);
+
+                var param = AddTemplateParameter(action.Name + "-folderPath", "string", folderpath);
+                //remove the metadata tag associated with the folderid
+                var meta = ((JObject)definition["actions"][action.Name]["metadata"]);
+                meta.Remove(((JProperty)metadata.First).Name);
+                meta.Add("[base64(parameters('" + param + "'))]", JToken.Parse("\"[parameters('" + param + "')]\""));
+
+                definition["actions"][action.Name]["inputs"]["path"] = "[concat('/datasets/default/folders/@{encodeURIComponent(''',base64(parameters('" + param + "')),''')}')]";
+            }
+        }
+
 
         private string GetConnectionTypeName(JToken ConnectionToken, JObject parameters)
         {
@@ -499,11 +544,11 @@ namespace LogicAppTemplate
             param.Add("type", JToken.FromObject(type));
             param.Add(defaultvalue);
 
-            if (!string.IsNullOrEmpty(defaultvalue.Value.ToString()))
+            if (!string.IsNullOrEmpty(defaultvalue.Value.ToString()) && type.Equals("string",StringComparison.CurrentCultureIgnoreCase))
             {
                 foreach (var c in template.parameters)
                 {
-                    if (c.Value.Value<string>("defaultValue").Equals(defaultvalue.Value.ToString()))
+                    if (c.Value.Value<string>("type").Equals("string", StringComparison.CurrentCultureIgnoreCase) &&  c.Value.Value<string>("defaultValue").Equals(defaultvalue.Value.ToString()))
                     {
                         return c.Key;
                     }
@@ -555,7 +600,7 @@ namespace LogicAppTemplate
             var request = HttpWebRequest.Create(url);
             request.Headers[HttpRequestHeader.Authorization] = "Bearer " + Token;
 
-            var logicAppRequest =  await request.GetResponseAsync();
+            var logicAppRequest = await request.GetResponseAsync();
             var stream = logicAppRequest.GetResponseStream();
             StreamReader reader = new StreamReader(stream);
             var apiResource = reader.ReadToEnd();
@@ -567,17 +612,17 @@ namespace LogicAppTemplate
         public JObject generateConnectionTemplate(JObject connectionResource, JObject connectionInstance, string apiId)
         {
             //create template
-            string connectionName = (string)connectionInstance["name"];            
+            string connectionName = (string)connectionInstance["name"];
             var connectionTemplate = new Models.ConnectionTemplate(AddTemplateParameter($"{connectionName}_name", "string", (string)connectionInstance["name"]), apiId);
             //displayName            
             connectionTemplate.properties.displayName = $"[parameters('{AddTemplateParameter(connectionName + "_displayName", "string", (string)connectionInstance["properties"]["displayName"])}')]";
             JObject connectionParameters = new JObject();
 
             bool useGateway = connectionInstance["properties"]["nonSecretParameterValues"]["gateway"] != null;
-            
+
 
             //add all parameters
-            
+
             foreach (JProperty parameter in connectionResource["properties"]["connectionParameters"])
             {
                 if ((string)(parameter.Value)["type"] != "oauthSetting")
@@ -592,29 +637,37 @@ namespace LogicAppTemplate
                             continue;
                     }
 
-                    var currentvalue = (string)connectionInstance["properties"]["nonSecretParameterValues"][parameter.Name] ?? "";
-                    var addedparam = AddTemplateParameter($"{connectionName}_{parameter.Name}", (string)(parameter.Value)["type"], currentvalue);
-                    connectionParameters.Add(parameter.Name, $"[parameters('{addedparam}')]");
                     
-                    //If has an enum
-                    if (parameter.Value["allowedValues"] != null)
+                    if (parameter.Name == "accessKey" && apiId.EndsWith("azureblob"))
                     {
-                        var array = new JArray();
-                        foreach (var allowedValue in parameter.Value["allowedValues"]) {
-                            array.Add(allowedValue["value"]);
-                        }
-                        template.parameters[addedparam]["allowedValues"] = array;
-                        if (parameter.Value["allowedValues"].Count() == 1)
+                        connectionParameters.Add(parameter.Name, $"[listKeys(resourceId('Microsoft.Storage/storageAccounts', parameters('{connectionName}_accountName')), providers('Microsoft.Storage', 'storageAccounts').apiVersions[0]).keys[0].value]");
+                    }
+                    else {
+                        var currentvalue = (string)connectionInstance["properties"]["nonSecretParameterValues"][parameter.Name] ?? "";
+                        var addedparam = AddTemplateParameter($"{connectionName}_{parameter.Name}", (string)(parameter.Value)["type"], currentvalue);
+                        connectionParameters.Add(parameter.Name, $"[parameters('{addedparam}')]");
+
+                        //If has an enum
+                        if (parameter.Value["allowedValues"] != null)
                         {
-                            template.parameters[addedparam]["defaultValue"] = parameter.Value["allowedValues"][0]["value"];
+                            var array = new JArray();
+                            foreach (var allowedValue in parameter.Value["allowedValues"])
+                            {
+                                array.Add(allowedValue["value"]);
+                            }
+                            template.parameters[addedparam]["allowedValues"] = array;
+                            if (parameter.Value["allowedValues"].Count() == 1)
+                            {
+                                template.parameters[addedparam]["defaultValue"] = parameter.Value["allowedValues"][0]["value"];
+                            }
                         }
-                    }                    
-                        
-                    if (parameter.Value["uiDefinition"]["description"] != null)
-                    {
-                        //add meta data
-                        template.parameters[addedparam]["metadata"] = new JObject();
-                        template.parameters[addedparam]["metadata"]["description"] = parameter.Value["uiDefinition"]["description"];
+
+                        if (parameter.Value["uiDefinition"]["description"] != null)
+                        {
+                            //add meta data
+                            template.parameters[addedparam]["metadata"] = new JObject();
+                            template.parameters[addedparam]["metadata"]["description"] = parameter.Value["uiDefinition"]["description"];
+                        }
                     }
                 }
             }
