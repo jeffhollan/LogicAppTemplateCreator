@@ -445,31 +445,11 @@ namespace LogicAppTemplate.Tests
 
             var generator = new TemplateGenerator();
 
-            var defintion = generator.generateDefinition(JObject.Parse(content)).GetAwaiter().GetResult();
+            var defintion = generator.generateDefinition(JObject.Parse(content),false).GetAwaiter().GetResult();            
 
-            //check parameters basic auth
-            Assert.AreEqual(defintion["parameters"]["HTTP-Password"]["defaultValue"], "bbb");
-            Assert.AreEqual(defintion["parameters"]["HTTP-Username"]["defaultValue"], "aa");
-            Assert.AreEqual(defintion["parameters"]["HTTP-URI"]["defaultValue"], "http://google.se");
-            Assert.AreEqual(defintion["resources"][0]["properties"]["definition"]["actions"]["HTTP"]["inputs"]["uri"], "[parameters('HTTP-URI')]");
+            Assert.AreEqual("[parameters('Get_blob_content-path')]", defintion["resources"][0]["properties"]["definition"]["actions"]["Condition"]["actions"]["Get_blob_content"]["metadata"]["[base64(parameters('Get_blob_content-path'))]"]);
+            Assert.AreEqual("/datasets/default/files/@{encodeURIComponent(encodeURIComponent(base64(parameters('Get_blob_content-path'))))}/content", defintion["resources"][0]["properties"]["definition"]["actions"]["Condition"]["actions"]["Get_blob_content"]["inputs"]["path"]);
 
-            //check parameters certificate auth
-            Assert.AreEqual(defintion["parameters"]["HTTP_2-Password"]["defaultValue"], "mypassword");
-            Assert.AreEqual(defintion["parameters"]["HTTP_2-Pfx"]["defaultValue"], "pfxcontent");
-            Assert.AreEqual(defintion["resources"][0]["properties"]["definition"]["actions"]["HTTP_2"]["inputs"]["uri"], "[parameters('HTTP-URI')]");
-
-            //check parameters oauth AAD
-            Assert.AreEqual(defintion["parameters"]["HTTP_3-Audience"]["defaultValue"], "myaudience");
-            Assert.AreEqual(defintion["parameters"]["HTTP_3-Authority"]["defaultValue"], "https://login.microsoft.com/my");
-            Assert.AreEqual(defintion["parameters"]["HTTP_3-ClientId"]["defaultValue"], "myclientid");
-            Assert.AreEqual(defintion["parameters"]["HTTP_3-Secret"]["defaultValue"], "mysecret");
-            Assert.AreEqual(defintion["parameters"]["HTTP_3-Tenant"]["defaultValue"], "mytenant");
-            Assert.AreEqual(defintion["parameters"]["HTTP_3-URI"]["defaultValue"], "http://google.se/w2");
-            Assert.AreEqual(defintion["resources"][0]["properties"]["definition"]["actions"]["HTTP_3"]["inputs"]["uri"], "[parameters('HTTP_3-URI')]");
-
-            //check parameters Raw
-            Assert.AreEqual(defintion["parameters"]["HTTP_4-Raw"]["defaultValue"], "myauthheader");
-            Assert.AreEqual(defintion["resources"][0]["properties"]["definition"]["actions"]["HTTP_4"]["inputs"]["uri"], "[parameters('HTTP-URI')]");
         }
 
         //var resourceName = "LogicAppTemplate.Templates.starterTemplate.json";

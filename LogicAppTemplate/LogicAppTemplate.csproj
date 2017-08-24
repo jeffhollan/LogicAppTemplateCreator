@@ -59,7 +59,10 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Constants\Constants.cs" />
+    <Compile Include="EmptyParameterTemplateGenerator.cs" />
+    <Compile Include="Models\NestedResourceTemplate.cs" />
     <Compile Include="Models\ParameterTemplate.cs" />
+    <Compile Include="NestedTemplateGenerator.cs" />
     <Compile Include="ParamGenerator.cs" />
     <Compile Include="TemplateGenerator.cs" />
     <Compile Include="Models\ConnectionTemplate.cs" />
@@ -67,8 +70,12 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="Cmdlets\Get-RGLogicAppsTemplate.ps1" />
+    <None Include="packages.config" />
     <EmbeddedResource Include="Templates\starterTemplate.json" />
     <EmbeddedResource Include="Templates\paramTemplate.json" />
+    <EmbeddedResource Include="Templates\nestedTemplateResource.json" />
+    <EmbeddedResource Include="Templates\nestedTemplateShell.json" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
