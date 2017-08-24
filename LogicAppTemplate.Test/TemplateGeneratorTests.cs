@@ -421,6 +421,37 @@ namespace LogicAppTemplate.Tests
 
         }
 
+        [TestMethod]
+        public void GenerateBlobConnectionTemplate()
+        {
+            var apiresource = JObject.Parse(GetEmbededFileContent("LogicAppTemplate.Test.TestFiles.ApiSource.azureblob.json"));
+            var apiresourceInstance = JObject.Parse(GetEmbededFileContent("LogicAppTemplate.Test.TestFiles.ApiSource.azureblobinstance.json"));
+            var generator = new TemplateGenerator();
+
+            var defintion = generator.generateConnectionTemplate(apiresource, apiresourceInstance, (string)apiresource["id"]);
+
+            var template = generator.GetTemplate();
+
+            Assert.AreEqual("[parameters('azureblob_name')]", defintion["name"]);
+            Assert.AreEqual("[parameters('azureblob_name')]", defintion["properties"]["displayName"]);
+
+            Assert.AreEqual("[parameters('azureblob_accountName')]", defintion["properties"]["parameterValues"]["accountName"]);
+            Assert.AreEqual("[listKeys(resourceId('Microsoft.Storage/storageAccounts', parameters('azureblob_accountName')), providers('Microsoft.Storage', 'storageAccounts').apiVersions[0]).keys[0].value]", defintion["properties"]["parameterValues"]["accessKey"]);
+        }
+        [TestMethod()]
+        public void TestBlobAction()
+        {
+            var content = GetEmbededFileContent("LogicAppTemplate.Test.TestFiles.AzureBlob.json");
+
+            var generator = new TemplateGenerator();
+
+            var defintion = generator.generateDefinition(JObject.Parse(content),false).GetAwaiter().GetResult();            
+
+            Assert.AreEqual("[parameters('Get_blob_content-path')]", defintion["resources"][0]["properties"]["definition"]["actions"]["Condition"]["actions"]["Get_blob_content"]["metadata"]["[base64(parameters('Get_blob_content-path'))]"]);
+            Assert.AreEqual("/datasets/default/files/@{encodeURIComponent(encodeURIComponent(base64(parameters('Get_blob_content-path'))))}/content", defintion["resources"][0]["properties"]["definition"]["actions"]["Condition"]["actions"]["Get_blob_content"]["inputs"]["path"]);
+
+        }
+
         //var resourceName = "LogicAppTemplate.Templates.starterTemplate.json";
         private static string GetEmbededFileContent(string resourceName)
         {

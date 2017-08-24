@@ -1,0 +1,49 @@
+﻿{
+  "properties": {
+    "name": "azureblob",
+    "connectionParameters": {
+      "accountName": {
+        "type": "string",
+        "uiDefinition": {
+          "displayName": "Azure Storage Account name",
+          "description": "Name of the storage account the connector should use.",
+          "tooltip": "Provide the storage account name",
+          "constraints": {
+            "required": "true"
+          }
+        }
+      },
+      "accessKey": {
+        "type": "securestring",
+        "uiDefinition": {
+          "displayName": "Azure Storage Account Access Key",
+          "description": "Specify a valid primary/secondary storage account access key.",
+          "tooltip": "Specify a valid primary/secondary storage account access key.",
+          "constraints": {
+            "required": "true"
+          }
+        }
+      }
+    },
+    "metadata": {
+      "source": "marketplace",
+      "brandColor": "#804998"
+    },
+    "runtimeUrls": [
+      "https://logic-apis-westeurope.azure-apim.net/apim/azureblob"
+    ],
+    "generalInformation": {
+      "iconUrl": "https://az818438.vo.msecnd.net/icons/azureblob.png",
+      "displayName": "Azure Blob Storage",
+      "description": "Microsoft Azure Storage provides a massively scalable, durable, and highly available storage for data on the cloud, and serves as the data storage solution for modern applications. Connect to Blob Storage to perform various operations such as create, update, get and delete on blobs in your Azure Storage account.",
+      "releaseTag": "Production"
+    },
+    "capabilities": [
+      "blob"
+    ]
+  },
+  "id": "/subscriptions/fakeee-15f5-4c85-bb3e-1e108dc79b00/providers/Microsoft.Web/locations/westeurope/managedApis/azureblob",
+  "name": "azureblob",
+  "type": "Microsoft.Web/locations/managedApis",
+  "location": "westeurope"
+}
