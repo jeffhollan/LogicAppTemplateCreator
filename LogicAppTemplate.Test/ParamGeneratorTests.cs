@@ -24,7 +24,7 @@ namespace LogicAppTemplate.Test
 
             //check parameters
             Assert.IsNull(defintion["parameters"]["INT0014-NewHires-ResourceGroup"]);
-            Assert.AreEqual("[resourceGroup().location]", defintion["parameters"]["logicAppLocation"]["value"]);
+            Assert.IsNull(defintion["parameters"]["logicAppLocation"]);
             Assert.AreEqual("INT0014-NewHires-Trigger", defintion["parameters"]["logicAppName"]["value"]);
         }
 
@@ -38,7 +38,7 @@ namespace LogicAppTemplate.Test
 
             //check parameters
             Assert.AreEqual("SQLAzure", defintion["parameters"]["logicAppName"]["value"]);
-            Assert.AreEqual("[resourceGroup().location]", defintion["parameters"]["logicAppLocation"]["value"]);
+            Assert.IsNull(defintion["parameters"]["logicAppLocation"]);
             Assert.AreEqual("sql-1", defintion["parameters"]["sql-1_name"]["value"]);
             Assert.AreEqual("SQL Azure", defintion["parameters"]["sql-1_displayName"]["value"]);
             Assert.AreEqual("dummyserverone.database.windows.net", defintion["parameters"]["sql-1_server"]["value"]);
@@ -57,7 +57,7 @@ namespace LogicAppTemplate.Test
 
             //check parameters
             Assert.AreEqual("SQLAzure", defintion["parameters"]["logicAppName"]["value"]);
-            Assert.AreEqual("[resourceGroup().location]", defintion["parameters"]["logicAppLocation"]["value"]);
+            Assert.IsNull(defintion["parameters"]["logicAppLocation"]);
             Assert.AreEqual("sql-1", defintion["parameters"]["sql-1_name"]["value"]);
             Assert.AreEqual("SQL Azure", defintion["parameters"]["sql-1_displayName"]["value"]);
             Assert.AreEqual("dummyserverone.database.windows.net", defintion["parameters"]["sql-1_server"]["value"]);
