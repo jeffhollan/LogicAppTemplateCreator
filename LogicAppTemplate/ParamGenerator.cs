@@ -72,7 +72,11 @@ namespace LogicAppTemplate
                 else {
                     obj["value"] = logicAppTemplate["parameters"][param.Name]["defaultValue"];
                 }
-                paramTemplate.parameters.Add(param.Name, obj);
+                // Don't create parameters that reference a ARM Template expression
+                if (!(obj["value"].ToString().StartsWith("[")))
+                {
+                    paramTemplate.parameters.Add(param.Name, obj);
+                }
             }
 
             return JObject.FromObject(paramTemplate);

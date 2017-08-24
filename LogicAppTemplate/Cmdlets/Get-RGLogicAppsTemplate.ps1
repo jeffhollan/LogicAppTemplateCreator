@@ -68,7 +68,10 @@ $azuredeploytemplate | Out-File $(Join-path $destination "azuredeploy.json") -Fo
 
 Write-Host
 
-Write-Host "Creating AzureDeploy ARM Template"
+Write-Host "Creating AzureDeploy ARM Parameter Template"
 
 #Generate an empty Azure Deploy Parameter
+
 Get-EmptyParameterTemplate | Out-File $(Join-path $destination "azuredeploy.parameters.json") -Force
+
+Write-Host
