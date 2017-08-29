@@ -361,8 +361,8 @@ namespace LogicAppTemplate
                         curr = curr.Replace(matches.Groups["resourcegroup"].Value, "', parameters('" + AddTemplateParameter(action.Name + "-ResourceGroup", "string", matches.Groups["resourcegroup"].Value) + "'),'");
                     }
 
-                    curr = curr.Replace(matches.Groups["functionApp"].Value, "', parameters('" + AddTemplateParameter(action.Name + "-FunctionApp", "string", matches.Groups["functionApp"].Value) + "'),'");
                     curr = curr.Replace(matches.Groups["functionName"].Value, "', parameters('" + AddTemplateParameter(action.Name + "-FunctionName", "string", matches.Groups["functionName"].Value) + "'),'");
+                    curr = curr.Replace(matches.Groups["functionApp"].Value, "', parameters('" + AddTemplateParameter(action.Name + "-FunctionApp", "string", matches.Groups["functionApp"].Value) + "'),'");
 
                     curr = "[concat('" + curr + "')]";
 
