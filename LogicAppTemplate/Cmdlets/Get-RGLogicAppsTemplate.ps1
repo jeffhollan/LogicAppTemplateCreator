@@ -75,3 +75,7 @@ Write-Host "Creating AzureDeploy ARM Parameter Template"
 Get-EmptyParameterTemplate | Out-File $(Join-path $destination "azuredeploy.parameters.json") -Force
 
 Write-Host
+
+Write-Host "Creating Visual Studio Project"
+
+Add-DeploymentVSProject -SourceDir $destination
