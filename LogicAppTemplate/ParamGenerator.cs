@@ -60,6 +60,12 @@ namespace LogicAppTemplate
         {
             foreach(var param in logicAppTemplate["parameters"].Children<JProperty>())
             {
+                // Don't create parameters that reference a ARM Template expression
+                if (param.Value.Value<string>("type").Equals("string",StringComparison.CurrentCultureIgnoreCase) && param.Value.Value<string>("defaultValue").StartsWith("["))
+                {
+                    continue;
+                }
+
                 var obj = new JObject();
                 if ( KeyVaultUsage.Static == KeyVault && (string)logicAppTemplate["parameters"][param.Name]["type"] == "securestring")
                 {
@@ -72,11 +78,8 @@ namespace LogicAppTemplate
                 else {
                     obj["value"] = logicAppTemplate["parameters"][param.Name]["defaultValue"];
                 }
-                // Don't create parameters that reference a ARM Template expression
-                if (!(obj["value"].ToString().StartsWith("[")))
-                {
-                    paramTemplate.parameters.Add(param.Name, obj);
-                }
+
+                paramTemplate.parameters.Add(param.Name, obj);
             }
 
             return JObject.FromObject(paramTemplate);
