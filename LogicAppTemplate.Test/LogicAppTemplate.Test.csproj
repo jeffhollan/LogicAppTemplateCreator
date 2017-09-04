@@ -91,12 +91,12 @@
     <EmbeddedResource Include="TestFiles\ApiSource\sqlcloud.json" />
     <EmbeddedResource Include="TestFiles\ApiSource\sqlcloudInstance.json" />
     <EmbeddedResource Include="TestFiles\paramGenerator-securestring.json" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="packages.config" />
     <EmbeddedResource Include="TestFiles\ApiSource\azureblob.json" />
     <EmbeddedResource Include="TestFiles\ApiSource\azureblobinstance.json" />
     <EmbeddedResource Include="TestFiles\AzureBlob.json" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="packages.config" />
   </ItemGroup>
   <Choose>
     <When Condition="'$(VisualStudioVersion)' == '10.0' And '$(IsCodedUITest)' == 'True'">

@@ -68,6 +68,7 @@
     <Compile Include="Models\ConnectionTemplate.cs" />
     <Compile Include="Models\DeploymentTemplate.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="VSProjectGenerator.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Cmdlets\Get-RGLogicAppsTemplate.ps1" />
@@ -76,6 +77,9 @@
     <EmbeddedResource Include="Templates\paramTemplate.json" />
     <EmbeddedResource Include="Templates\nestedTemplateResource.json" />
     <EmbeddedResource Include="Templates\nestedTemplateShell.json" />
+    <EmbeddedResource Include="Templates\VSProject\DeployProjectTemplate.deployproj" />
+    <EmbeddedResource Include="Templates\VSProject\Deploy-AzureResourceGroup.ps1" />
+    <EmbeddedResource Include="Templates\VSProject\Deployment.targets" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
