@@ -218,7 +218,7 @@ namespace LogicAppTemplate
                     //get api instance data, sub,group,provider,name
                     JObject apiResourceInstance = await generateConnectionResource(connectionId);
                     //add depends on to make sure that the api connection is created before the Logic App
-                    ((JArray)workflowTemplateReference["dependsOn"]).Add($"[resourceId('Microsoft.Web/connections', parameters('{connectionName}_name'))]");
+                    ((JArray)workflowTemplateReference["dependsOn"]).Add($"[resourceId('Microsoft.Web/connections', parameters('{connectionNameProperty}_name'))]");
 
                     // WriteVerbose($"Generating connection resource for {connectionName}....");
                     var connectionTemplate = generateConnectionTemplate(apiResource, apiResourceInstance, (string)apiId);
