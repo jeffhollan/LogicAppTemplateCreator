@@ -1,0 +1,256 @@
+﻿{
+  "properties": {
+    "provisioningState": "Succeeded",
+    "createdTime": "2017-05-03T17:21:19.7829436Z",
+    "changedTime": "2017-05-07T06:18:26.9717973Z",
+    "state": "Enabled",
+    "version": "08587074689787463751",
+    "accessEndpoint": "https://prod-23.westeurope.logic.azure.com:443/workflows/d1693117c2304a319d4f4e93a9bc8226",
+    "definition": {
+      "$schema": "https://schema.management.azure.com/providers/Microsoft.Logic/schemas/2016-06-01/workflowdefinition.json#",
+      "actions": {
+        "Error": {
+          "actions": {
+            "Notification": {
+              "inputs": {
+                "body": {
+                  "EventType": "SUPPORT",
+                  "MailBody": "An error occured while receiving a file from SNC. File path is @{body('Copy_file')?['Path']}",
+                  "Title": "SNC / Error while receiving a file from SNC"
+                },
+                "host": {
+                  "triggerName": "manual",
+                  "workflow": {
+                    "id": "/subscriptions/FAKEd0d-bcaf-4a6f-b27a-9fe3f331692c/resourceGroups/th_rgToUse/providers/Microsoft.Logic/workflows/LA_Notification"
+                  }
+                }
+              },
+              "runAfter": {},
+              "type": "Workflow"
+            },
+            "Terminate": {
+              "inputs": {
+                "runError": {
+                  "code": "RECEIVE ERROR",
+                  "message": "An error occured while receiving the file."
+                },
+                "runStatus": "Failed"
+              },
+              "runAfter": {
+                "Notification": [
+                  "Succeeded"
+                ]
+              },
+              "type": "Terminate"
+            }
+          },
+          "runAfter": {
+            "Scope": [
+              "Failed",
+              "TimedOut"
+            ]
+          },
+          "type": "Scope"
+        },
+        "Initialize_variable": {
+          "inputs": {
+            "variables": [
+              {
+                "name": "ArchiveFullPath",
+                "type": "String",
+                "value": "@triggerBody()?['Path']"
+              }
+            ]
+          },
+          "runAfter": {},
+          "type": "InitializeVariable"
+        },
+        "Scope": {
+          "actions": {
+            "Copy_file": {
+              "inputs": {
+                "host": {
+                  "connection": {
+                    "name": "@parameters('$connections')['filesystem']['connectionId']"
+                  }
+                },
+                "method": "post",
+                "path": "/datasets/default/copyFile",
+                "queries": {
+                  "destination": "@variables('ArchiveFullPath')",
+                  "overwrite": true,
+                  "source": "@triggerBody()?['Path']"
+                }
+              },
+              "runAfter": {
+                "Send_message_to_the_ServiceBus_topic": [
+                  "Succeeded"
+                ]
+              },
+              "type": "ApiConnection"
+            },
+            "Delete_file": {
+              "inputs": {
+                "host": {
+                  "connection": {
+                    "name": "@parameters('$connections')['filesystem']['connectionId']"
+                  }
+                },
+                "method": "delete",
+                "path": "/datasets/default/files/@{encodeURIComponent(encodeURIComponent(triggerBody()?['Path']))}"
+              },
+              "runAfter": {
+                "Copy_file": [
+                  "Succeeded"
+                ]
+              },
+              "type": "ApiConnection"
+            },
+            "FC_ExtractFilePathInfos": {
+              "inputs": {
+                "body": "@triggerBody()?['Path']",
+                "function": {
+                  "id": "/subscriptions/FAKEd0d-bcaf-4a6f-b27a-9fe3f331692c/resourceGroups/th_rgToUse/providers/Microsoft.Web/sites/fa_toUse/functions/FC_ExtractFilePathInfos"
+                },
+                "method": "POST"
+              },
+              "runAfter": {},
+              "type": "Function"
+            },
+            "Get_file_content_using_path": {
+              "inputs": {
+                "host": {
+                  "connection": {
+                    "name": "@parameters('$connections')['filesystem']['connectionId']"
+                  }
+                },
+                "method": "get",
+                "path": "/datasets/default/GetFileContentByPath",
+                "queries": {
+                  "inferContentType": true,
+                  "path": "@triggerBody()?['Path']"
+                }
+              },
+              "runAfter": {
+                "Set_ArchiveFullPath": [
+                  "Succeeded"
+                ]
+              },
+              "type": "ApiConnection"
+            },
+            "Send_message_to_the_ServiceBus_topic": {
+              "inputs": {
+                "body": {
+                  "ContentData": "@{base64(body('Get_file_content_using_path'))}",
+                  "ContentType": "@triggerBody()?['MediaType']",
+                  "Label": "@triggerBody()?['Name']",
+                  "Properties": {
+                    "EventType": "SNC_PO",
+                    "SourceFileName": "@triggerBody()?['Name']",
+                    "SourcePartner": "SNC"
+                  },
+                  "SessionId": "@{guid()}"
+                },
+                "host": {
+                  "connection": {
+                    "name": "@parameters('$connections')['servicebus']['connectionId']"
+                  }
+                },
+                "method": "post",
+                "path": "/@{encodeURIComponent('sbt_receiveorders')}/messages",
+                "queries": {
+                  "systemProperties": "Run Details"
+                }
+              },
+              "runAfter": {
+                "Get_file_content_using_path": [
+                  "Succeeded"
+                ]
+              },
+              "type": "ApiConnection"
+            },
+            "Set_ArchiveFullPath": {
+              "inputs": {
+                "name": "ArchiveFullPath",
+                "value": "@{body('FC_ExtractFilePathInfos')['Path']}\\..\\Imported\\@{body('FC_ExtractFilePathInfos')['FileNameWithoutExtension']}_@{guid()}@{body('FC_ExtractFilePathInfos')['FileExtension']}"
+              },
+              "runAfter": {
+                "FC_ExtractFilePathInfos": [
+                  "Succeeded"
+                ]
+              },
+              "type": "SetVariable"
+            }
+          },
+          "runAfter": {
+            "Initialize_variable": [
+              "Succeeded"
+            ]
+          },
+          "type": "Scope"
+        }
+      },
+      "contentVersion": "1.0.0.0",
+      "outputs": {},
+      "parameters": {
+        "$connections": {
+          "defaultValue": {},
+          "type": "Object"
+        }
+      },
+      "triggers": {
+        "When_a_file_is_created_in_the_Receive_folder_from_SNC": {
+          "inputs": {
+            "host": {
+              "connection": {
+                "name": "@parameters('$connections')['filesystem_1']['connectionId']"
+              }
+            },
+            "method": "get",
+            "path": "/datasets/default/triggers/batch/onnewfile",
+            "queries": {
+              "folderId": "6e202211-2856-4d17-9ded-5beb8b8626b0",
+              "maxFileCount": 10
+            }
+          },
+          "metadata": {
+            "6e202211-2856-4d17-9ded-5beb8b8626b0": "/"
+          },
+          "recurrence": {
+            "frequency": "Minute",
+            "interval": 3
+          },
+          "splitOn": "@triggerBody()",
+          "type": "ApiConnection"
+        }
+      }
+    },
+
+    "parameters": {
+      "$connections": {
+        "value": {
+          "filesystem": {
+            "connectionId": "/subscriptions/FAKEd0d-bcaf-4a6f-b27a-9fe3f331692c/resourceGroups/RG_CLQ_SNC/providers/Microsoft.Web/connections/filesystem",
+            "connectionName": "filesystem",
+            "id": "/subscriptions/FAKEd0d-bcaf-4a6f-b27a-9fe3f331692c/providers/Microsoft.Web/locations/westeurope/managedApis/filesystem"
+          },
+          "filesystem_1": {
+            "connectionId": "/subscriptions/FAKEd0d-bcaf-4a6f-b27a-9fe3f331692c/resourceGroups/RG_CLQ_SNC/providers/Microsoft.Web/connections/filesystem-1",
+            "connectionName": "filesystem-1",
+            "id": "/subscriptions/FAKEd0d-bcaf-4a6f-b27a-9fe3f331692c/providers/Microsoft.Web/locations/westeurope/managedApis/filesystem"
+          },
+          "servicebus": {
+            "connectionId": "/subscriptions/FAKEd0d-bcaf-4a6f-b27a-9fe3f331692c/resourceGroups/RG_CLQ_SNC/providers/Microsoft.Web/connections/servicebus",
+            "connectionName": "servicebus",
+            "id": "/subscriptions/FAKEd0d-bcaf-4a6f-b27a-9fe3f331692c/providers/Microsoft.Web/locations/westeurope/managedApis/servicebus"
+          }
+        }
+      }
+    }
+
+  },
+  "id": "/subscriptions/fakeecb73-15f5-4c85-bb3e-fakeecb73/resourceGroups/myresourcegrp/providers/Microsoft.Logic/workflows/INT0020-All-Users-Batch2",
+  "name": "INT0020-All-Users-Batch2",
+  "type": "Microsoft.Logic/workflows",
+  "location": "westeurope"
+}

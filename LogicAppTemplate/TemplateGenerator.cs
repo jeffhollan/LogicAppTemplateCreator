@@ -434,19 +434,21 @@ namespace LogicAppTemplate
                                     var meta = ((JObject)trigger.Value["metadata"]);
                                     if (meta != null)
                                     {
-                                        var folderid = meta.Parent.Parent["inputs"]["queries"].Value<string>("folderId");
-                                        //need to check if base64 string?
-                                        JToken folderpathToken = null;
-                                        if (meta.TryGetValue(folderid, out folderpathToken))
+                                        try
                                         {
-                                            var param = AddTemplateParameter(trigger.Name + "-folderPath","string",folderpathToken.Value<string>());
-                                            meta[folderid] = "[parameters('" + param + "')]";
-                                        }
-                                        else
-                                        {
+
+                                            var base64string = ((JProperty)meta.First).Name;
                                             var param = AddParameterForMetadataBase64(meta, trigger.Name + "-folderPath");
                                             meta.Parent.Parent["inputs"]["queries"]["folderId"] = "[base64(parameters('" + param + "'))]";
                                         }
+                                        catch (FormatException ex)
+                                        {
+
+                                            //folderid is not a valid base64 so we are skipping it for now
+                                            /*var path = ((JProperty)meta.First).Value.ToString();
+                                             var param = AddTemplateParameter(trigger.Name + "-folderPath","string",path);
+                                             meta[((JProperty)meta.First).Name] = $"[parameters('{param}')]";*/
+                                        }                                        
                                     }                                   
                                     break;
                                 }
