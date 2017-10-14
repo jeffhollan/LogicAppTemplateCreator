@@ -452,7 +452,7 @@ namespace LogicAppTemplate.Tests
             Assert.AreEqual("/datasets/default/files/@{encodeURIComponent(encodeURIComponent(base64(parameters('Get_blob_content-path'))))}/content", defintion["resources"][0]["properties"]["definition"]["actions"]["Condition"]["actions"]["Get_blob_content"]["inputs"]["path"]);
 
         }
-
+     
         //var resourceName = "LogicAppTemplate.Templates.starterTemplate.json";
         private static string GetEmbededFileContent(string resourceName)
         {

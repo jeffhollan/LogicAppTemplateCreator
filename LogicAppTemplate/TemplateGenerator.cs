@@ -347,7 +347,7 @@ namespace LogicAppTemplate
                 {
                     var curr = ((JObject)definition["actions"][action.Name]["inputs"]["function"]).Value<string>("id");
 
-                    Regex rgx = new Regex(@"\/subscriptions\/(?<subscription>[0-9a-zA-Z-]*)\/resourceGroups\/(?<resourcegroup>[a-zA-Z0-9-]*)\/providers\/Microsoft.Web\/sites\/(?<functionApp>[a-zA-Z0-9-]*)\/functions\/(?<functionName>.*)");
+                    Regex rgx = new Regex(@"\/subscriptions\/(?<subscription>[0-9a-zA-Z-]*)\/resourceGroups\/(?<resourcegroup>[a-zA-Z0-9-_]*)\/providers\/Microsoft.Web\/sites\/(?<functionApp>[a-zA-Z0-9-_]*)\/functions\/(?<functionName>.*)");
                     var matches = rgx.Match(curr);
 
                     curr = curr.Replace(matches.Groups["subscription"].Value, "',subscription().subscriptionId,'");
@@ -434,9 +434,19 @@ namespace LogicAppTemplate
                                     var meta = ((JObject)trigger.Value["metadata"]);
                                     if (meta != null)
                                     {
-                                        var base64string = ((JProperty)meta.First).Name;
-                                        var param = AddParameterForMetadataBase64(meta, trigger.Name + "-folderPath");
-                                        meta.Parent.Parent["inputs"]["queries"]["folderId"] = "[base64(parameters('" + param + "'))]";
+                                        var folderid = meta.Parent.Parent["inputs"]["queries"].Value<string>("folderId");
+                                        //need to check if base64 string?
+                                        JToken folderpathToken = null;
+                                        if (meta.TryGetValue(folderid, out folderpathToken))
+                                        {
+                                            var param = AddTemplateParameter(trigger.Name + "-folderPath","string",folderpathToken.Value<string>());
+                                            meta[folderid] = "[parameters('" + param + "')]";
+                                        }
+                                        else
+                                        {
+                                            var param = AddParameterForMetadataBase64(meta, trigger.Name + "-folderPath");
+                                            meta.Parent.Parent["inputs"]["queries"]["folderId"] = "[base64(parameters('" + param + "'))]";
+                                        }
                                     }                                   
                                     break;
                                 }
