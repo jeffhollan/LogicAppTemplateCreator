@@ -264,6 +264,7 @@ namespace LogicAppTemplate.Tests
             //File trigger parameters and base64 handling
             Assert.IsNotNull(defintion["resources"][0]["properties"]["definition"]["actions"]["List_files_in_folder"]["metadata"]["[base64(parameters('List_files_in_folder-folderPath'))]"]);
             Assert.AreEqual("[parameters('List_files_in_folder-folderPath')]", defintion["resources"][0]["properties"]["definition"]["actions"]["List_files_in_folder"]["metadata"]["[base64(parameters('List_files_in_folder-folderPath'))]"]);
+            Assert.AreEqual("[concat('/datasets/default/folders/@{encodeURIComponent(encodeURIComponent(',base64(parameters('List_files_in_folder-folderPath')),'))}')]", defintion["resources"][0]["properties"]["definition"]["actions"]["List_files_in_folder"]["inputs"]["path"]);
             //Assert.AreEqual("[base64(parameters('When_a_file_is_created-folderPath'))]", defintion["resources"][0]["properties"]["definition"]["triggers"]["When_a_file_is_created"]["inputs"]["queries"]["folderId"]);
         }
 
@@ -322,7 +323,7 @@ namespace LogicAppTemplate.Tests
             //check parameters certificate auth
             Assert.AreEqual(defintion["parameters"]["HTTP_2-Password"]["defaultValue"], "mypassword");
             Assert.AreEqual(defintion["parameters"]["HTTP_2-Pfx"]["defaultValue"], "pfxcontent");
-            Assert.AreEqual(defintion["resources"][0]["properties"]["definition"]["actions"]["HTTP_2"]["inputs"]["uri"], "[parameters('HTTP-URI')]");
+            Assert.AreEqual(defintion["resources"][0]["properties"]["definition"]["actions"]["HTTP_2"]["inputs"]["uri"], "[parameters('HTTP_2-URI')]");
 
             //check parameters oauth AAD
             Assert.AreEqual(defintion["parameters"]["HTTP_3-Audience"]["defaultValue"], "myaudience");
@@ -335,7 +336,7 @@ namespace LogicAppTemplate.Tests
 
             //check parameters Raw
             Assert.AreEqual(defintion["parameters"]["HTTP_4-Raw"]["defaultValue"], "myauthheader");
-            Assert.AreEqual(defintion["resources"][0]["properties"]["definition"]["actions"]["HTTP_4"]["inputs"]["uri"], "[parameters('HTTP-URI')]");
+            Assert.AreEqual(defintion["resources"][0]["properties"]["definition"]["actions"]["HTTP_4"]["inputs"]["uri"], "[parameters('HTTP_4-URI')]");
         }
         [TestMethod]
         public void GenerateFileSystemGatewayConnectionTemplate()
@@ -433,7 +434,7 @@ namespace LogicAppTemplate.Tests
             var template = generator.GetTemplate();
 
             Assert.AreEqual("[parameters('azureblob_name')]", defintion["name"]);
-            Assert.AreEqual("[parameters('azureblob_name')]", defintion["properties"]["displayName"]);
+            Assert.AreEqual("[parameters('azureblob_displayName')]", defintion["properties"]["displayName"]);
 
             Assert.AreEqual("[parameters('azureblob_accountName')]", defintion["properties"]["parameterValues"]["accountName"]);
             Assert.AreEqual("[listKeys(resourceId('Microsoft.Storage/storageAccounts', parameters('azureblob_accountName')), providers('Microsoft.Storage', 'storageAccounts').apiVersions[0]).keys[0].value]", defintion["properties"]["parameterValues"]["accessKey"]);

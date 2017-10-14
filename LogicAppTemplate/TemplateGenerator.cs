@@ -391,7 +391,7 @@ namespace LogicAppTemplate
                                     {
                                         var base64string = ((JProperty)meta.First).Name;
                                         var param = AddParameterForMetadataBase64(meta, action.Name + "-folderPath");
-                                        meta.Parent.Parent["inputs"]["path"] = action.Value.SelectToken("inputs.path").ToString().Replace($"'{base64string}'", "base64(parameters('" + param + "'))");                           
+                                        meta.Parent.Parent["inputs"]["path"] = "[concat('" +action.Value.SelectToken("inputs.path").ToString().Replace($"'{base64string}'", "',base64(parameters('" + param + "')),'") + "')]";                           
                                     }
                                     break;
                                 }
@@ -542,7 +542,7 @@ namespace LogicAppTemplate
             param.Add("type", JToken.FromObject(type));
             param.Add(defaultvalue);
 
-            if (!string.IsNullOrEmpty(defaultvalue.Value.ToString()) && type.Equals("string",StringComparison.CurrentCultureIgnoreCase))
+       /*     if (!string.IsNullOrEmpty(defaultvalue.Value.ToString()) && type.Equals("string",StringComparison.CurrentCultureIgnoreCase))
             {
                 foreach (var c in template.parameters)
                 {
@@ -551,7 +551,7 @@ namespace LogicAppTemplate
                         return c.Key;
                     }
                 }
-            }
+            }*/
 
             if (template.parameters[paramname] == null)
             {
