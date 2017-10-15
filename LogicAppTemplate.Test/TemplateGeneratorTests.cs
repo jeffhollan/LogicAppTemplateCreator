@@ -464,7 +464,7 @@ namespace LogicAppTemplate.Tests
 
             //Assert.AreEqual("[parameters('Get_blob_content-path')]", defintion["resources"][0]["properties"]["definition"]["actions"]["Condition"]["actions"]["Get_blob_content"]["metadata"]["[base64(parameters('Get_blob_content-path'))]"]);
             //Assert.AreEqual("/datasets/default/files/@{encodeURIComponent(encodeURIComponent(base64(parameters('Get_blob_content-path'))))}/content", defintion["resources"][0]["properties"]["definition"]["actions"]["Condition"]["actions"]["Get_blob_content"]["inputs"]["path"]);
-
+            Assert.AreEqual("[concat('/subscriptions/',subscription().subscriptionId,'/resourceGroups/',parameters('FC_ExtractFilePathInfos-ResourceGroup'),'/providers/Microsoft.Web/sites/',parameters('FC_ExtractFilePathInfos-FunctionApp'),'/functions/',parameters('FC_ExtractFilePathInfos-FunctionName'))]", defintion["resources"][0]["properties"]["definition"]["actions"]["Scope"]["actions"]["FC_ExtractFilePathInfos"]["inputs"]["function"]["id"]);
         }
 
         [TestMethod()]
