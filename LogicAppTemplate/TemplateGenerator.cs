@@ -349,8 +349,9 @@ namespace LogicAppTemplate
 
                     Regex rgx = new Regex(@"\/subscriptions\/(?<subscription>[0-9a-zA-Z-]*)\/resourceGroups\/(?<resourcegroup>[a-zA-Z0-9-_]*)\/providers\/Microsoft.Web\/sites\/(?<functionApp>[a-zA-Z0-9-_]*)\/functions\/(?<functionName>.*)");
                     var matches = rgx.Match(curr);
+                    definition["actions"][action.Name]["inputs"]["function"]["id"] = $"[concat('/subscriptions/',subscription().subscriptionId,'/resourceGroups/',parameters('{AddTemplateParameter(action.Name + "-ResourceGroup", "string", matches.Groups["resourcegroup"].Value)}'),'/providers/Microsoft.Web/sites/',parameters('{AddTemplateParameter(action.Name + "-FunctionApp", "string", matches.Groups["functionApp"].Value)}'),'/functions/',parameters('{AddTemplateParameter(action.Name + "-FunctionName", "string", matches.Groups["functionName"].Value)}'))]";
 
-                    curr = curr.Replace(matches.Groups["subscription"].Value, "',subscription().subscriptionId,'");
+                    /*curr = curr.Replace(matches.Groups["subscription"].Value, "',subscription().subscriptionId,'");
 
                     if (LogicAppResourceGroup == matches.Groups["resourcegroup"].Value)
                     {
@@ -366,7 +367,7 @@ namespace LogicAppTemplate
 
                     curr = "[concat('" + curr + "')]";
 
-                    definition["actions"][action.Name]["inputs"]["function"]["id"] = curr;
+                    definition["actions"][action.Name]["inputs"]["function"]["id"] = curr;*/
                 }
                 else
                 {
