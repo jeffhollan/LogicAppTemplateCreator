@@ -45,12 +45,12 @@ namespace LogicAppTemplate.Tests
             var defintion = generator.generateDefinition(JObject.Parse(content)).GetAwaiter().GetResult();
 
             //check parameters
-            Assert.IsNull(defintion["parameters"]["INT0014-NewHires-ResourceGroup"]);
+            Assert.AreEqual("[resourceGroup().name]",defintion["parameters"]["INT0014-NewHires-ResourceGroup"]["defaultValue"]);
             Assert.AreEqual("[resourceGroup().location]", defintion["parameters"]["logicAppLocation"]["defaultValue"]);
             Assert.AreEqual("INT0014-NewHires-Trigger", defintion["parameters"]["logicAppName"]["defaultValue"]);
 
             //check Upload Attachment
-            Assert.AreEqual("[concat('/subscriptions/',subscription().subscriptionId,'/resourceGroups/', resourceGroup().name,'/providers/Microsoft.Logic/workflows/INT0014-NewHires')]", defintion["resources"][0]["properties"]["definition"]["actions"]["INT0014-NewHires"]["inputs"]["host"]["workflow"]["id"]);
+            Assert.AreEqual("[concat('/subscriptions/',subscription().subscriptionId,'/resourceGroups/',parameters('INT0014-NewHires-ResourceGroup'),'/providers/Microsoft.Logic/workflows/',parameters('INT0014-NewHires-LogicAppName'))]", defintion["resources"][0]["properties"]["definition"]["actions"]["INT0014-NewHires"]["inputs"]["host"]["workflow"]["id"]);
         }
 
         [TestMethod()]
@@ -68,7 +68,7 @@ namespace LogicAppTemplate.Tests
             Assert.AreEqual("INT0014-NewHires-Trigger", defintion["parameters"]["logicAppName"]["defaultValue"]);
 
             //check Upload Attachment
-            Assert.AreEqual("[concat('/subscriptions/',subscription().subscriptionId,'/resourceGroups/', parameters('INT0014-NewHires-ResourceGroup'),'/providers/Microsoft.Logic/workflows/INT0014-NewHires')]", defintion["resources"][0]["properties"]["definition"]["actions"]["INT0014-NewHires"]["inputs"]["host"]["workflow"]["id"]);
+            Assert.AreEqual("[concat('/subscriptions/',subscription().subscriptionId,'/resourceGroups/',parameters('INT0014-NewHires-ResourceGroup'),'/providers/Microsoft.Logic/workflows/',parameters('INT0014-NewHires-LogicAppName'))]", defintion["resources"][0]["properties"]["definition"]["actions"]["INT0014-NewHires"]["inputs"]["host"]["workflow"]["id"]);
         }
 
         [TestMethod()]
@@ -171,7 +171,7 @@ namespace LogicAppTemplate.Tests
 
             //check parameters
 
-            Assert.AreEqual("[concat('/subscriptions/',subscription().subscriptionId,'/resourceGroups/', resourceGroup().name,'/providers/Microsoft.Logic/workflows/INT002_Create_Actioncode')]", defintion["resources"][0]["properties"]["definition"]["actions"]["Choose_external_procedure"]["actions"]["INT002_Create_Actioncode"]["inputs"]["host"]["workflow"]["id"]);
+            Assert.AreEqual("[concat('/subscriptions/',subscription().subscriptionId,'/resourceGroups/',parameters('INT002_Create_Actioncode-ResourceGroup'),'/providers/Microsoft.Logic/workflows/',parameters('INT002_Create_Actioncode-LogicAppName'))]", defintion["resources"][0]["properties"]["definition"]["actions"]["Choose_external_procedure"]["actions"]["INT002_Create_Actioncode"]["inputs"]["host"]["workflow"]["id"]);
             //check nested nested action
 
         }

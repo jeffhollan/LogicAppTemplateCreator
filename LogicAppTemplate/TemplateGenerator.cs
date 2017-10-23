@@ -249,7 +249,7 @@ namespace LogicAppTemplate
                     string resourcegroupValue = LogicAppResourceGroup == matches.Groups["resourcegroup"].Value ? "[resourceGroup().name]" : matches.Groups["resourcegroup"].Value;
                     string resourcegroupParameterName = AddTemplateParameter(action.Name + "-ResourceGroup", "string", resourcegroupValue);
                     string wokflowParameterName = AddTemplateParameter(action.Name + "-LogicAppName", "string", matches.Groups["workflow"].Value);
-                    string workflowid = $"[concat('/subscriptions/',subscription().subscriptionId,'/resourceGroups/',parameters('{resourcegroupParameterName}'),'/providers/Microsoft.Logic/workflows/',parameters('{wokflowParameterName}')))]";
+                    string workflowid = $"[concat('/subscriptions/',subscription().subscriptionId,'/resourceGroups/',parameters('{resourcegroupParameterName}'),'/providers/Microsoft.Logic/workflows/',parameters('{wokflowParameterName}'))]";
 
                     //curr = curr.Replace(matches.Groups["subscription"].Value, "',subscription().subscriptionId,'");
                     //$"[concat('/subscriptions/',subscription().subscriptionId,'/resourceGroups/',parameters('{AddTemplateParameter(action.Name + "-ResourceGroup", "string", matches.Groups["resourcegroup"].Value)}'),'/providers/Microsoft.Web/sites/',parameters('{AddTemplateParameter(action.Name + "-FunctionApp", "string", matches.Groups["functionApp"].Value)}'),'/functions/',parameters('{AddTemplateParameter(action.Name + "-FunctionName", "string", matches.Groups["functionName"].Value)}'))]";
