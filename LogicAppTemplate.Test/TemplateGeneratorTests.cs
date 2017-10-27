@@ -45,12 +45,12 @@ namespace LogicAppTemplate.Tests
             var defintion = generator.generateDefinition(JObject.Parse(content)).GetAwaiter().GetResult();
 
             //check parameters
-            Assert.IsNull(defintion["parameters"]["INT0014-NewHires-ResourceGroup"]);
+            Assert.AreEqual("[resourceGroup().name]",defintion["parameters"]["INT0014-NewHires-ResourceGroup"]["defaultValue"]);
             Assert.AreEqual("[resourceGroup().location]", defintion["parameters"]["logicAppLocation"]["defaultValue"]);
             Assert.AreEqual("INT0014-NewHires-Trigger", defintion["parameters"]["logicAppName"]["defaultValue"]);
 
             //check Upload Attachment
-            Assert.AreEqual("[concat('/subscriptions/',subscription().subscriptionId,'/resourceGroups/', resourceGroup().name,'/providers/Microsoft.Logic/workflows/INT0014-NewHires')]", defintion["resources"][0]["properties"]["definition"]["actions"]["INT0014-NewHires"]["inputs"]["host"]["workflow"]["id"]);
+            Assert.AreEqual("[concat('/subscriptions/',subscription().subscriptionId,'/resourceGroups/',parameters('INT0014-NewHires-ResourceGroup'),'/providers/Microsoft.Logic/workflows/',parameters('INT0014-NewHires-LogicAppName'))]", defintion["resources"][0]["properties"]["definition"]["actions"]["INT0014-NewHires"]["inputs"]["host"]["workflow"]["id"]);
         }
 
         [TestMethod()]
@@ -68,7 +68,7 @@ namespace LogicAppTemplate.Tests
             Assert.AreEqual("INT0014-NewHires-Trigger", defintion["parameters"]["logicAppName"]["defaultValue"]);
 
             //check Upload Attachment
-            Assert.AreEqual("[concat('/subscriptions/',subscription().subscriptionId,'/resourceGroups/', parameters('INT0014-NewHires-ResourceGroup'),'/providers/Microsoft.Logic/workflows/INT0014-NewHires')]", defintion["resources"][0]["properties"]["definition"]["actions"]["INT0014-NewHires"]["inputs"]["host"]["workflow"]["id"]);
+            Assert.AreEqual("[concat('/subscriptions/',subscription().subscriptionId,'/resourceGroups/',parameters('INT0014-NewHires-ResourceGroup'),'/providers/Microsoft.Logic/workflows/',parameters('INT0014-NewHires-LogicAppName'))]", defintion["resources"][0]["properties"]["definition"]["actions"]["INT0014-NewHires"]["inputs"]["host"]["workflow"]["id"]);
         }
 
         [TestMethod()]
@@ -171,7 +171,7 @@ namespace LogicAppTemplate.Tests
 
             //check parameters
 
-            Assert.AreEqual("[concat('/subscriptions/',subscription().subscriptionId,'/resourceGroups/', resourceGroup().name,'/providers/Microsoft.Logic/workflows/INT002_Create_Actioncode')]", defintion["resources"][0]["properties"]["definition"]["actions"]["Choose_external_procedure"]["actions"]["INT002_Create_Actioncode"]["inputs"]["host"]["workflow"]["id"]);
+            Assert.AreEqual("[concat('/subscriptions/',subscription().subscriptionId,'/resourceGroups/',parameters('INT002_Create_Actioncode-ResourceGroup'),'/providers/Microsoft.Logic/workflows/',parameters('INT002_Create_Actioncode-LogicAppName'))]", defintion["resources"][0]["properties"]["definition"]["actions"]["Choose_external_procedure"]["actions"]["INT002_Create_Actioncode"]["inputs"]["host"]["workflow"]["id"]);
             //check nested nested action
 
         }
@@ -450,6 +450,34 @@ namespace LogicAppTemplate.Tests
 
             Assert.AreEqual("[parameters('Get_blob_content-path')]", defintion["resources"][0]["properties"]["definition"]["actions"]["Condition"]["actions"]["Get_blob_content"]["metadata"]["[base64(parameters('Get_blob_content-path'))]"]);
             Assert.AreEqual("/datasets/default/files/@{encodeURIComponent(encodeURIComponent(base64(parameters('Get_blob_content-path'))))}/content", defintion["resources"][0]["properties"]["definition"]["actions"]["Condition"]["actions"]["Get_blob_content"]["inputs"]["path"]);
+
+        }
+
+        [TestMethod()]
+        public void TestMissingParameter()
+        {
+            var content = GetEmbededFileContent("LogicAppTemplate.Test.TestFiles.misingparameter.json");
+
+            var generator = new TemplateGenerator();
+
+            var defintion = generator.generateDefinition(JObject.Parse(content), false).GetAwaiter().GetResult();
+
+            //Assert.AreEqual("[parameters('Get_blob_content-path')]", defintion["resources"][0]["properties"]["definition"]["actions"]["Condition"]["actions"]["Get_blob_content"]["metadata"]["[base64(parameters('Get_blob_content-path'))]"]);
+            //Assert.AreEqual("/datasets/default/files/@{encodeURIComponent(encodeURIComponent(base64(parameters('Get_blob_content-path'))))}/content", defintion["resources"][0]["properties"]["definition"]["actions"]["Condition"]["actions"]["Get_blob_content"]["inputs"]["path"]);
+            Assert.AreEqual("[concat('/subscriptions/',subscription().subscriptionId,'/resourceGroups/',parameters('FC_ExtractFilePathInfos-ResourceGroup'),'/providers/Microsoft.Web/sites/',parameters('FC_ExtractFilePathInfos-FunctionApp'),'/functions/',parameters('FC_ExtractFilePathInfos-FunctionName'))]", defintion["resources"][0]["properties"]["definition"]["actions"]["Scope"]["actions"]["FC_ExtractFilePathInfos"]["inputs"]["function"]["id"]);
+        }
+
+        [TestMethod()]
+        public void TestFileTriggerAndMore()
+        {
+            var content = GetEmbededFileContent("LogicAppTemplate.Test.TestFiles.file-test-triggerandmore.json");
+
+            var generator = new TemplateGenerator();
+
+            var defintion = generator.generateDefinition(JObject.Parse(content), false).GetAwaiter().GetResult();
+
+            //Assert.AreEqual("[parameters('Get_blob_content-path')]", defintion["resources"][0]["properties"]["definition"]["actions"]["Condition"]["actions"]["Get_blob_content"]["metadata"]["[base64(parameters('Get_blob_content-path'))]"]);
+            //Assert.AreEqual("/datasets/default/files/@{encodeURIComponent(encodeURIComponent(base64(parameters('Get_blob_content-path'))))}/content", defintion["resources"][0]["properties"]["definition"]["actions"]["Condition"]["actions"]["Get_blob_content"]["inputs"]["path"]);
 
         }
 

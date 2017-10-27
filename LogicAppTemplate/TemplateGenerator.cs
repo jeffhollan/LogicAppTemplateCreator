@@ -233,6 +233,7 @@ namespace LogicAppTemplate
 
         }
 
+        private static string regextoresourcegroup = @"\/subscriptions\/(?<subscription>[0-9a-zA-Z-]*)\/resourceGroups\/(?<resourcegroup>[\w-_d]*)\/";
         private JToken handleActions(JObject definition, JObject parameters)
         {
             foreach (JProperty action in definition["actions"])
@@ -242,23 +243,28 @@ namespace LogicAppTemplate
                 if (type == "workflow")
                 {
                     var curr = ((JObject)definition["actions"][action.Name]["inputs"]["host"]["workflow"]).Value<string>("id");
-
-                    Regex rgx = new Regex(@"\/subscriptions\/(?<subscription>[0-9a-zA-Z-]*)\/resourceGroups\/(?<resourcegroup>[a-zA-Z0-9-]*)");
+                    ///subscriptions/fakeecb73-15f5-4c85-bb3e-fakeecb73/resourceGroups/myresourcegrp/providers/Microsoft.Logic/workflows/INT0020-All-Users-Batch2
+                    Regex rgx = new Regex( regextoresourcegroup + @"providers\/Microsoft.Logic\/workflows\/(?<workflow>[\w-_d]*)");
                     var matches = rgx.Match(curr);
+                    string resourcegroupValue = LogicAppResourceGroup == matches.Groups["resourcegroup"].Value ? "[resourceGroup().name]" : matches.Groups["resourcegroup"].Value;
+                    string resourcegroupParameterName = AddTemplateParameter(action.Name + "-ResourceGroup", "string", resourcegroupValue);
+                    string wokflowParameterName = AddTemplateParameter(action.Name + "-LogicAppName", "string", matches.Groups["workflow"].Value);
+                    string workflowid = $"[concat('/subscriptions/',subscription().subscriptionId,'/resourceGroups/',parameters('{resourcegroupParameterName}'),'/providers/Microsoft.Logic/workflows/',parameters('{wokflowParameterName}'))]";
 
-                    curr = curr.Replace(matches.Groups["subscription"].Value, "',subscription().subscriptionId,'");
+                    //curr = curr.Replace(matches.Groups["subscription"].Value, "',subscription().subscriptionId,'");
+                    //$"[concat('/subscriptions/',subscription().subscriptionId,'/resourceGroups/',parameters('{AddTemplateParameter(action.Name + "-ResourceGroup", "string", matches.Groups["resourcegroup"].Value)}'),'/providers/Microsoft.Web/sites/',parameters('{AddTemplateParameter(action.Name + "-FunctionApp", "string", matches.Groups["functionApp"].Value)}'),'/functions/',parameters('{AddTemplateParameter(action.Name + "-FunctionName", "string", matches.Groups["functionName"].Value)}'))]";
 
-                    if (LogicAppResourceGroup == matches.Groups["resourcegroup"].Value)
-                    {
-                        curr = curr.Replace(matches.Groups["resourcegroup"].Value, "', resourceGroup().name,'");
-                    }
-                    else
-                    {
-                        curr = curr.Replace(matches.Groups["resourcegroup"].Value, "', parameters('" + AddTemplateParameter(action.Name + "-ResourceGroup", "string", matches.Groups["resourcegroup"].Value) + "'),'");
-                    }
-                    curr = "[concat('" + curr + "')]";
-
-                    definition["actions"][action.Name]["inputs"]["host"]["workflow"]["id"] = curr;
+                    /* if (LogicAppResourceGroup == matches.Groups["resourcegroup"].Value)
+                     {
+                         curr = curr.Replace(matches.Groups["resourcegroup"].Value, "', resourceGroup().name,'");
+                     }
+                     else
+                     {
+                         curr = curr.Replace(matches.Groups["resourcegroup"].Value, "', parameters('" + AddTemplateParameter(action.Name + "-ResourceGroup", "string", matches.Groups["resourcegroup"].Value) + "'),'");
+                     }
+                     curr = "[concat('" + curr + "')]";
+                     */
+                    definition["actions"][action.Name]["inputs"]["host"]["workflow"]["id"] = workflowid;
                     //string result = "[concat('" + rgx.Replace(matches.Groups[1].Value, "',subscription().subscriptionId,'") + + "']";
                 }
                 else if (type == "apimanagement")
@@ -347,10 +353,11 @@ namespace LogicAppTemplate
                 {
                     var curr = ((JObject)definition["actions"][action.Name]["inputs"]["function"]).Value<string>("id");
 
-                    Regex rgx = new Regex(@"\/subscriptions\/(?<subscription>[0-9a-zA-Z-]*)\/resourceGroups\/(?<resourcegroup>[a-zA-Z0-9-]*)\/providers\/Microsoft.Web\/sites\/(?<functionApp>[a-zA-Z0-9-]*)\/functions\/(?<functionName>.*)");
+                    Regex rgx = new Regex(@"\/subscriptions\/(?<subscription>[0-9a-zA-Z-]*)\/resourceGroups\/(?<resourcegroup>[a-zA-Z0-9-_]*)\/providers\/Microsoft.Web\/sites\/(?<functionApp>[a-zA-Z0-9-_]*)\/functions\/(?<functionName>.*)");
                     var matches = rgx.Match(curr);
+                    definition["actions"][action.Name]["inputs"]["function"]["id"] = $"[concat('/subscriptions/',subscription().subscriptionId,'/resourceGroups/',parameters('{AddTemplateParameter(action.Name + "-ResourceGroup", "string", matches.Groups["resourcegroup"].Value)}'),'/providers/Microsoft.Web/sites/',parameters('{AddTemplateParameter(action.Name + "-FunctionApp", "string", matches.Groups["functionApp"].Value)}'),'/functions/',parameters('{AddTemplateParameter(action.Name + "-FunctionName", "string", matches.Groups["functionName"].Value)}'))]";
 
-                    curr = curr.Replace(matches.Groups["subscription"].Value, "',subscription().subscriptionId,'");
+                    /*curr = curr.Replace(matches.Groups["subscription"].Value, "',subscription().subscriptionId,'");
 
                     if (LogicAppResourceGroup == matches.Groups["resourcegroup"].Value)
                     {
@@ -366,7 +373,7 @@ namespace LogicAppTemplate
 
                     curr = "[concat('" + curr + "')]";
 
-                    definition["actions"][action.Name]["inputs"]["function"]["id"] = curr;
+                    definition["actions"][action.Name]["inputs"]["function"]["id"] = curr;*/
                 }
                 else
                 {
@@ -434,9 +441,21 @@ namespace LogicAppTemplate
                                     var meta = ((JObject)trigger.Value["metadata"]);
                                     if (meta != null)
                                     {
-                                        var base64string = ((JProperty)meta.First).Name;
-                                        var param = AddParameterForMetadataBase64(meta, trigger.Name + "-folderPath");
-                                        meta.Parent.Parent["inputs"]["queries"]["folderId"] = "[base64(parameters('" + param + "'))]";
+                                        try
+                                        {
+
+                                            var base64string = ((JProperty)meta.First).Name;
+                                            var param = AddParameterForMetadataBase64(meta, trigger.Name + "-folderPath");
+                                            meta.Parent.Parent["inputs"]["queries"]["folderId"] = "[base64(parameters('" + param + "'))]";
+                                        }
+                                        catch (FormatException ex)
+                                        {
+
+                                            //folderid is not a valid base64 so we are skipping it for now
+                                            /*var path = ((JProperty)meta.First).Value.ToString();
+                                             var param = AddTemplateParameter(trigger.Name + "-folderPath","string",path);
+                                             meta[((JProperty)meta.First).Name] = $"[parameters('{param}')]";*/
+                                        }                                        
                                     }                                   
                                     break;
                                 }

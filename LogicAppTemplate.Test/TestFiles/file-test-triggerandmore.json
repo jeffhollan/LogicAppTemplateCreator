@@ -1,0 +1,158 @@
+﻿{
+  "properties": {
+    "provisioningState": "Succeeded",
+    "createdTime": "2017-10-14T18:32:48.6380892Z",
+    "changedTime": "2017-10-14T18:46:06.5010487Z",
+    "state": "Enabled",
+    "version": "08586936001190250694",
+    "accessEndpoint": "https://prod-63.westeurope.logic.azure.com:443/workflows/20e24836d1ec479985d073e57a48e89e",
+    "definition": {
+      "$schema": "https://schema.management.azure.com/providers/Microsoft.Logic/schemas/2016-06-01/workflowdefinition.json#",
+      "contentVersion": "1.0.0.0",
+      "parameters": {
+        "$connections": {
+          "defaultValue": {},
+          "type": "Object"
+        }
+      },
+      "triggers": {
+        "When_one_or_more_files_are_added_or_modified_(metadata_only)": {
+          "recurrence": {
+            "frequency": "Minute",
+            "interval": 3
+          },
+          "splitOn": "@triggerBody()",
+          "metadata": {
+            "QzpcdGVtcFxmaWxlb3V0XG91dA==": "C:\\temp\\fileout\\out"
+          },
+          "type": "ApiConnection",
+          "inputs": {
+            "host": {
+              "connection": {
+                "name": "@parameters('$connections')['filesystem']['connectionId']"
+              }
+            },
+            "method": "get",
+            "path": "/datasets/default/triggers/batch/onupdatedfile",
+            "queries": {
+              "folderId": "QzpcdGVtcFxmaWxlb3V0XG91dA==",
+              "maxFileCount": 10
+            }
+          }
+        }
+      },
+      "actions": {
+        "Copy_file": {
+          "runAfter": {
+            "Get_file_content_using_path": [
+              "Succeeded"
+            ]
+          },
+          "type": "ApiConnection",
+          "inputs": {
+            "host": {
+              "connection": {
+                "name": "@parameters('$connections')['filesystem']['connectionId']"
+              }
+            },
+            "method": "post",
+            "path": "/datasets/default/copyFile",
+            "queries": {
+              "destination": "@{triggerBody()?['Path']}-copy",
+              "overwrite": false,
+              "source": "@triggerBody()?['Path']"
+            }
+          }
+        },
+        "Create_file": {
+          "runAfter": {
+            "Copy_file": [
+              "Succeeded"
+            ]
+          },
+          "type": "ApiConnection",
+          "inputs": {
+            "body": "@body('Get_file_content_using_path')",
+            "host": {
+              "connection": {
+                "name": "@parameters('$connections')['filesystem']['connectionId']"
+              }
+            },
+            "method": "post",
+            "path": "/datasets/default/files",
+            "queries": {
+              "folderPath": "/",
+              "name": "@{body('Copy_file')?['DisplayName']}-new.txt"
+            }
+          }
+        },
+        "Get_file_content_using_path": {
+          "runAfter": {},
+          "type": "ApiConnection",
+          "inputs": {
+            "host": {
+              "connection": {
+                "name": "@parameters('$connections')['filesystem']['connectionId']"
+              }
+            },
+            "method": "get",
+            "path": "/datasets/default/GetFileContentByPath",
+            "queries": {
+              "inferContentType": true,
+              "path": "@triggerBody()?['Path']"
+            }
+          }
+        }
+      },
+      "outputs": {}
+    },
+    "parameters": {
+      "$connections": {
+        "value": {
+          "filesystem": {
+            "connectionId": "/subscriptions/c107df29-a4af-4bc9-a733-f88f0eaa4296/resourceGroups/OnPremDataGateway/providers/Microsoft.Web/connections/filesystem-1",
+            "connectionName": "filesystem-1",
+            "id": "/subscriptions/c107df29-a4af-4bc9-a733-f88f0eaa4296/providers/Microsoft.Web/locations/westeurope/managedApis/filesystem"
+          }
+        }
+      }
+    },
+    "endpointsConfiguration": {
+      "workflow": {
+        "outgoingIpAddresses": [
+          {
+            "address": "40.68.222.65"
+          },
+          {
+            "address": "40.68.209.23"
+          },
+          {
+            "address": "13.95.147.65"
+          }
+        ],
+        "accessEndpointIpAddresses": [
+          {
+            "address": "13.95.155.53"
+          },
+          {
+            "address": "52.174.54.218"
+          },
+          {
+            "address": "52.174.49.6"
+          }
+        ]
+      },
+      "connector": {
+        "outgoingIpAddresses": [
+          {
+            "address": "40.115.50.13"
+          }
+        ]
+      }
+    }
+  },
+  "id": "/subscriptions/c107df29-a4af-4bc9-a733-f88f0eaa4296/resourceGroups/OnPremDataGateway/providers/Microsoft.Logic/workflows/FileTrigger",
+  "name": "FileTrigger",
+  "type": "Microsoft.Logic/workflows",
+  "location": "westeurope"
+}

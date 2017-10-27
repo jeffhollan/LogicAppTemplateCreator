@@ -97,6 +97,8 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
+    <EmbeddedResource Include="TestFiles\misingparameter.json" />
+    <EmbeddedResource Include="TestFiles\file-test-triggerandmore.json" />
   </ItemGroup>
   <Choose>
     <When Condition="'$(VisualStudioVersion)' == '10.0' And '$(IsCodedUITest)' == 'True'">
