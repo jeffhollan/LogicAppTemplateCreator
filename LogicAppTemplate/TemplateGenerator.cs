@@ -553,6 +553,11 @@ namespace LogicAppTemplate
             return AddTemplateParameter(paramname, type, new JProperty("defaultValue", defaultvalue));
         }
 
+        private string AddTemplateParameter(string paramname, string type, object defaultvalue)
+        {
+            return AddTemplateParameter(paramname, type, new JProperty("defaultValue", defaultvalue));
+        }
+
 
         private string AddTemplateParameter(string paramname, string type, JProperty defaultvalue)
         {
@@ -660,8 +665,8 @@ namespace LogicAppTemplate
                         connectionParameters.Add(parameter.Name, $"[listKeys(resourceId('Microsoft.Storage/storageAccounts', parameters('{connectionName}_accountName')), providers('Microsoft.Storage', 'storageAccounts').apiVersions[0]).keys[0].value]");
                     }
                     else {
-                        var currentvalue = (string)connectionInstance["properties"]["nonSecretParameterValues"][parameter.Name] ?? "";
-                        var addedparam = AddTemplateParameter($"{connectionName}_{parameter.Name}", (string)(parameter.Value)["type"], currentvalue);
+                        //todo check this!
+                        var addedparam = AddTemplateParameter($"{connectionName}_{parameter.Name}", (string)(parameter.Value)["type"], connectionInstance["properties"]["nonSecretParameterValues"][parameter.Name]);
                         connectionParameters.Add(parameter.Name, $"[parameters('{addedparam}')]");
 
                         //If has an enum
