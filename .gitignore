@@ -246,3 +246,4 @@ ModelManifest.xml
 # FAKE - F# Make
 .fake/
 /ShopriteGenerator
+/json1.json
