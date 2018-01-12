@@ -18,48 +18,26 @@ using System.Windows.Forms;
 
 namespace LogicAppTemplate
 {
-    [Cmdlet(VerbsCommon.Get, "LogicAppTemplate", ConfirmImpact = ConfirmImpact.None)]
-    public class TemplateGenerator : PSCmdlet
-    {
-        [Parameter(
-            Mandatory = true,
-            HelpMessage = "Name of the Logic App"
-            )]
-        public string LogicApp;
-        [Parameter(
-            Mandatory = true,
-            HelpMessage = "Name of the Resource Group"
-            )]
-        public string ResourceGroup;
-        [Parameter(
-            Mandatory = true,
-            HelpMessage = "The SubscriptionId"
-            )]
-        public string SubscriptionId;
-        [Parameter(
-            Mandatory = false,
-            HelpMessage = "Name of the Tenant i.e. contoso.onmicrosoft.com"
-            )]
-        public string TenantName = "";
-        [Parameter(
-            Mandatory = false,
-            HelpMessage = "A Bearer token value"
-        )]
-        public string Token = "";
-        [Parameter(
-            Mandatory = false,
-            HelpMessage = "Piped input from armclient",
-            ValueFromPipeline = true
-        )]
 
-        public string ClaimsDump;
+    public class TemplateGenerator
+    {
+
         private DeploymentTemplate template;
         private JObject workflowTemplateReference;
 
         private string LogicAppResourceGroup;
 
-        public TemplateGenerator()
+        IResourceCollector resourceCollector;
+        private string SubscriptionId;
+        private string ResourceGroup;
+        private string LogicApp;
+
+        public TemplateGenerator(string LogicApp, string SubscriptionId, string ResourceGroup, IResourceCollector resourceCollector)
         {
+            this.SubscriptionId = SubscriptionId;
+            this.ResourceGroup = ResourceGroup;
+            this.LogicApp = LogicApp;
+            this.resourceCollector = resourceCollector;
             var assembly = System.Reflection.Assembly.GetExecutingAssembly();
             var resourceName = "LogicAppTemplate.Templates.starterTemplate.json";
 
@@ -69,72 +47,16 @@ namespace LogicAppTemplate
                 template = JsonConvert.DeserializeObject<DeploymentTemplate>(reader.ReadToEnd());
             }
         }
-
-        public TemplateGenerator(string token) : this()
+      
+        public async Task<JObject> GenerateTemplate()
         {
-            Token = token;
+            return await ConvertWithToken();
         }
 
-        protected override void ProcessRecord()
+        public async Task<JObject> ConvertWithToken()
         {
-            if (ClaimsDump == null)
-            {
-                // WriteVerbose("No armclient token piped through.  Attempting to authenticate");
-                if (String.IsNullOrEmpty(Token))
-                {
-                    string authstring = Constants.AuthString;
-                    if (!string.IsNullOrEmpty(TenantName))
-                    {
-                        authstring = authstring.Replace("common", TenantName);
-                    }
-                    AuthenticationContext ac = new AuthenticationContext(authstring, true);
-
-                    var ar = ac.AcquireTokenAsync(Constants.ResourceUrl, Constants.ClientId, new Uri(Constants.RedirectUrl), new PlatformParameters(PromptBehavior.Auto)).GetAwaiter().GetResult();
-                    Token = ar.AccessToken;
-                    // WriteVerbose("Retrieved Token: " + Token);
-                }
-            }
-            else if (ClaimsDump.Contains("Token copied"))
-            {
-                Token = Clipboard.GetText().Replace("Bearer ", "");
-                // WriteVerbose("Got token from armclient: " + Token);
-            }
-            else
-            {
-                return;
-            }
-
-            var result = ConvertWithToken(SubscriptionId, ResourceGroup, LogicApp, Token).Result;
-            WriteObject(result.ToString());
-        }
-
-
-        public async Task<JObject> ConvertWithToken(string subscriptionId, string resourceGroup, string logicAppName, string bearerToken)
-        {
-            SubscriptionId = subscriptionId;
-            ResourceGroup = resourceGroup;
-            LogicApp = logicAppName;
-            // WriteVerbose("Retrieving Definition....");
-            JObject _definition = getDefinition();
-            // WriteVerbose("Converting definition to template");
+            JObject _definition = await resourceCollector.GetResource($"https://management.azure.com/subscriptions/{SubscriptionId}/resourceGroups/{ResourceGroup}/providers/Microsoft.Logic/workflows/{LogicApp}");   
             return await generateDefinition(_definition);
-        }
-
-        private JObject getDefinition()
-        {
-
-            string url = $"https://management.azure.com/subscriptions/{SubscriptionId}/resourceGroups/{ResourceGroup}/providers/Microsoft.Logic/workflows/{LogicApp}?api-version=2016-06-01";
-            // WriteVerbose("Doing a GET to: " + url);
-            var request = HttpWebRequest.Create(url);
-            request.Headers[HttpRequestHeader.Authorization] = "Bearer " + Token;
-
-            var logicAppRequest = request.GetResponse();
-            var stream = logicAppRequest.GetResponseStream();
-            StreamReader reader = new StreamReader(stream);
-            var logicApp = reader.ReadToEnd();
-            // WriteVerbose("Got definition");
-            return JObject.Parse(logicApp);
-
         }
 
         public async Task<JObject> generateDefinition(JObject definition, bool generateConnection = true)
@@ -212,11 +134,12 @@ namespace LogicAppTemplate
                 if (generateConnection)
                 {
                     //get api definition
-                    JObject apiResource = await generateConnectionResource((string)apiId);
-
+                    //                    JObject apiResource = await generateConnectionResource((string)apiId);
+                    JObject apiResource = await resourceCollector.GetResource("https://management.azure.com" + (string)apiId);
                     var connectionId = (string)conn["connectionId"];
                     //get api instance data, sub,group,provider,name
-                    JObject apiResourceInstance = await generateConnectionResource(connectionId);
+                    //JObject apiResourceInstance = await generateConnectionResource(connectionId);
+                    JObject apiResourceInstance = await resourceCollector.GetResource("https://management.azure.com" + connectionId);
                     //add depends on to make sure that the api connection is created before the Logic App
                     ((JArray)workflowTemplateReference["dependsOn"]).Add($"[resourceId('Microsoft.Web/connections', parameters('{connectionNameProperty}_name'))]");
 
@@ -230,8 +153,10 @@ namespace LogicAppTemplate
 
             // WriteVerbose("Finalizing Template...");
             return JObject.FromObject(template);
-
         }
+
+
+
 
         private static string regextoresourcegroup = @"\/subscriptions\/(?<subscription>[0-9a-zA-Z-]*)\/resourceGroups\/(?<resourcegroup>[\w-_d]*)\/";
         private JToken handleActions(JObject definition, JObject parameters)
@@ -244,26 +169,12 @@ namespace LogicAppTemplate
                 {
                     var curr = ((JObject)definition["actions"][action.Name]["inputs"]["host"]["workflow"]).Value<string>("id");
                     ///subscriptions/fakeecb73-15f5-4c85-bb3e-fakeecb73/resourceGroups/myresourcegrp/providers/Microsoft.Logic/workflows/INT0020-All-Users-Batch2
-                    Regex rgx = new Regex( regextoresourcegroup + @"providers\/Microsoft.Logic\/workflows\/(?<workflow>[\w-_d]*)");
+                    Regex rgx = new Regex(regextoresourcegroup + @"providers\/Microsoft.Logic\/workflows\/(?<workflow>[\w-_d]*)");
                     var matches = rgx.Match(curr);
                     string resourcegroupValue = LogicAppResourceGroup == matches.Groups["resourcegroup"].Value ? "[resourceGroup().name]" : matches.Groups["resourcegroup"].Value;
                     string resourcegroupParameterName = AddTemplateParameter(action.Name + "-ResourceGroup", "string", resourcegroupValue);
                     string wokflowParameterName = AddTemplateParameter(action.Name + "-LogicAppName", "string", matches.Groups["workflow"].Value);
                     string workflowid = $"[concat('/subscriptions/',subscription().subscriptionId,'/resourceGroups/',parameters('{resourcegroupParameterName}'),'/providers/Microsoft.Logic/workflows/',parameters('{wokflowParameterName}'))]";
-
-                    //curr = curr.Replace(matches.Groups["subscription"].Value, "',subscription().subscriptionId,'");
-                    //$"[concat('/subscriptions/',subscription().subscriptionId,'/resourceGroups/',parameters('{AddTemplateParameter(action.Name + "-ResourceGroup", "string", matches.Groups["resourcegroup"].Value)}'),'/providers/Microsoft.Web/sites/',parameters('{AddTemplateParameter(action.Name + "-FunctionApp", "string", matches.Groups["functionApp"].Value)}'),'/functions/',parameters('{AddTemplateParameter(action.Name + "-FunctionName", "string", matches.Groups["functionName"].Value)}'))]";
-
-                    /* if (LogicAppResourceGroup == matches.Groups["resourcegroup"].Value)
-                     {
-                         curr = curr.Replace(matches.Groups["resourcegroup"].Value, "', resourceGroup().name,'");
-                     }
-                     else
-                     {
-                         curr = curr.Replace(matches.Groups["resourcegroup"].Value, "', parameters('" + AddTemplateParameter(action.Name + "-ResourceGroup", "string", matches.Groups["resourcegroup"].Value) + "'),'");
-                     }
-                     curr = "[concat('" + curr + "')]";
-                     */
                     definition["actions"][action.Name]["inputs"]["host"]["workflow"]["id"] = workflowid;
                     //string result = "[concat('" + rgx.Replace(matches.Groups[1].Value, "',subscription().subscriptionId,'") + + "']";
                 }
@@ -356,24 +267,6 @@ namespace LogicAppTemplate
                     Regex rgx = new Regex(@"\/subscriptions\/(?<subscription>[0-9a-zA-Z-]*)\/resourceGroups\/(?<resourcegroup>[a-zA-Z0-9-_]*)\/providers\/Microsoft.Web\/sites\/(?<functionApp>[a-zA-Z0-9-_]*)\/functions\/(?<functionName>.*)");
                     var matches = rgx.Match(curr);
                     definition["actions"][action.Name]["inputs"]["function"]["id"] = $"[concat('/subscriptions/',subscription().subscriptionId,'/resourceGroups/',parameters('{AddTemplateParameter(action.Name + "-ResourceGroup", "string", matches.Groups["resourcegroup"].Value)}'),'/providers/Microsoft.Web/sites/',parameters('{AddTemplateParameter(action.Name + "-FunctionApp", "string", matches.Groups["functionApp"].Value)}'),'/functions/',parameters('{AddTemplateParameter(action.Name + "-FunctionName", "string", matches.Groups["functionName"].Value)}'))]";
-
-                    /*curr = curr.Replace(matches.Groups["subscription"].Value, "',subscription().subscriptionId,'");
-
-                    if (LogicAppResourceGroup == matches.Groups["resourcegroup"].Value)
-                    {
-                        curr = curr.Replace(matches.Groups["resourcegroup"].Value, "', resourceGroup().name,'");
-                    }
-                    else
-                    {
-                        curr = curr.Replace(matches.Groups["resourcegroup"].Value, "', parameters('" + AddTemplateParameter(action.Name + "-ResourceGroup", "string", matches.Groups["resourcegroup"].Value) + "'),'");
-                    }
-
-                    curr = curr.Replace(matches.Groups["functionName"].Value, "', parameters('" + AddTemplateParameter(action.Name + "-FunctionName", "string", matches.Groups["functionName"].Value) + "'),'");
-                    curr = curr.Replace(matches.Groups["functionApp"].Value, "', parameters('" + AddTemplateParameter(action.Name + "-FunctionApp", "string", matches.Groups["functionApp"].Value) + "'),'");
-
-                    curr = "[concat('" + curr + "')]";
-
-                    definition["actions"][action.Name]["inputs"]["function"]["id"] = curr;*/
                 }
                 else
                 {
@@ -398,7 +291,7 @@ namespace LogicAppTemplate
                                     {
                                         var base64string = ((JProperty)meta.First).Name;
                                         var param = AddParameterForMetadataBase64(meta, action.Name + "-folderPath");
-                                        meta.Parent.Parent["inputs"]["path"] = "[concat('" +action.Value.SelectToken("inputs.path").ToString().Replace($"'{base64string}'", "',base64(parameters('" + param + "')),'") + "')]";                           
+                                        meta.Parent.Parent["inputs"]["path"] = "[concat('" + action.Value.SelectToken("inputs.path").ToString().Replace($"'{base64string}'", "',base64(parameters('" + param + "')),'") + "')]";
                                     }
                                     break;
                                 }
@@ -455,8 +348,8 @@ namespace LogicAppTemplate
                                             /*var path = ((JProperty)meta.First).Value.ToString();
                                              var param = AddTemplateParameter(trigger.Name + "-folderPath","string",path);
                                              meta[((JProperty)meta.First).Name] = $"[parameters('{param}')]";*/
-                                        }                                        
-                                    }                                   
+                                        }
+                                    }
                                     break;
                                 }
                         }
@@ -472,7 +365,7 @@ namespace LogicAppTemplate
                         {
                             string value = recurrence.Value<string>("startTime");
                             DateTime date;
-                            if(DateTime.TryParse(value,out date))
+                            if (DateTime.TryParse(value, out date))
                             {
                                 value = date.ToString("O");
                             }
@@ -484,7 +377,7 @@ namespace LogicAppTemplate
                         }
                         if (recurrence["schedule"] != null)
                         {
-                            definition["triggers"][trigger.Name]["recurrence"]["schedule"] = "[parameters('" + this.AddTemplateParameter(trigger.Name + "Schedule", "Object", new JProperty("defaultValue", recurrence["schedule"])) + "')]";                            
+                            definition["triggers"][trigger.Name]["recurrence"]["schedule"] = "[parameters('" + this.AddTemplateParameter(trigger.Name + "Schedule", "Object", new JProperty("defaultValue", recurrence["schedule"])) + "')]";
                         }
                     }
                 }
@@ -493,18 +386,18 @@ namespace LogicAppTemplate
             return definition;
         }
 
-        private string AddParameterForMetadataBase64(JObject meta,string parametername)
+        private string AddParameterForMetadataBase64(JObject meta, string parametername)
         {
             var base64string = ((JProperty)meta.First).Name;
             var path = Encoding.UTF8.GetString(Convert.FromBase64String(base64string));
             var param = AddTemplateParameter(parametername, "string", path);
             meta.Remove(((JProperty)meta.First).Name);
             meta.Add("[base64(parameters('" + param + "'))]", JToken.Parse("\"[parameters('" + param + "')]\""));
-            
+
             return param;
         }
 
-        private void HandledMetaDataFilePaths(JObject definition,JProperty action)
+        private void HandledMetaDataFilePaths(JObject definition, JProperty action)
         {
             var metadata = action.Value.SelectToken("metadata");
             if (metadata != null)
@@ -566,17 +459,6 @@ namespace LogicAppTemplate
             param.Add("type", JToken.FromObject(type));
             param.Add(defaultvalue);
 
-       /*     if (!string.IsNullOrEmpty(defaultvalue.Value.ToString()) && type.Equals("string",StringComparison.CurrentCultureIgnoreCase))
-            {
-                foreach (var c in template.parameters)
-                {
-                    if (c.Value.Value<string>("type").Equals("string", StringComparison.CurrentCultureIgnoreCase) &&  c.Value.Value<string>("defaultValue").Equals(defaultvalue.Value.ToString()))
-                    {
-                        return c.Key;
-                    }
-                }
-            }*/
-
             if (template.parameters[paramname] == null)
             {
                 template.parameters.Add(paramname, param);
@@ -614,6 +496,7 @@ namespace LogicAppTemplate
             return apiId.Insert(0, "[concat(") + "')]";
         }
 
+        /*
         private async Task<JObject> generateConnectionResource(string apiId)
         {
 
@@ -630,12 +513,16 @@ namespace LogicAppTemplate
             return JObject.Parse(apiResource);
 
         }
-
+        */
         public JObject generateConnectionTemplate(JObject connectionResource, JObject connectionInstance, string apiId)
         {
             //create template
             string connectionName = (string)connectionInstance["name"];
             var connectionTemplate = new Models.ConnectionTemplate(AddTemplateParameter($"{connectionName}_name", "string", (string)connectionInstance["name"]), apiId);
+            if (connectionInstance.Value<string>("type") == "Microsoft.Web/customApis")
+            {
+                AddTemplateParameter($"{connectionName}_ResourceGroupName", "string", (string)connectionInstance["name"]);
+            }
             //displayName            
             connectionTemplate.properties.displayName = $"[parameters('{AddTemplateParameter(connectionName + "_displayName", "string", (string)connectionInstance["properties"]["displayName"])}')]";
             JObject connectionParameters = new JObject();
@@ -659,12 +546,13 @@ namespace LogicAppTemplate
                             continue;
                     }
 
-                    
+
                     if (parameter.Name == "accessKey" && apiId.EndsWith("azureblob"))
                     {
                         connectionParameters.Add(parameter.Name, $"[listKeys(resourceId('Microsoft.Storage/storageAccounts', parameters('{connectionName}_accountName')), providers('Microsoft.Storage', 'storageAccounts').apiVersions[0]).keys[0].value]");
                     }
-                    else {
+                    else
+                    {
                         //todo check this!
                         var addedparam = AddTemplateParameter($"{connectionName}_{parameter.Name}", (string)(parameter.Value)["type"], connectionInstance["properties"]["nonSecretParameterValues"][parameter.Name]);
                         connectionParameters.Add(parameter.Name, $"[parameters('{addedparam}')]");

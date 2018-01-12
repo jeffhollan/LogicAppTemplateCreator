@@ -40,7 +40,7 @@ namespace LogicAppTemplate.Tests
         {
             var content = GetEmbededFileContent("LogicAppTemplate.Test.TestFiles.WorkflowTest.json");
 
-            var generator = new TemplateGenerator();
+            var generator = new TemplateGenerator("","","",null);
 
             var defintion = generator.generateDefinition(JObject.Parse(content)).GetAwaiter().GetResult();
 
@@ -58,7 +58,7 @@ namespace LogicAppTemplate.Tests
         {
             var content = GetEmbededFileContent("LogicAppTemplate.Test.TestFiles.WorkflowTestOtherResourcegroup.json");
 
-            var generator = new TemplateGenerator();
+            var generator = new TemplateGenerator("","","",null);
 
             var defintion = generator.generateDefinition(JObject.Parse(content)).GetAwaiter().GetResult();
 
@@ -76,7 +76,7 @@ namespace LogicAppTemplate.Tests
         {
             var content = GetEmbededFileContent("LogicAppTemplate.Test.TestFiles.APIM.json");
 
-            var generator = new TemplateGenerator();
+            var generator = new TemplateGenerator("","","",null);
 
             var defintion = generator.generateDefinition(JObject.Parse(content)).GetAwaiter().GetResult();
             //check parameters
@@ -96,7 +96,7 @@ namespace LogicAppTemplate.Tests
         {
             var content = GetEmbededFileContent("LogicAppTemplate.Test.TestFiles.APIMMultipleSame.json");
 
-            var generator = new TemplateGenerator();
+            var generator = new TemplateGenerator("","","",null);
 
             var defintion = generator.generateDefinition(JObject.Parse(content)).GetAwaiter().GetResult();
 
@@ -126,7 +126,7 @@ namespace LogicAppTemplate.Tests
         {
             var content = GetEmbededFileContent("LogicAppTemplate.Test.TestFiles.APIMMultipleDiffrent.json");
 
-            var generator = new TemplateGenerator();
+            var generator = new TemplateGenerator("","","",null);
 
             var defintion = generator.generateDefinition(JObject.Parse(content)).GetAwaiter().GetResult();
 
@@ -165,7 +165,7 @@ namespace LogicAppTemplate.Tests
         {
             var content = GetEmbededFileContent("LogicAppTemplate.Test.TestFiles.complex-logicapp-if.json");
 
-            var generator = new TemplateGenerator();
+            var generator = new TemplateGenerator("","","",null);
 
             var defintion = generator.generateDefinition(JObject.Parse(content)).GetAwaiter().GetResult();
 
@@ -181,7 +181,7 @@ namespace LogicAppTemplate.Tests
         {
             var content = GetEmbededFileContent("LogicAppTemplate.Test.TestFiles.complex-logicapp-switch.json");
 
-            var generator = new TemplateGenerator();
+            var generator = new TemplateGenerator("","","",null);
 
             var defintion = generator.generateDefinition(JObject.Parse(content)).GetAwaiter().GetResult();
 
@@ -198,7 +198,7 @@ namespace LogicAppTemplate.Tests
         {
             var content = GetEmbededFileContent("LogicAppTemplate.Test.TestFiles.parameter-test-object.json");
 
-            var generator = new TemplateGenerator();
+            var generator = new TemplateGenerator("","","",null);
 
             var defintion = generator.generateDefinition(JObject.Parse(content)).GetAwaiter().GetResult();
 
@@ -218,7 +218,7 @@ namespace LogicAppTemplate.Tests
         {
             var content = GetEmbededFileContent("LogicAppTemplate.Test.TestFiles.file-test-trigger-gateway.json");
 
-            var generator = new TemplateGenerator();
+            var generator = new TemplateGenerator("","","",null);
             var defintion = generator.generateDefinition(JObject.Parse(content),false).GetAwaiter().GetResult();
 
             //check parameters
@@ -245,7 +245,7 @@ namespace LogicAppTemplate.Tests
         {
             var content = GetEmbededFileContent("LogicAppTemplate.Test.TestFiles.file-test-readfolder.json");
 
-            var generator = new TemplateGenerator();
+            var generator = new TemplateGenerator("","","",null);
             var defintion = generator.generateDefinition(JObject.Parse(content), false).GetAwaiter().GetResult();
 
             //check parameters
@@ -273,7 +273,7 @@ namespace LogicAppTemplate.Tests
         {
             var content = GetEmbededFileContent("LogicAppTemplate.Test.TestFiles.IntegrationAccount-FlatFileAndTransform.json");
 
-            var generator = new TemplateGenerator();
+            var generator = new TemplateGenerator("","","",null);
 
             var defintion = generator.generateDefinition(JObject.Parse(content)).GetAwaiter().GetResult();
 
@@ -295,7 +295,7 @@ namespace LogicAppTemplate.Tests
         {
             var content = GetEmbededFileContent("LogicAppTemplate.Test.TestFiles.HTTP-basic.json");
 
-            var generator = new TemplateGenerator();
+            var generator = new TemplateGenerator("","","",null);
 
             var defintion = generator.generateDefinition(JObject.Parse(content)).GetAwaiter().GetResult();
 
@@ -310,7 +310,7 @@ namespace LogicAppTemplate.Tests
         {
             var content = GetEmbededFileContent("LogicAppTemplate.Test.TestFiles.HTTP-Authentication.json");
 
-            var generator = new TemplateGenerator();
+            var generator = new TemplateGenerator("","","",null);
 
             var defintion = generator.generateDefinition(JObject.Parse(content)).GetAwaiter().GetResult();
 
@@ -343,7 +343,7 @@ namespace LogicAppTemplate.Tests
         {
             var apiresource = JObject.Parse(GetEmbededFileContent("LogicAppTemplate.Test.TestFiles.ApiSource.filegateway.json"));
             var apiresourceInstance = JObject.Parse(GetEmbededFileContent("LogicAppTemplate.Test.TestFiles.ApiSource.filegatewayInstance.json"));
-            var generator = new TemplateGenerator();
+            var generator = new TemplateGenerator("","","",null);
 
             var defintion = generator.generateConnectionTemplate(apiresource, apiresourceInstance, (string)apiresource["id"]);
 
@@ -370,7 +370,7 @@ namespace LogicAppTemplate.Tests
         {
             var apiresource = JObject.Parse(GetEmbededFileContent("LogicAppTemplate.Test.TestFiles.ApiSource.sqlgateway.json"));
             var apiresourceInstance = JObject.Parse(GetEmbededFileContent("LogicAppTemplate.Test.TestFiles.ApiSource.sqlgatewayInstance.json"));
-            var generator = new TemplateGenerator();
+            var generator = new TemplateGenerator("","","",null);
 
             var defintion = generator.generateConnectionTemplate(apiresource, apiresourceInstance, (string)apiresource["id"]);
 
@@ -399,7 +399,7 @@ namespace LogicAppTemplate.Tests
         {
             var apiresource = JObject.Parse(GetEmbededFileContent("LogicAppTemplate.Test.TestFiles.ApiSource.sqlcloud.json"));
             var apiresourceInstance = JObject.Parse(GetEmbededFileContent("LogicAppTemplate.Test.TestFiles.ApiSource.sqlcloudInstance.json"));
-            var generator = new TemplateGenerator();
+            var generator = new TemplateGenerator("","","",null);
 
             var defintion = generator.generateConnectionTemplate(apiresource, apiresourceInstance, (string)apiresource["id"]);
 
@@ -427,7 +427,7 @@ namespace LogicAppTemplate.Tests
         {
             var apiresource = JObject.Parse(GetEmbededFileContent("LogicAppTemplate.Test.TestFiles.ApiSource.azureblob.json"));
             var apiresourceInstance = JObject.Parse(GetEmbededFileContent("LogicAppTemplate.Test.TestFiles.ApiSource.azureblobinstance.json"));
-            var generator = new TemplateGenerator();
+            var generator = new TemplateGenerator("","","",null);
 
             var defintion = generator.generateConnectionTemplate(apiresource, apiresourceInstance, (string)apiresource["id"]);
 
@@ -444,7 +444,7 @@ namespace LogicAppTemplate.Tests
         {
             var content = GetEmbededFileContent("LogicAppTemplate.Test.TestFiles.AzureBlob.json");
 
-            var generator = new TemplateGenerator();
+            var generator = new TemplateGenerator("","","",null);
 
             var defintion = generator.generateDefinition(JObject.Parse(content),false).GetAwaiter().GetResult();            
 
@@ -458,7 +458,7 @@ namespace LogicAppTemplate.Tests
         {
             var content = GetEmbededFileContent("LogicAppTemplate.Test.TestFiles.misingparameter.json");
 
-            var generator = new TemplateGenerator();
+            var generator = new TemplateGenerator("","","",null);
 
             var defintion = generator.generateDefinition(JObject.Parse(content), false).GetAwaiter().GetResult();
 
@@ -472,7 +472,7 @@ namespace LogicAppTemplate.Tests
         {
             var content = GetEmbededFileContent("LogicAppTemplate.Test.TestFiles.file-test-triggerandmore.json");
 
-            var generator = new TemplateGenerator();
+            var generator = new TemplateGenerator("","","",null);
 
             var defintion = generator.generateDefinition(JObject.Parse(content), false).GetAwaiter().GetResult();
 

@@ -1,0 +1,52 @@
+{
+  {
+    "properties": {
+      "connectionParameters": {
+        "username": {
+          "type": "securestring",
+          "uiDefinition": {
+            "displayName": "username",
+            "description": "The username for this api",
+            "tooltip": "Provide the username",
+            "constraints": {
+              "tabIndex": 2,
+              "clearText": true,
+              "required": "true"
+            }
+          }
+        },
+        "password": {
+          "type": "securestring",
+          "uiDefinition": {
+            "displayName": "password",
+            "description": "The password for this api",
+            "tooltip": "Provide the password",
+            "constraints": {
+              "tabIndex": 3,
+              "clearText": false,
+              "required": "true"
+            }
+          }
+        }
+      },
+      "runtimeUrls": [
+        "https://logic-apis-westeurope.azure-apim.net/apim/70c607e6bf5c4e328a91aa8196a8019b",
+        "http://logic-apis-westeurope.azure-apim.net/apim/70c607e6bf5c4e328a91aa8196a8019b"
+      ],
+      "capabilities": [],
+      "description": "The Billogram API is built according to RESTful principles, which means it uses HTTP as an application protocol rather than just as a transport layer for a custom protocol, like SOAP does. In other words, HTTP features such as the various request types (GET, PUT, POST, DELETE), response codes (403 Forbidden, 404 Not Found, 500 Internal Server Error) and standard headers (Accept, Authorization, Cache-Control) are a part of the API.",
+      "displayName": "Billogram",
+      "iconUri": "/Content/retail/assets/default-connection-icon.6296199fc1d74aa45ca68e1253762025.2.svg",
+      "apiDefinitions": {
+        "originalSwaggerUrl": "https://wawsprodam25a46afbahub8.blob.core.windows.net/api-swagger-files/70c607e6bf5c4e328a91aa8196a8019b.json_original?sv=2017-04-17&sr=b&sig=WFVHXK4ErGq7bitIYdMPeeHnjCnY7wqoCYGimQu2Iok%3D&se=2018-01-11T13%3A58%3A42Z&sp=r",
+        "modifiedSwaggerUrl": "https://wawsprodam25a46afbahub8.blob.core.windows.net/api-swagger-files/70c607e6bf5c4e328a91aa8196a8019b.json?sv=2017-04-17&sr=b&sig=S0dGSwav7rpPJFKlyWJNAxW6BvHzvwnNnLC%2BpZfBg8k%3D&se=2018-01-11T13%3A58%3A42Z&sp=r"
+      },
+      "apiType": "Rest",
+      "wsdlDefinition": {}
+    },
+    "id": "/subscriptions/89d02439-770d-43f3-9e4a-8b910457a10c/resourceGroups/Messaging/providers/Microsoft.Web/customApis/Billogram",
+    "name": "Billogram",
+    "type": "Microsoft.Web/customApis",
+    "location": "westeurope"
+  }
+}
