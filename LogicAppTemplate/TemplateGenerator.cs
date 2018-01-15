@@ -221,11 +221,10 @@ namespace LogicAppTemplate
                 {
                     var curr = ((JObject)definition["actions"][action.Name]["inputs"]["host"]["workflow"]).Value<string>("id");
                     ///subscriptions/fakeecb73-15f5-4c85-bb3e-fakeecb73/resourceGroups/myresourcegrp/providers/Microsoft.Logic/workflows/INT0020-All-Users-Batch2
-                    Regex rgx = new Regex(regextoresourcegroup + @"providers\/Microsoft.Logic\/workflows\/(?<workflow>[\w-_d]*)");
-                    var matches = rgx.Match(curr);
-                    string resourcegroupValue = LogicAppResourceGroup == matches.Groups["resourcegroup"].Value ? "[resourceGroup().name]" : matches.Groups["resourcegroup"].Value;
+                    var wid = new AzureResourceId(curr);                    
+                    string resourcegroupValue = LogicAppResourceGroup == wid.ResourceGroupName ? "[resourceGroup().name]" : wid.ResourceGroupName;
                     string resourcegroupParameterName = AddTemplateParameter(action.Name + "-ResourceGroup", "string", resourcegroupValue);
-                    string wokflowParameterName = AddTemplateParameter(action.Name + "-LogicAppName", "string", matches.Groups["workflow"].Value);
+                    string wokflowParameterName = AddTemplateParameter(action.Name + "-LogicAppName", "string", wid.ResourceName);
                     string workflowid = $"[concat('/subscriptions/',subscription().subscriptionId,'/resourceGroups/',parameters('{resourcegroupParameterName}'),'/providers/Microsoft.Logic/workflows/',parameters('{wokflowParameterName}'))]";
                     definition["actions"][action.Name]["inputs"]["host"]["workflow"]["id"] = workflowid;
                     //string result = "[concat('" + rgx.Replace(matches.Groups[1].Value, "',subscription().subscriptionId,'") + + "']";
@@ -233,15 +232,14 @@ namespace LogicAppTemplate
                 else if (type == "apimanagement")
                 {
                     var apiId = ((JObject)definition["actions"][action.Name]["inputs"]["api"]).Value<string>("id");
+                    var aaid = new AzureResourceId(apiId);
+                   
 
-                    Regex rgx = new Regex(@"\/subscriptions\/(?<subscription>[0-9a-zA-Z-]*)\/resourceGroups\/(?<resourcegroup>[a-zA-Z0-9-]*).*\/service\/(?<apim>[a-zA-Z0-9]*)\/apis\/(?<apiId>[0-9a-zA-Z]*)");
-                    var matches = rgx.Match(apiId);
-
-                    apiId = apiId.Replace(matches.Groups["subscription"].Value, "',subscription().subscriptionId,'");
-                    apiId = apiId.Replace(matches.Groups["resourcegroup"].Value, "', parameters('" + AddTemplateParameter("apimResourceGroup", "string", matches.Groups["resourcegroup"].Value) + "'),'");
-                    apiId = apiId.Replace(matches.Groups["apim"].Value, "', parameters('" + AddTemplateParameter("apimInstanceName", "string", matches.Groups["apim"].Value) + "'),'");
-                    apiId = apiId.Replace(matches.Groups["apiId"].Value, "', parameters('" + AddTemplateParameter("apimApiId", "string", matches.Groups["apiId"].Value) + "'),'");
-                    apiId = "[concat('" + apiId + "')]";
+                    aaid.SubscriptionId = "',subscription().subscriptionId,'";
+                    aaid.ResourceGroupName = "', parameters('" + AddTemplateParameter("apimResourceGroup", "string", aaid.ResourceGroupName) + "'),'";
+                    aaid.ReplaceValueAfter("service", "', parameters('" + AddTemplateParameter("apimInstanceName", "string", aaid.ValueAfter("service")) + "'),'");
+                    aaid.ReplaceValueAfter("apis", "', parameters('" + AddTemplateParameter("apimApiId", "string", aaid.ValueAfter("apis")) + "'),'");
+                    apiId = "[concat('" + aaid.ToString() + "')]";
 
                     definition["actions"][action.Name]["inputs"]["api"]["id"] = apiId;
 
@@ -315,10 +313,14 @@ namespace LogicAppTemplate
                 else if (type == "function")
                 {
                     var curr = ((JObject)definition["actions"][action.Name]["inputs"]["function"]).Value<string>("id");
+                    var faid = new AzureResourceId(curr);
 
-                    Regex rgx = new Regex(@"\/subscriptions\/(?<subscription>[0-9a-zA-Z-]*)\/resourceGroups\/(?<resourcegroup>[a-zA-Z0-9-_]*)\/providers\/Microsoft.Web\/sites\/(?<functionApp>[a-zA-Z0-9-_]*)\/functions\/(?<functionName>.*)");
-                    var matches = rgx.Match(curr);
-                    definition["actions"][action.Name]["inputs"]["function"]["id"] = $"[concat('/subscriptions/',subscription().subscriptionId,'/resourceGroups/',parameters('{AddTemplateParameter(action.Name + "-ResourceGroup", "string", matches.Groups["resourcegroup"].Value)}'),'/providers/Microsoft.Web/sites/',parameters('{AddTemplateParameter(action.Name + "-FunctionApp", "string", matches.Groups["functionApp"].Value)}'),'/functions/',parameters('{AddTemplateParameter(action.Name + "-FunctionName", "string", matches.Groups["functionName"].Value)}'))]";
+                    faid.SubscriptionId = "',subscription().subscriptionId,'";
+                    faid.ResourceGroupName = "',parameters('" + AddTemplateParameter(action.Name + "-ResourceGroup", "string", faid.ResourceGroupName) + "'),'";
+                    faid.ReplaceValueAfter("sites", "',parameters('" + AddTemplateParameter(action.Name + "-FunctionApp", "string", faid.ValueAfter("sites")) + "'),'");
+                    faid.ReplaceValueAfter("functions", "',parameters('" + AddTemplateParameter(action.Name + "-FunctionName", "string", faid.ValueAfter("functions")) + "')");
+
+                    definition["actions"][action.Name]["inputs"]["function"]["id"] = "[concat('" + faid.ToString() + ")]";
                 }
                 else
                 {
