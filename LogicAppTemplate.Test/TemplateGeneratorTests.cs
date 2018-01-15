@@ -361,6 +361,9 @@ namespace LogicAppTemplate.Tests
             Assert.AreEqual("[parameters('filesystem_name')]", defintion["name"]);
             Assert.AreEqual("[parameters('filesystem_displayName')]", defintion["properties"]["displayName"]);
 
+            Assert.AreEqual("Malos-LogicApp2015", template.parameters["filesystem_gatewayname"]["defaultValue"]);
+            Assert.AreEqual("OnPremDataGateway", template.parameters["filesystem_gatewayresourcegroup"]["defaultValue"]);
+
             Assert.AreEqual("File System", template.parameters["filesystem_displayName"]["defaultValue"]);
             Assert.AreEqual("[concat('/subscriptions/', subscription().subscriptionId, '/providers/Microsoft.Web/locations/', parameters('logicAppLocation'), '/managedApis/filesystem')]", defintion["properties"]["api"]["id"]);
 
@@ -454,7 +457,7 @@ namespace LogicAppTemplate.Tests
             Assert.AreEqual("/datasets/default/files/@{encodeURIComponent(encodeURIComponent(base64(parameters('Get_blob_content-path'))))}/content", defintion["resources"][0]["properties"]["definition"]["actions"]["Condition"]["actions"]["Get_blob_content"]["inputs"]["path"]);
 
 
-            Assert.AreEqual("[concat('/subscriptions/',subscription().subscriptionId,'/providers/Microsoft.Web/locations/', parameters('logicAppLocation'), '/managedApis/azureblob')]", defintion["resources"][0]["properties"]["parameters"]["$connections"]["value"]["azureblob"]["id"]);
+            Assert.AreEqual("[concat('/subscriptions/',subscription().subscriptionId,'/providers/Microsoft.Web/locations/',parameters('logicAppLocation'),'/managedApis/azureblob')]", defintion["resources"][0]["properties"]["parameters"]["$connections"]["value"]["azureblob"]["id"]);
             Assert.AreEqual("[resourceId('Microsoft.Web/connections', parameters('azureblob_name'))]", defintion["resources"][0]["properties"]["parameters"]["$connections"]["value"]["azureblob"]["connectionId"]);
             Assert.AreEqual("[parameters('azureblob_name')]", defintion["resources"][0]["properties"]["parameters"]["$connections"]["value"]["azureblob"]["connectionName"]);
         }

@@ -57,12 +57,28 @@ namespace LogicAppTemplate
             }
         }
 
+        public string ValueAfter(String type)
+        {
+            var rest = this.splittedId.SkipWhile(s => s != type).Skip(1);            
+            return rest.FirstOrDefault();            
+        }
+
+        public void ReplaceValueAfter(String type, string value)
+        {
+            var position = this.splittedId.TakeWhile(s => s != type).Count() + 1;
+            if (position < this.splittedId.Length)
+                this.splittedId[position] = value;
+        }
+
         private string[] splittedId;
         public AzureResourceId (string resourceid)
         {
             this.splittedId = resourceid.Split('/');
         }
 
-
+        public override string ToString()
+        {
+            return splittedId.Aggregate( (a,n) => { return a + '/' + n; } ).ToString();
+        }
     }
 }

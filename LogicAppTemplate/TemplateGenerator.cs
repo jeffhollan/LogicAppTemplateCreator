@@ -57,10 +57,6 @@ namespace LogicAppTemplate
         public async Task<JObject> generateDefinition(JObject definition, bool generateConnection = true)
         {
             var rid = new AzureResourceId(definition.Value<string>("id"));
-            //Regex rgx = new Regex(@"\/subscriptions\/(?<subscription>[0-9a-zA-Z-]*)\/resourceGroups\/(?<resourcegroup>[a-zA-Z0-9-]*)");
-            //var matches = rgx.Match(definition.Value<string>("id"));
-            //LogicAppResourceGroup = matches.Groups["resourcegroup"].Value;
-
             LogicAppResourceGroup = rid.ResourceGroupName;
 
             template.parameters["logicAppName"]["defaultValue"] = definition.Value<string>("name");
@@ -121,10 +117,11 @@ namespace LogicAppTemplate
                 string connectionId = connectionProperty.First.Value<string>("connectionId");
                 string id = connectionProperty.First.Value<string>("id");
                 string connectionName = connectionProperty.First["connectionName"] != null ? connectionProperty.First.Value<string>("connectionName"): connectionId.Split('/').Last();
-                
-                string concatedId = apiIdTemplate(id);
+
+                var cid = apiIdTemplate(id);
+                string concatedId = $"[concat('{cid.ToString()}')]";
                 //fixes old templates where name sometimes is missing
-                
+
                 var connectionNameParam = AddTemplateParameter($"{connectionName}_name", "string", connectionName);
                 workflowTemplateReference["properties"]["parameters"]["$connections"]["value"][connectionName] = JObject.FromObject(new
                 {
@@ -194,26 +191,21 @@ namespace LogicAppTemplate
             // WriteVerbose("Finalizing Template...");
             return JObject.FromObject(template);
         }
-        private string apiIdTemplate(string apiId)
+        private AzureResourceId apiIdTemplate(string apiId)
         {
-            //subscriptions/89d02439-770d-43f3-9e4a-8b910457a10c/resourceGroups/Messaging/providers/Microsoft.Web/customApis/Billogram
-            //subscriptions/fakeecb73-d0ff-455d-a2bf-eae0b300696d/providers/Microsoft.Web/locations/westeurope/managedApis/filesystem
-            string tmpapiId = apiId.Replace(this.SubscriptionId, "',subscription().subscriptionId,'");
-            if(tmpapiId.Contains("/managedApis/"))
+            var rid = new AzureResourceId(apiId);
+            rid.SubscriptionId = "',subscription().subscriptionId,'";
+            if(apiId.Contains("/managedApis/"))
             {
-                System.Text.RegularExpressions.Regex r = new System.Text.RegularExpressions.Regex(@"\/locations\/(.*)\/managedApis");
-                tmpapiId = r.Replace(tmpapiId, @"/locations/', parameters('logicAppLocation'), '/managedApis");
+                rid.ReplaceValueAfter("locations", "',parameters('logicAppLocation'),'");                
             }else
             {
-                var r = new Regex(regextoresourcegroup);
-                var matches = r.Match(apiId);
-                string resourcegroupValue = LogicAppResourceGroup == matches.Groups["resourcegroup"].Value ? "[resourceGroup().name]" : matches.Groups["resourcegroup"].Value;
+                
+                string resourcegroupValue = LogicAppResourceGroup == rid.ResourceGroupName ? "[resourceGroup().name]" : rid.ResourceGroupName;
                 string resourcegroupParameterName = AddTemplateParameter(apiId.Split('/').Last() + "-ResourceGroup", "string", resourcegroupValue);
-                tmpapiId = tmpapiId.Replace("/resourceGroups/" + resourcegroupValue, $"/resourceGroups/',parameters('{resourcegroupParameterName}'),'");
-
+                rid.ResourceGroupName = $"',parameters('{resourcegroupParameterName}'),'";
             }
-            
-            return  $"[concat('{tmpapiId}')]";
+            return rid; 
         }
 
 
@@ -614,13 +606,11 @@ namespace LogicAppTemplate
 
             if (useGateway)
             {
-                var currentvalue = (string)connectionInstance["properties"]["nonSecretParameterValues"]["gateway"]["id"];
-                ///subscriptions/c107df29-a4af-4bc9-a733-f88f0eaa4296/resourceGroups/OnPremDataGateway/providers/Microsoft.Web/connectionGateways/Malos-LogicApp2015
-                Regex rgx = new Regex(@"\/subscriptions\/(?<subscription>[0-9a-zA-Z-]*)\/resourceGroups\/(?<resourcegroup>[a-zA-Z0-9-]*)\/providers\/Microsoft.Web\/connectionGateways\/(?<gatewayname>[a-zA-Z0-9-]*)");
-                var matches = rgx.Match(currentvalue);
+                var currentvalue = (string)connectionInstance["properties"]["nonSecretParameterValues"]["gateway"]["id"];     
+                var rid = new AzureResourceId(currentvalue);
+                var gatewayname = AddTemplateParameter($"{connectionName}_gatewayname", "string", rid.ResourceName);
+                var resourcegroup = AddTemplateParameter($"{connectionName}_gatewayresourcegroup", "string", rid.ResourceGroupName);
 
-                var gatewayname = AddTemplateParameter($"{connectionName}_gatewayname", "string", matches.Groups["gatewayname"].Value);
-                var resourcegroup = AddTemplateParameter($"{connectionName}_gatewayresourcegroup", "string", matches.Groups["resourcegroup"].Value);
                 var gatewayobject = new JObject();
                 gatewayobject["id"] = $"[concat('subscriptions/',subscription().subscriptionId,'/resourceGroups/',parameters('{resourcegroup}'),'/providers/Microsoft.Web/connectionGateways/',parameters('{gatewayname}'))]";
                 connectionParameters.Add("gateway", gatewayobject);
