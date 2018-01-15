@@ -59,6 +59,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AzureResourceCollector.cs" />
+    <Compile Include="AzureResourceId.cs" />
     <Compile Include="Constants\Constants.cs" />
     <Compile Include="EmptyParameterTemplateGenerator.cs" />
     <Compile Include="GeneratorCmdlet.cs" />

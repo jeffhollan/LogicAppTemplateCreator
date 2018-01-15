@@ -47,23 +47,21 @@ namespace LogicAppTemplate
                 template = JsonConvert.DeserializeObject<DeploymentTemplate>(reader.ReadToEnd());
             }
         }
-      
+
         public async Task<JObject> GenerateTemplate()
         {
-            return await ConvertWithToken();
-        }
-
-        public async Task<JObject> ConvertWithToken()
-        {
-            JObject _definition = await resourceCollector.GetResource($"https://management.azure.com/subscriptions/{SubscriptionId}/resourceGroups/{ResourceGroup}/providers/Microsoft.Logic/workflows/{LogicApp}");   
+            JObject _definition = await resourceCollector.GetResource($"https://management.azure.com/subscriptions/{SubscriptionId}/resourceGroups/{ResourceGroup}/providers/Microsoft.Logic/workflows/{LogicApp}");
             return await generateDefinition(_definition);
-        }
+        }        
 
         public async Task<JObject> generateDefinition(JObject definition, bool generateConnection = true)
         {
-            Regex rgx = new Regex(@"\/subscriptions\/(?<subscription>[0-9a-zA-Z-]*)\/resourceGroups\/(?<resourcegroup>[a-zA-Z0-9-]*)");
-            var matches = rgx.Match(definition.Value<string>("id"));
-            LogicAppResourceGroup = matches.Groups["resourcegroup"].Value;
+            var rid = new AzureResourceId(definition.Value<string>("id"));
+            //Regex rgx = new Regex(@"\/subscriptions\/(?<subscription>[0-9a-zA-Z-]*)\/resourceGroups\/(?<resourcegroup>[a-zA-Z0-9-]*)");
+            //var matches = rgx.Match(definition.Value<string>("id"));
+            //LogicAppResourceGroup = matches.Groups["resourcegroup"].Value;
+
+            LogicAppResourceGroup = rid.ResourceGroupName;
 
             template.parameters["logicAppName"]["defaultValue"] = definition.Value<string>("name");
 
@@ -72,7 +70,6 @@ namespace LogicAppTemplate
             // WriteVerbose("Upgrading connectionId paramters...");
             var modifiedDefinition = definition["properties"]["definition"].ToString().Replace(@"['connectionId']", @"['connectionId']");
             // WriteVerbose("Removing API Host references...");
-            //template.parameters["logicAppLocation"]["defaultValue"] = definition["location"];
 
             workflowTemplateReference["properties"]["definition"] = handleActions(JObject.Parse(modifiedDefinition), (JObject)definition["properties"]["parameters"]);
 
@@ -112,39 +109,82 @@ namespace LogicAppTemplate
             workflowTemplateReference["properties"]["parameters"]["$connections"] = new JObject(new JProperty("value", new JObject()));
             foreach (JProperty connectionProperty in connections["value"])
             {
-                // WriteVerbose($"Parameterizing {connectionProperty.Name}");
-                string connectionName = connectionProperty.Name;
+                /*               
+                "Billogram": {
+                "connectionId": "/subscriptions/89d02439-770d-43f3-9e4a-8b910457a10c/resourceGroups/INT001.Invoice/providers/Microsoft.Web/connections/Billogram",
+                "connectionName": "Billogram",
+                "id": "/subscriptions/89d02439-770d-43f3-9e4a-8b910457a10c/resourceGroups/Messaging/providers/Microsoft.Web/customApis/Billogram"
+                } 
+                 */
 
-
-                var conn = (JObject)connectionProperty.Value;
-
-                var apiId = conn["id"] != null ? conn["id"] :
-                            conn["api"]["id"] != null ? conn["api"]["id"] : null;
-                if (apiId == null)
-                    throw new NullReferenceException($"Connection {connectionName} is missing an id");
-                string connectionNameProperty = (string)conn["connectionName"] ?? ((string)conn["connectionId"]).Split('/').Last();
+                string name = connectionProperty.Name;
+                string connectionId = connectionProperty.First.Value<string>("connectionId");
+                string id = connectionProperty.First.Value<string>("id");
+                string connectionName = connectionProperty.First["connectionName"] != null ? connectionProperty.First.Value<string>("connectionName"): connectionId.Split('/').Last();
+                
+                string concatedId = apiIdTemplate(id);
+                //fixes old templates where name sometimes is missing
+                
+                var connectionNameParam = AddTemplateParameter($"{connectionName}_name", "string", connectionName);
                 workflowTemplateReference["properties"]["parameters"]["$connections"]["value"][connectionName] = JObject.FromObject(new
                 {
-                    id = apiIdTemplate((string)apiId),
-                    connectionId = $"[resourceId('Microsoft.Web/connections', parameters('{connectionNameProperty}_name'))]",
-                    connectionName = $"[parameters('{connectionNameProperty}_name')]"
+                    id = concatedId, 
+                    connectionId = $"[resourceId('Microsoft.Web/connections', parameters('{connectionNameParam}'))]",
+                    connectionName = $"[parameters('{connectionNameParam}')]"
                 });
-                AddTemplateParameter($"{connectionNameProperty}_name", "string", (string)connectionNameProperty);
-
+                
+                /*
+                "connections_Billogram_id": {
+                    "defaultValue": "/subscriptions/cb693348-19cf-42ee-9a63-1969d567f333/resourceGroups/Shared/providers/Microsoft.Web/customApis/Billogram",
+                    "type": "String"
+                }
+                "workflows_INT001.Invoice_id": {
+                    "defaultValue": "/subscriptions/cb693348-19cf-42ee-9a63-1969d567f333/resourceGroups/Shared/providers/Microsoft.Web/customApis/Billogram",
+                    "type": "String"
+                }
+                        "connections_Billogram_name": {
+                    "defaultValue": "Billogram",
+                    "type": "String"
+                },
+                {
+                    "comments": "Generalized from resource: '/subscriptions/cb693348-19cf-42ee-9a63-1969d567f333/resourceGroups/INT001.Invoice/providers/Microsoft.Web/connections/Billogram'.",
+                    "type": "Microsoft.Web/connections",
+                    "name": "[parameters('connections_Billogram_name')]",
+                    "apiVersion": "2016-06-01",
+                    "location": "westeurope",
+                    "scale": null,
+                    "properties": {
+                        "displayName": "[parameters('connections_Billogram_name')]",
+                        "customParameterValues": {},
+                        "api": {
+                            "id": "[parameters('connections_Billogram_id')]"
+                        }
+                    },
+                    "dependsOn": []
+                }
+                  "parameters": {
+                    "$connections": {
+                        "value": {
+                            "Billogram": {
+                                "connectionId": "[resourceId('Microsoft.Web/connections', parameters('connections_Billogram_name'))]",
+                                "connectionName": "Billogram",
+                                "id": "[parameters('workflows_INT001.Invoice_id')]"
+                            }
+                        }
+                    }
+                }           
+                 */
                 if (generateConnection)
                 {
                     //get api definition
-                    //                    JObject apiResource = await generateConnectionResource((string)apiId);
-                    JObject apiResource = await resourceCollector.GetResource("https://management.azure.com" + (string)apiId);
-                    var connectionId = (string)conn["connectionId"];
+                    JObject apiResource = await resourceCollector.GetResource("https://management.azure.com" + id);
                     //get api instance data, sub,group,provider,name
-                    //JObject apiResourceInstance = await generateConnectionResource(connectionId);
                     JObject apiResourceInstance = await resourceCollector.GetResource("https://management.azure.com" + connectionId);
                     //add depends on to make sure that the api connection is created before the Logic App
-                    ((JArray)workflowTemplateReference["dependsOn"]).Add($"[resourceId('Microsoft.Web/connections', parameters('{connectionNameProperty}_name'))]");
+                    ((JArray)workflowTemplateReference["dependsOn"]).Add($"[resourceId('Microsoft.Web/connections', parameters('{connectionNameParam}'))]");
 
                     // WriteVerbose($"Generating connection resource for {connectionName}....");
-                    var connectionTemplate = generateConnectionTemplate(apiResource, apiResourceInstance, (string)apiId);
+                    var connectionTemplate = generateConnectionTemplate(apiResource, apiResourceInstance, connectionName, concatedId, connectionNameParam);
 
                     template.resources.Insert(1, connectionTemplate);
                 }
@@ -154,7 +194,27 @@ namespace LogicAppTemplate
             // WriteVerbose("Finalizing Template...");
             return JObject.FromObject(template);
         }
+        private string apiIdTemplate(string apiId)
+        {
+            //subscriptions/89d02439-770d-43f3-9e4a-8b910457a10c/resourceGroups/Messaging/providers/Microsoft.Web/customApis/Billogram
+            //subscriptions/fakeecb73-d0ff-455d-a2bf-eae0b300696d/providers/Microsoft.Web/locations/westeurope/managedApis/filesystem
+            string tmpapiId = apiId.Replace(this.SubscriptionId, "',subscription().subscriptionId,'");
+            if(tmpapiId.Contains("/managedApis/"))
+            {
+                System.Text.RegularExpressions.Regex r = new System.Text.RegularExpressions.Regex(@"\/locations\/(.*)\/managedApis");
+                tmpapiId = r.Replace(tmpapiId, @"/locations/', parameters('logicAppLocation'), '/managedApis");
+            }else
+            {
+                var r = new Regex(regextoresourcegroup);
+                var matches = r.Match(apiId);
+                string resourcegroupValue = LogicAppResourceGroup == matches.Groups["resourcegroup"].Value ? "[resourceGroup().name]" : matches.Groups["resourcegroup"].Value;
+                string resourcegroupParameterName = AddTemplateParameter(apiId.Split('/').Last() + "-ResourceGroup", "string", resourcegroupValue);
+                tmpapiId = tmpapiId.Replace("/resourceGroups/" + resourcegroupValue, $"/resourceGroups/',parameters('{resourcegroupParameterName}'),'");
 
+            }
+            
+            return  $"[concat('{tmpapiId}')]";
+        }
 
 
 
@@ -487,44 +547,14 @@ namespace LogicAppTemplate
             return realParameterName;
         }
 
-        private string apiIdTemplate(string apiId)
-        {
-            System.Text.RegularExpressions.Regex r = new System.Text.RegularExpressions.Regex(@"\/locations\/(.*)\/managedApis");
-            apiId = r.Replace(apiId, @"/locations/', parameters('logicAppLocation'), '/managedApis");
-            r = new System.Text.RegularExpressions.Regex(@"(.*)\/providers");
-            apiId = r.Replace(apiId, @"subscription().id,'/providers");
-            return apiId.Insert(0, "[concat(") + "')]";
-        }
-
-        /*
-        private async Task<JObject> generateConnectionResource(string apiId)
-        {
-
-            string url = "https://management.azure.com" + apiId + "?api-version=2016-06-01";
-            // WriteVerbose("Doing a GET to: " + url);
-            var request = HttpWebRequest.Create(url);
-            request.Headers[HttpRequestHeader.Authorization] = "Bearer " + Token;
-
-            var logicAppRequest = await request.GetResponseAsync();
-            var stream = logicAppRequest.GetResponseStream();
-            StreamReader reader = new StreamReader(stream);
-            var apiResource = reader.ReadToEnd();
-            // WriteVerbose("Got api");
-            return JObject.Parse(apiResource);
-
-        }
-        */
-        public JObject generateConnectionTemplate(JObject connectionResource, JObject connectionInstance, string apiId)
+      
+        
+        public JObject generateConnectionTemplate(JObject connectionResource, JObject connectionInstance, string connectionName,string concatedId, string connectionNameParam)
         {
             //create template
-            string connectionName = (string)connectionInstance["name"];
-            var connectionTemplate = new Models.ConnectionTemplate(AddTemplateParameter($"{connectionName}_name", "string", (string)connectionInstance["name"]), apiId);
-            if (connectionInstance.Value<string>("type") == "Microsoft.Web/customApis")
-            {
-                AddTemplateParameter($"{connectionName}_ResourceGroupName", "string", (string)connectionInstance["name"]);
-            }
+            var connectionTemplate = new Models.ConnectionTemplate(connectionNameParam, concatedId);           
             //displayName            
-            connectionTemplate.properties.displayName = $"[parameters('{AddTemplateParameter(connectionName + "_displayName", "string", (string)connectionInstance["properties"]["displayName"])}')]";
+            connectionTemplate.properties.displayName = $"[parameters('{AddTemplateParameter(connectionName+ "_displayName", "string", (string)connectionInstance["properties"]["displayName"])}')]";
             JObject connectionParameters = new JObject();
 
             bool useGateway = connectionInstance["properties"]["nonSecretParameterValues"]["gateway"] != null;
@@ -547,7 +577,7 @@ namespace LogicAppTemplate
                     }
 
 
-                    if (parameter.Name == "accessKey" && apiId.EndsWith("azureblob"))
+                    if (parameter.Name == "accessKey" && concatedId.EndsWith("/azureblob')]"))
                     {
                         connectionParameters.Add(parameter.Name, $"[listKeys(resourceId('Microsoft.Storage/storageAccounts', parameters('{connectionName}_accountName')), providers('Microsoft.Storage', 'storageAccounts').apiVersions[0]).keys[0].value]");
                     }

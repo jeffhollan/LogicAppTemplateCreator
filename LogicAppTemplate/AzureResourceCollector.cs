@@ -48,7 +48,7 @@ namespace LogicAppTemplate
             var responseContent = await response.Content.ReadAsStringAsync();
             if (!string.IsNullOrEmpty(DebugOutputFolder))
             {
-                System.IO.File.WriteAllText(DebugOutputFolder + "\\" + resourceId.Split('/').SkipWhile((a) => { return a != "service"; }).Aggregate<string>((b, c) => { return b + "-" + c; }) + ".json", responseContent);
+                System.IO.File.WriteAllText(DebugOutputFolder + "\\" + resourceId.Split('/').SkipWhile((a) => { return a != "providers"; }).Aggregate<string>((b, c) => { return b + "-" + c; }) + ".json", responseContent);
             }
             return JObject.Parse(responseContent);
 

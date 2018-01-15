@@ -15,18 +15,10 @@ namespace LogicAppTemplate.Models
 
     public class Properties
     {
-        public Properties(string name, string apiId,string type = "")
+        public Properties(string name, string apiId)
         {
             displayName = name;
-            if (type == "Microsoft.Web/customApis")
-            {
-                api = new Api { id = string.Format("[concat('/subscriptions/', subscription().subscriptionId,'/resourceGroups/', parameters('{1}_ResourceGroupName') ,'/providers/Microsoft.Web/customApis/', '{0}')]", apiId.Split('/').Last(),name.Split('_').First()) };
-                /// subscriptions/89d02439-770d-43f3-9e4a-8b910457a10c/resourceGroups/Messaging/providers/Microsoft.Web/customApis/Billogram
-            }
-            else
-            {
-                api = new Api { id = string.Format("[concat('/subscriptions/', subscription().subscriptionId, '/providers/Microsoft.Web/locations/', parameters('logicAppLocation'), '/managedApis/', '{0}')]", apiId.Split('/').Last()) };
-            }
+            api = new Api { id = apiId};
         }
         public Api api { get; set; }
         public string displayName { get; set; }

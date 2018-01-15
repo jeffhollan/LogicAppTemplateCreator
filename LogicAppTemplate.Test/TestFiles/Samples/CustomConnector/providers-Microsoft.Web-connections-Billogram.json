@@ -1,0 +1,23 @@
+{
+  "properties": {
+    "displayName": "test",
+    "statuses": [ { "status": "Connected" } ],
+    "customParameterValues": {},
+    "nonSecretParameterValues": {},
+    "createdTime": "2017-12-20T13:06:27.2875608Z",
+    "changedTime": "2017-12-20T13:06:27.2875608Z",
+    "api": {
+      "name": "Billogram",
+      "displayName": "Billogram",
+      "description": "The Billogram API is built according to RESTful principles, which means it uses HTTP as an application protocol rather than just as a transport layer for a custom protocol, like SOAP does. In other words, HTTP features such as the various request types (GET, PUT, POST, DELETE), response codes (403 Forbidden, 404 Not Found, 500 Internal Server Error) and standard headers (Accept, Authorization, Cache-Control) are a part of the API.",
+      "iconUri": "/Content/retail/assets/default-connection-icon.6296199fc1d74aa45ca68e1253762025.2.svg",
+      "id": "/subscriptions/89d02439-770d-43f3-9e4a-8b910457a10c/resourceGroups/Messaging/providers/Microsoft.Web/customApis/Billogram",
+      "type": "Microsoft.Web/customApis"
+    },
+    "testLinks": []
+  },
+  "id": "/subscriptions/89d02439-770d-43f3-9e4a-8b910457a10c/resourceGroups/INT001.Invoice/providers/Microsoft.Web/connections/Billogram",
+  "name": "Billogram",
+  "type": "Microsoft.Web/connections",
+  "location": "westeurope"
+}
