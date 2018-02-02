@@ -12,44 +12,26 @@ namespace LogicAppTemplate
     [Cmdlet(VerbsCommon.Get, "LogicAppTemplate", ConfirmImpact = ConfirmImpact.None)]
     public class GeneratorCmdlet : PSCmdlet
     {
-        [Parameter(
-            Mandatory = true,
-            HelpMessage = "Name of the Logic App"
-            )]
+        [Parameter(Mandatory = true, HelpMessage = "Name of the Logic App")]
         public string LogicApp;
-        [Parameter(
-            Mandatory = true,
-            HelpMessage = "Name of the Resource Group"
-            )]
-        public string ResourceGroup;
-        [Parameter(
-            Mandatory = true,
-            HelpMessage = "The SubscriptionId"
-            )]
-        public string SubscriptionId;
-        [Parameter(
-            Mandatory = false,
-            HelpMessage = "Name of the Tenant i.e. contoso.onmicrosoft.com"
-            )]
-        public string TenantName = "";
-        [Parameter(
-            Mandatory = false,
-            HelpMessage = "A Bearer token value"
-        )]
-        public string Token = "";
-        [Parameter(
-            Mandatory = false,
-            HelpMessage = "Piped input from armclient",
-            ValueFromPipeline = true
-        )]
-        public string DebugOutPutFolder = "";
-        [Parameter(
-            Mandatory = false,
-            HelpMessage = "If set, result from rest interface will be saved to this folder",
-            ValueFromPipeline = true
-        )]
 
+        [Parameter(Mandatory = true, HelpMessage = "Name of the Resource Group")]
+        public string ResourceGroup;
+
+        [Parameter(Mandatory = true, HelpMessage = "The SubscriptionId")]
+        public string SubscriptionId;
+
+        [Parameter(Mandatory = false, HelpMessage = "Name of the Tenant i.e. contoso.onmicrosoft.com")]
+        public string TenantName = "";
+
+        [Parameter(Mandatory = false, HelpMessage = "A Bearer token value")]
+        public string Token = "";
+
+        [Parameter(Mandatory = false, HelpMessage = "Piped input from armclient", ValueFromPipeline = true)]
         public string ClaimsDump;
+
+        [Parameter(Mandatory = false, HelpMessage = "If set, result from rest interface will be saved to this folder")]
+        public string DebugOutPutFolder = "";
 
         protected override void ProcessRecord()
         {
@@ -63,7 +45,10 @@ namespace LogicAppTemplate
                 if (String.IsNullOrEmpty(Token))
                 {
                     Token = resourceCollector.Login(TenantName);
-                    //WriteVerbose(Token);
+                }
+                else
+                {
+                    resourceCollector.token = Token;
                 }
             }
             else if (ClaimsDump.Contains("Token copied"))
@@ -75,7 +60,7 @@ namespace LogicAppTemplate
             {
                 return;
             }
-            TemplateGenerator generator = new TemplateGenerator(LogicApp, SubscriptionId, ResourceGroup,  resourceCollector);
+            TemplateGenerator generator = new TemplateGenerator(LogicApp, SubscriptionId, ResourceGroup, resourceCollector);
             try
             {
 
