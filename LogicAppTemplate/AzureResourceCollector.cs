@@ -44,6 +44,9 @@ namespace LogicAppTemplate
             if (response.StatusCode == HttpStatusCode.NotFound)
             {
                 return null;
+            }else if (response.StatusCode == HttpStatusCode.Forbidden)
+            {
+                throw new Exception("Authorization failed, httpstatus: " + response.StatusCode);
             }
             var responseContent = await response.Content.ReadAsStringAsync();
             if (!string.IsNullOrEmpty(DebugOutputFolder))
