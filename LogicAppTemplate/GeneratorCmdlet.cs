@@ -33,6 +33,9 @@ namespace LogicAppTemplate
         [Parameter(Mandatory = false, HelpMessage = "If set, result from rest interface will be saved to this folder")]
         public string DebugOutPutFolder = "";
 
+        [Parameter(Mandatory = false, HelpMessage = "If true, diagnostic settings will be included in the ARM template")]
+        public bool DiagnosticSettings = false;
+
         protected override void ProcessRecord()
         {
             AzureResourceCollector resourceCollector = new AzureResourceCollector();
@@ -61,6 +64,8 @@ namespace LogicAppTemplate
                 return;
             }
             TemplateGenerator generator = new TemplateGenerator(LogicApp, SubscriptionId, ResourceGroup, resourceCollector);
+            generator.DiagnosticSettings = DiagnosticSettings;
+
             try
             {
 

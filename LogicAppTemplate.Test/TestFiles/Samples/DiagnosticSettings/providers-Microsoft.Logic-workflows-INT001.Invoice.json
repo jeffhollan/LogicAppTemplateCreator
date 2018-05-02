@@ -1,0 +1,43 @@
+{
+  "properties": {
+    "provisioningState": "Succeeded",
+    "createdTime": "2017-12-11T09:06:35.7590186Z",
+    "changedTime": "2018-01-12T15:40:34.0733717Z",
+    "state": "Enabled",
+    "version": "08586858352515017541",
+    "definition": {
+      "$schema": "https://schema.management.azure.com/providers/Microsoft.Logic/schemas/2016-06-01/workflowdefinition.json#",
+      "contentVersion": "1.0.0.0",
+      "parameters": {
+        "$connections": {
+          "defaultValue": {},
+          "type": "Object"
+        }
+      },
+      "triggers": {
+        "manual": {
+          "type": "Request",
+          "kind": "Http",
+          "inputs": { "schema": {} }
+        }
+      },
+      "actions": {
+        "Response": {
+          "runAfter": {},
+          "type": "Response",
+          "inputs": {
+            "body": {},
+            "statusCode": 200
+          }
+        }
+      },
+      "outputs": {}
+    },
+    "parameters": {
+    }
+  },
+  "id": "/subscriptions/89d02439-770d-43f3-9e4a-8b910457a10c/resourceGroups/INT001.Invoice/providers/Microsoft.Logic/workflows/INT001.Invoice",
+  "name": "INT001.Invoice",
+  "type": "Microsoft.Logic/workflows",
+  "location": "westeurope"
+}

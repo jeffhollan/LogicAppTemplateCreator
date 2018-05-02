@@ -13,6 +13,9 @@ This is a simple PowerShell script module I wrote to convert Logic Apps into a t
 Example when user is connected to multitenants:
 `Get-LogicAppTemplate -LogicApp MyApp -ResourceGroup Integrate2016 -SubscriptionId 80d4fe69-xxxx-4dd2-a938-9250f1c8ab03 -TenantName contoso.onmicrosoft.com`
 
+Example with diagnostic settings:
+`Get-LogicAppTemplate -LogicApp MyApp -ResourceGroup Integrate2016 -SubscriptionId 80d4fe69-xxxx-4dd2-a938-9250f1c8ab03 -DiagnosticSettings $true`
+
 ### Specifications
 
 | Parameter | Description | Required |
@@ -23,7 +26,7 @@ Example when user is connected to multitenants:
 | TenantName | Name of the Tenant i.e. contoso.onmicrosoft.com | false |
 | Token | An AAD Token to access the resources - should not include `Bearer`, only the token | false |
 | ClaimsDump | A dump of claims piped in from `armclient` - should not be manually set | false |
-
+| DiagnosticSettings | If true, diagnostic settings are included in the ARM template | false |
 
 After extraction a parameters file can be created off the LogicAppTemplate. (works on any ARM template file):
 

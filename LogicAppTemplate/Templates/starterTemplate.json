@@ -67,7 +67,8 @@
         "integrationAccount": {
           "id": "[concat('/subscriptions/',subscription().subscriptionId,'/resourcegroups/',parameters('IntegrationAccountResourceGroupName'),'/providers/Microsoft.Logic/integrationAccounts/',parameters('IntegrationAccountName'))]"
         }
-      }
+      },
+      "resources": []
     }
   ],
   "outputs": {}
