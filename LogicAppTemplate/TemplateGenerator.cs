@@ -356,7 +356,15 @@ namespace LogicAppTemplate
                                     {
                                         var base64string = ((JProperty)meta.First).Name;
                                         var param = AddParameterForMetadataBase64(meta, action.Name + "-path");
-                                        meta.Parent.Parent["inputs"]["path"] = action.Value.SelectToken("inputs.path").ToString().Replace($"'{base64string}'", "base64(parameters('" + param + "'))");
+
+                                        var token = action.Value.SelectToken("inputs.path");
+
+                                        var replaced = token.Value<string>().Replace($"'{base64string}'", $"', parameters('__apostrophe'), base64(parameters('{param}')), parameters('__apostrophe'), '");
+                                        var newValue = $"[concat('{replaced}')]";
+
+                                        meta.Parent.Parent["inputs"]["path"] = newValue;
+
+                                        AddTemplateParameter("__apostrophe", "string", "'");
                                     }
                                     break;
                                 }

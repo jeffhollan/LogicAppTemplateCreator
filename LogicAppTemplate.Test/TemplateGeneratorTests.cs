@@ -449,13 +449,13 @@ namespace LogicAppTemplate.Tests
         {
             var content = GetEmbededFileContent("LogicAppTemplate.Test.TestFiles.AzureBlob.json");
 
-            var generator = new TemplateGenerator("lanme", "fakeee-15f5-4c85-bb3e-1e108dc79b00", "",null);
+            var generator = new TemplateGenerator("lanme", "fakeee-15f5-4c85-bb3e-1e108dc79b00", "", null);
 
-            var defintion = generator.generateDefinition(JObject.Parse(content),false).GetAwaiter().GetResult();            
+            var defintion = generator.generateDefinition(JObject.Parse(content), false).GetAwaiter().GetResult();
 
             Assert.AreEqual("[parameters('Get_blob_content-path')]", defintion["resources"][0]["properties"]["definition"]["actions"]["Condition"]["actions"]["Get_blob_content"]["metadata"]["[base64(parameters('Get_blob_content-path'))]"]);
-            Assert.AreEqual("/datasets/default/files/@{encodeURIComponent(encodeURIComponent(base64(parameters('Get_blob_content-path'))))}/content", defintion["resources"][0]["properties"]["definition"]["actions"]["Condition"]["actions"]["Get_blob_content"]["inputs"]["path"]);
-
+            Assert.AreEqual("[concat('/datasets/default/files/@{encodeURIComponent(encodeURIComponent(', parameters('__apostrophe'), base64(parameters('Get_blob_content-path')), parameters('__apostrophe'), '))}/content')]", defintion["resources"][0]["properties"]["definition"]["actions"]["Condition"]["actions"]["Get_blob_content"]["inputs"]["path"]);
+            Assert.AreEqual("'", defintion["parameters"]["__apostrophe"]["defaultValue"].Value<string>());
 
             Assert.AreEqual("[concat('/subscriptions/',subscription().subscriptionId,'/providers/Microsoft.Web/locations/',parameters('logicAppLocation'),'/managedApis/azureblob')]", defintion["resources"][0]["properties"]["parameters"]["$connections"]["value"]["azureblob"]["id"]);
             Assert.AreEqual("[resourceId('Microsoft.Web/connections', parameters('azureblob_name'))]", defintion["resources"][0]["properties"]["parameters"]["$connections"]["value"]["azureblob"]["connectionId"]);
