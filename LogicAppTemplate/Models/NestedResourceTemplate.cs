@@ -1,15 +1,13 @@
-﻿using System;
+﻿using Newtonsoft.Json.Linq;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace LogicAppTemplate.Models
 {
     public class TemplateLink
     {
         public string contentVersion
-        { get
+        {
+            get
             {
                 return "1.0.0.0";
             }
@@ -49,6 +47,7 @@ namespace LogicAppTemplate.Models
         }
         public List<object> dependsOn { get; set; }
         public TemplateProperties properties { get; set; }
+        public IList<JObject> resources { get; set; }
 
         public NestedResourceTemplate()
         {
@@ -56,8 +55,6 @@ namespace LogicAppTemplate.Models
             dependsOn = new List<object>();
             properties.parametersLink = new TemplateLink();
             properties.templateLink = new TemplateLink();
+        }
     }
-    }
-
-
 }

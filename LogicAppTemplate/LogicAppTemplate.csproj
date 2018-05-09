@@ -64,6 +64,7 @@
     <Compile Include="EmptyParameterTemplateGenerator.cs" />
     <Compile Include="GeneratorCmdlet.cs" />
     <Compile Include="IResourceCollector.cs" />
+    <Compile Include="Models\DiagnosticSettingsTemplate.cs" />
     <Compile Include="Models\NestedResourceTemplate.cs" />
     <Compile Include="Models\ParameterTemplate.cs" />
     <Compile Include="NestedTemplateGenerator.cs" />
