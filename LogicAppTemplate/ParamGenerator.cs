@@ -61,7 +61,7 @@ namespace LogicAppTemplate
             foreach(var param in logicAppTemplate["parameters"].Children<JProperty>())
             {
                 // Don't create parameters that reference a ARM Template expression
-                if (param.Value.Value<string>("type").Equals("string",StringComparison.CurrentCultureIgnoreCase) && param.Value.Value<string>("defaultValue").StartsWith("["))
+                if (param.Value.Value<string>("type").Equals("string",StringComparison.CurrentCultureIgnoreCase) && param.Value.Value<string>("defaultValue") != null  && param.Value.Value<string>("defaultValue").StartsWith("["))
                 {
                     continue;
                 }

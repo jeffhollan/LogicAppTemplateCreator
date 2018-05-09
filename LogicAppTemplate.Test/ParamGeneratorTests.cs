@@ -70,9 +70,18 @@ namespace LogicAppTemplate.Test
             Assert.AreEqual("sql-1_password", defintion["parameters"]["sql-1_password"]["reference"]["secretName"]);
         }
 
+        [TestMethod]
+        public void GenerateParameterFileWithNullString()
+        {
+            var content = GetEmbededFileContent("LogicAppTemplate.Test.TestFiles.paramGenerator-nullString.json");
+            var generator = new ParamGenerator();
+            generator.KeyVault = ParamGenerator.KeyVaultUsage.Static;
+            var defintion = generator.CreateParameterFileFromTemplate(JObject.Parse(content));
 
-
-
+            // Check parameters
+            Assert.AreEqual("SQLAzure", (string)defintion["parameters"]["logicAppName"]["value"]);
+            Assert.IsNull((string)defintion["parameters"]["sql-1_name"]["value"]);
+        }
 
         //var resourceName = "LogicAppTemplate.Templates.starterTemplate.json";
         private static string GetEmbededFileContent(string resourceName)

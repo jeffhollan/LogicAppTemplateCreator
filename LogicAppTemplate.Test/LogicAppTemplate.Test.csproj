@@ -105,6 +105,7 @@
     <EmbeddedResource Include="TestFiles\Samples\CustomConnector\providers-Microsoft.Logic-workflows-INT001.Invoice.json" />
     <EmbeddedResource Include="TestFiles\Samples\CustomConnector\providers-Microsoft.Web-connections-Billogram.json" />
     <EmbeddedResource Include="TestFiles\Samples\CustomConnector\providers-Microsoft.Web-customApis-Billogram.json" />
+    <EmbeddedResource Include="TestFiles\paramGenerator-nullString.json" />
     <EmbeddedResource Include="TestFiles\Samples\DiagnosticSettings\providers-Microsoft.Logic-workflows-INT001.Invoice.json" />
     <EmbeddedResource Include="TestFiles\Samples\DiagnosticSettings\providers-Microsoft.Logic-workflows-INT001.Invoice-providers-microsoft.insights-diagnosticSettings.json" />
   </ItemGroup>
