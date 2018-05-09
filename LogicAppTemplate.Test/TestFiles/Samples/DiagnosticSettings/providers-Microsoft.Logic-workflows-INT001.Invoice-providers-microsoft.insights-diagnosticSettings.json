@@ -1,0 +1,40 @@
+{
+  "value": [
+    {
+      "id": "/subscriptions/89d02439-770d-43f3-9e4a-8b910457a10c/resourceGroups/INT001.Invoice/providers/Microsoft.Logic/workflows/INT001.Invoice/providers/microsoft.insights/diagnosticSettings/service",
+      "type": null,
+      "name": "service",
+      "location": null,
+      "kind": null,
+      "tags": null,
+      "properties": {
+        "storageAccountId": null,
+        "serviceBusRuleId": null,
+        "workspaceId": "/subscriptions/e193a254-ff76-492c-988d-455179ace003/resourceGroups/shared.infrastructure/providers/Microsoft.OperationalInsights/workspaces/twobits",
+        "eventHubAuthorizationRuleId": null,
+        "eventHubName": null,
+        "metrics": [
+          {
+            "category": "AllMetrics",
+            "enabled": false,
+            "retentionPolicy": {
+              "enabled": false,
+              "days": 0
+            }
+          }
+        ],
+        "logs": [
+          {
+            "category": "WorkflowRuntime",
+            "enabled": true,
+            "retentionPolicy": {
+              "enabled": true,
+              "days": 3
+            }
+          }
+        ]
+      },
+      "identity": null
+    }
+  ]
+}

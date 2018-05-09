@@ -35,9 +35,9 @@ namespace LogicAppTemplate
         }
         private static HttpClient client = new HttpClient() { BaseAddress = new Uri("https://management.azure.com") };
 
-        public async Task<JObject> GetResource(string resourceId, string suffix = "")
+        public async Task<JObject> GetResource(string resourceId, string apiVersion, string suffix = "")
         {
-            string url = resourceId + "?api-version=2016-06-01" + (string.IsNullOrEmpty(suffix) ? "" : $"&{suffix}");
+            string url = resourceId + "?api-version=" + apiVersion + (string.IsNullOrEmpty(suffix) ? "" : $"&{suffix}");
             client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
             var response = await client.GetAsync(url);
 

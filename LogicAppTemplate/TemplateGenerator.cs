@@ -48,9 +48,11 @@ namespace LogicAppTemplate
             }
         }
 
+        public bool DiagnosticSettings { get; set; }
+
         public async Task<JObject> GenerateTemplate()
         {
-            JObject _definition = await resourceCollector.GetResource($"https://management.azure.com/subscriptions/{SubscriptionId}/resourceGroups/{ResourceGroup}/providers/Microsoft.Logic/workflows/{LogicApp}");
+            JObject _definition = await resourceCollector.GetResource($"https://management.azure.com/subscriptions/{SubscriptionId}/resourceGroups/{ResourceGroup}/providers/Microsoft.Logic/workflows/{LogicApp}", "2016-06-01");
             return await generateDefinition(_definition);
         }        
 
@@ -69,7 +71,18 @@ namespace LogicAppTemplate
 
             workflowTemplateReference["properties"]["definition"] = handleActions(JObject.Parse(modifiedDefinition), (JObject)definition["properties"]["parameters"]);
 
+            // Diagnostic Settings
+            if (DiagnosticSettings)
+            {
+                JToken resources = await handleDiagnosticSettings(definition);
+                ((JArray)workflowTemplateReference["resources"]).Merge(resources);
+            }
 
+            // Remove resources if empty
+            if (((JArray)workflowTemplateReference["resources"]).Count == 0)
+            {
+                workflowTemplateReference.Remove("resources");
+            }
 
             if (definition["properties"]["integrationAccount"] == null)
             {
@@ -174,9 +187,9 @@ namespace LogicAppTemplate
                 if (generateConnection)
                 {
                     //get api definition
-                    JObject apiResource = await resourceCollector.GetResource("https://management.azure.com" + id);
+                    JObject apiResource = await resourceCollector.GetResource("https://management.azure.com" + id, "2016-06-01");
                     //get api instance data, sub,group,provider,name
-                    JObject apiResourceInstance = await resourceCollector.GetResource("https://management.azure.com" + connectionId);
+                    JObject apiResourceInstance = await resourceCollector.GetResource("https://management.azure.com" + connectionId, "2016-06-01");
                     //add depends on to make sure that the api connection is created before the Logic App
                     ((JArray)workflowTemplateReference["dependsOn"]).Add($"[resourceId('Microsoft.Web/connections', parameters('{connectionNameParam}'))]");
 
@@ -191,6 +204,39 @@ namespace LogicAppTemplate
             // WriteVerbose("Finalizing Template...");
             return JObject.FromObject(template);
         }
+
+        private async Task<JToken> handleDiagnosticSettings(JObject definition)
+        {
+            JArray result = new JArray();
+
+            // Get diagnostic settings 
+            JObject resources = await resourceCollector.GetResource("https://management.azure.com" + definition.Value<string>("id") + "/providers/microsoft.insights/diagnosticSettings", "2017-05-01-preview");
+
+            foreach (JObject resourceProperty in resources["value"])
+            {
+                string dsName = AddTemplateParameter(Constants.DsName, "string", resourceProperty["name"]);
+                
+                Match m = Regex.Match((string)resourceProperty["properties"]["workspaceId"], "resourceGroups/(.*)/providers/Microsoft.OperationalInsights/workspaces/(.*)", RegexOptions.IgnoreCase);
+
+                string dsResourceGroup = AddTemplateParameter(Constants.DsResourceGroup, "string", m.Groups[1].Value);
+                string dsWorkspaceId = AddTemplateParameter(Constants.DsWorkspaceName, "string", m.Groups[2].Value);
+
+                string dsLogsEnabled = AddTemplateParameter(Constants.DsLogsEnabled, "bool", resourceProperty["properties"]["logs"][0]["enabled"]);
+                string dsLogsRetentionPolicyEnabled = AddTemplateParameter(Constants.DsLogsRetentionPolicyEnabled, "bool", resourceProperty["properties"]["logs"][0]["retentionPolicy"]["enabled"]);
+                string dsLogsRetentionPolicyDays = AddTemplateParameter(Constants.DsLogsRetentionPolicyDays, "int", resourceProperty["properties"]["logs"][0]["retentionPolicy"]["days"]);
+                string dsMetricsEnabled = AddTemplateParameter(Constants.DsMetricsEnabled, "bool", resourceProperty["properties"]["metrics"][0]["enabled"]);
+                string dsMetricsRetentionPolicyEnabled = AddTemplateParameter(Constants.DsMetricsRetentionPolicyEnabled, "bool", resourceProperty["properties"]["metrics"][0]["retentionPolicy"]["enabled"]);
+                string dsMetricsRetentionPolicyDays = AddTemplateParameter(Constants.DsMetricsRetentionPolicyDays, "int", resourceProperty["properties"]["metrics"][0]["retentionPolicy"]["days"]);
+
+                DiagnosticSettingsTemplate resource = new DiagnosticSettingsTemplate(dsName);
+                resource.dependsOn.Add("[parameters('logicAppName')]");
+
+                result.Add(JObject.FromObject(resource));
+            }
+
+            return result;
+        }
+
         private AzureResourceId apiIdTemplate(string apiId)
         {
             var rid = new AzureResourceId(apiId);
@@ -356,7 +402,15 @@ namespace LogicAppTemplate
                                     {
                                         var base64string = ((JProperty)meta.First).Name;
                                         var param = AddParameterForMetadataBase64(meta, action.Name + "-path");
-                                        meta.Parent.Parent["inputs"]["path"] = action.Value.SelectToken("inputs.path").ToString().Replace($"'{base64string}'", "base64(parameters('" + param + "'))");
+
+                                        var token = action.Value.SelectToken("inputs.path");
+
+                                        var replaced = token.Value<string>().Replace($"'{base64string}'", $"', parameters('__apostrophe'), base64(parameters('{param}')), parameters('__apostrophe'), '");
+                                        var newValue = $"[concat('{replaced}')]";
+
+                                        meta.Parent.Parent["inputs"]["path"] = newValue;
+
+                                        AddTemplateParameter("__apostrophe", "string", "'");
                                     }
                                     break;
                                 }
