@@ -610,7 +610,7 @@ namespace LogicAppTemplate
 
             //add all parameters
 
-            foreach (JProperty parameter in connectionResource["properties"]["connectionParameters"])
+            foreach (JProperty parameter in connectionResource["properties"]?["connectionParameters"])
             {
                 if ((string)(parameter.Value)["type"] != "oauthSetting")
                 {
