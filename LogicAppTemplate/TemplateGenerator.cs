@@ -609,52 +609,54 @@ namespace LogicAppTemplate
 
 
             //add all parameters
-
-            foreach (JProperty parameter in connectionResource["properties"]?["connectionParameters"])
+            if (connectionResource["properties"]["connectionParameters"] != null)
             {
-                if ((string)(parameter.Value)["type"] != "oauthSetting")
+                foreach (JProperty parameter in connectionResource["properties"]["connectionParameters"])
                 {
-                    //we are not handling parameter gatewaySetting
-                    if ((string)parameter.Value["type"] == "gatewaySetting")
-                        continue;
-                    if (parameter.Value["uiDefinition"]["constraints"]["capability"] != null)
+                    if ((string)(parameter.Value)["type"] != "oauthSetting")
                     {
-                        var match = parameter.Value["uiDefinition"]["constraints"]["capability"].FirstOrDefault(cc => (string)cc == "gateway" && useGateway || (string)cc == "cloud" && !useGateway);
-                        if (match == null)
+                        //we are not handling parameter gatewaySetting
+                        if ((string)parameter.Value["type"] == "gatewaySetting")
                             continue;
-                    }
-
-
-                    if (parameter.Name == "accessKey" && concatedId.EndsWith("/azureblob')]"))
-                    {
-                        connectionParameters.Add(parameter.Name, $"[listKeys(resourceId('Microsoft.Storage/storageAccounts', parameters('{connectionName}_accountName')), providers('Microsoft.Storage', 'storageAccounts').apiVersions[0]).keys[0].value]");
-                    }
-                    else
-                    {
-                        //todo check this!
-                        var addedparam = AddTemplateParameter($"{connectionName}_{parameter.Name}", (string)(parameter.Value)["type"], connectionInstance["properties"]["nonSecretParameterValues"][parameter.Name]);
-                        connectionParameters.Add(parameter.Name, $"[parameters('{addedparam}')]");
-
-                        //If has an enum
-                        if (parameter.Value["allowedValues"] != null)
+                        if (parameter.Value["uiDefinition"]["constraints"]["capability"] != null)
                         {
-                            var array = new JArray();
-                            foreach (var allowedValue in parameter.Value["allowedValues"])
-                            {
-                                array.Add(allowedValue["value"]);
-                            }
-                            template.parameters[addedparam]["allowedValues"] = array;
-                            if (parameter.Value["allowedValues"].Count() == 1)
-                            {
-                                template.parameters[addedparam]["defaultValue"] = parameter.Value["allowedValues"][0]["value"];
-                            }
+                            var match = parameter.Value["uiDefinition"]["constraints"]["capability"].FirstOrDefault(cc => (string)cc == "gateway" && useGateway || (string)cc == "cloud" && !useGateway);
+                            if (match == null)
+                                continue;
                         }
 
-                        if (parameter.Value["uiDefinition"]["description"] != null)
+
+                        if (parameter.Name == "accessKey" && concatedId.EndsWith("/azureblob')]"))
                         {
-                            //add meta data
-                            template.parameters[addedparam]["metadata"] = new JObject();
-                            template.parameters[addedparam]["metadata"]["description"] = parameter.Value["uiDefinition"]["description"];
+                            connectionParameters.Add(parameter.Name, $"[listKeys(resourceId('Microsoft.Storage/storageAccounts', parameters('{connectionName}_accountName')), providers('Microsoft.Storage', 'storageAccounts').apiVersions[0]).keys[0].value]");
+                        }
+                        else
+                        {
+                            //todo check this!
+                            var addedparam = AddTemplateParameter($"{connectionName}_{parameter.Name}", (string)(parameter.Value)["type"], connectionInstance["properties"]["nonSecretParameterValues"][parameter.Name]);
+                            connectionParameters.Add(parameter.Name, $"[parameters('{addedparam}')]");
+
+                            //If has an enum
+                            if (parameter.Value["allowedValues"] != null)
+                            {
+                                var array = new JArray();
+                                foreach (var allowedValue in parameter.Value["allowedValues"])
+                                {
+                                    array.Add(allowedValue["value"]);
+                                }
+                                template.parameters[addedparam]["allowedValues"] = array;
+                                if (parameter.Value["allowedValues"].Count() == 1)
+                                {
+                                    template.parameters[addedparam]["defaultValue"] = parameter.Value["allowedValues"][0]["value"];
+                                }
+                            }
+
+                            if (parameter.Value["uiDefinition"]["description"] != null)
+                            {
+                                //add meta data
+                                template.parameters[addedparam]["metadata"] = new JObject();
+                                template.parameters[addedparam]["metadata"]["description"] = parameter.Value["uiDefinition"]["description"];
+                            }
                         }
                     }
                 }
