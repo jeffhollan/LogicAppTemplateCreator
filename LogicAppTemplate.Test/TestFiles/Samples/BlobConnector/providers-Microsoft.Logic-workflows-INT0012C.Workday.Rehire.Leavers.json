@@ -1,0 +1,393 @@
+{
+  "properties": {
+    "provisioningState": "Succeeded",
+    "createdTime": "2018-04-13T12:51:55.4461866Z",
+    "changedTime": "2018-08-22T09:13:08.8135041Z",
+    "state": "Enabled",
+    "version": "08586666776966879396",
+    "accessEndpoint": "https://prod-29.northeurope.logic.azure.com:443/workflows/c49b12cfd177496d95919901f7627b7a",
+    "integrationAccount": {
+      "name": "IntegrationAccountDev",
+      "id": "/subscriptions/9fake03d-3c94-40e9-b2cb-18921e5d6cfa/resourceGroups/LogicAppsDev/providers/Microsoft.Logic/integrationAccounts/IntegrationAccountDev",
+      "type": "Microsoft.Logic/integrationAccounts"
+    },
+    "definition": {
+      "$schema": "https://schema.management.azure.com/providers/Microsoft.Logic/schemas/2016-06-01/workflowdefinition.json#",
+      "contentVersion": "1.0.0.0",
+      "parameters": {
+        "$connections": {
+          "defaultValue": {},
+          "type": "Object"
+        }
+      },
+      "triggers": {
+        "request": {
+          "type": "Request",
+          "kind": "Http",
+          "inputs": {
+            "schema": {
+              "properties": {
+                "Business Site Country": { "type": "string" },
+                "Business Site Country PriorValue": { "type": "string" },
+                "Business Site Name": { "type": "string" },
+                "Business Site Name Full": { "type": "string" },
+                "Business Site Name PriorValue": { "type": "string" },
+                "Business Title": { "type": "string" },
+                "Car License": { "type": "string" },
+                "Company": { "type": "string" },
+                "Company Subtype": { "type": "string" },
+                "Cost Center": { "type": "string" },
+                "Department": { "type": "string" },
+                "Employee ID": { "type": "string" },
+                "First Name": { "type": "string" },
+                "First Name PriorValue": { "type": "string" },
+                "Formatted Name": { "type": "string" },
+                "Gender": { "type": "string" },
+                "Is Manager": { "type": "string" },
+                "Last Day Of Work": { "type": "string" },
+                "Last Name": { "type": "string" },
+                "Last Name PriorValue": { "type": "string" },
+                "Middle Name": { "type": "string" },
+                "Organization Company": { "type": "string" },
+                "Supervisor ID": { "type": "string" },
+                "Supervisor Name": { "type": "string" },
+                "Worker Type": { "type": "string" }
+              },
+              "type": "object"
+            }
+          }
+        }
+      },
+      "actions": {
+        "Check_empty_Manager": {
+          "actions": {},
+          "runAfter": { "Get_Manager": [ "Succeeded" ] },
+          "else": {
+            "actions": {
+              "Manager": {
+                "runAfter": {},
+                "type": "Compose",
+                "inputs": "@substring(xpath(body('Get_Manager'), 'string(/*[local-name()=\"LDAP\"]/*[local-name()=\"Batches\"]/*[local-name()=\"Batch\"]/*[local-name()=\"Entities\"]/*[local-name()=\"Entity\"]/*[local-name()=\"Operations\"]/*[local-name()=\"Operation\"]/*[local-name()=\"SearchResult\"]/*[local-name()=\"DirectoryEntries\"]/*[local-name()=\"DirectoryEntry\"]/*[local-name()=\"Properties\"]/*[local-name()=\"Property\" and @name=\"DN\"]/@*[local-name()=\"value\"])'), 36, sub(length(xpath(body('Get_Manager'), 'string(/*[local-name()=\"LDAP\"]/*[local-name()=\"Batches\"]/*[local-name()=\"Batch\"]/*[local-name()=\"Entities\"]/*[local-name()=\"Entity\"]/*[local-name()=\"Operations\"]/*[local-name()=\"Operation\"]/*[local-name()=\"SearchResult\"]/*[local-name()=\"DirectoryEntries\"]/*[local-name()=\"DirectoryEntry\"]/*[local-name()=\"Properties\"]/*[local-name()=\"Property\" and @name=\"DN\"]/@*[local-name()=\"value\"])')), 36))"
+              }
+            }
+          },
+          "expression": { "and": [ { "equals": [ "@xpath(body('Get_Manager'), 'string(/*[local-name()=\"LDAP\"]/*[local-name()=\"Batches\"]/*[local-name()=\"Batch\"]/*[local-name()=\"Entities\"]/*[local-name()=\"Entity\"]/*[local-name()=\"Operations\"]/*[local-name()=\"Operation\"]/*[local-name()=\"SearchResult\"]/*[local-name()=\"DirectoryEntries\"]/*[local-name()=\"DirectoryEntry\"]/*[local-name()=\"Properties\"]/*[local-name()=\"Property\" and @name=\"DN\"]/@*[local-name()=\"value\"])')", "" ] } ] },
+          "type": "If"
+        },
+        "Check_mail": {
+          "actions": {},
+          "runAfter": { "Check_new_location_2": [ "Succeeded" ] },
+          "else": {
+            "actions": {
+              "Set_variable": {
+                "runAfter": {},
+                "type": "SetVariable",
+                "inputs": {
+                  "name": "Mail",
+                  "value": "@{substring(body('Filter_Mail')?[0]?['@value'], 7, sub(length(body('Filter_Mail')?[0]?['@value']), 7))}"
+                }
+              }
+            }
+          },
+          "expression": { "and": [ { "equals": [ "@string(body('Filter_Mail'))", "[]" ] } ] },
+          "type": "If"
+        },
+        "Check_namechange": {
+          "actions": {
+            "INT0014A.Workday.WorkerInformationSync.NameChange": {
+              "runAfter": {},
+              "type": "Workflow",
+              "inputs": {
+                "body": "@triggerBody()",
+                "host": {
+                  "triggerName": "request",
+                  "workflow": { "id": "/subscriptions/9fake03d-3c94-40e9-b2cb-18921e5d6cfa/resourceGroups/LogicAppsDev/providers/Microsoft.Logic/workflows/INT0014A.Workday.WorkerInformationSync.NameChange" }
+                }
+              }
+            },
+            "Set_variable_2": {
+              "runAfter": { "INT0014A.Workday.WorkerInformationSync.NameChange": [ "Succeeded" ] },
+              "type": "SetVariable",
+              "inputs": {
+                "name": "Mail",
+                "value": "@{body('INT0014A.Workday.WorkerInformationSync.NameChange')}"
+              }
+            }
+          },
+          "runAfter": { "Check_mail": [ "Succeeded" ] },
+          "expression": {
+            "or": [
+              { "not": { "equals": [ "@triggerBody()?['Last Name PriorValue']", "" ] } },
+              { "not": { "equals": [ "@triggerBody()?['First Name PriorValue']", "" ] } }
+            ]
+          },
+          "type": "If"
+        },
+        "Check_new_location": {
+          "actions": {},
+          "runAfter": { "Check_empty_Manager": [ "Succeeded" ] },
+          "else": {
+            "actions": {
+              "INT0038.Samaccount.Create": {
+                "runAfter": {},
+                "type": "Workflow",
+                "inputs": {
+                  "body": "@triggerBody()",
+                  "headers": { "OU": "@{triggerOutputs()['headers']['OU']}" },
+                  "host": {
+                    "triggerName": "request",
+                    "workflow": { "id": "/subscriptions/9fake03d-3c94-40e9-b2cb-18921e5d6cfa/resourceGroups/LogicAppsDev/providers/Microsoft.Logic/workflows/INT0038.Samaccount.Create" }
+                  }
+                }
+              }
+            }
+          },
+          "expression": {
+            "and": [
+              { "contains": [ "@outputs('Ldap_response')?['OU']", "@concat('OU=', substring(triggerOutputs()['headers']['OU'],0,2))" ] },
+              { "contains": [ "@outputs('Ldap_response')?['OU']", "@concat('OU=', substring(triggerOutputs()['headers']['OU'],2,2))" ] }
+            ]
+          },
+          "type": "If"
+        },
+        "Check_new_location_2": {
+          "actions": {},
+          "runAfter": { "Mail_substring_variable": [ "Succeeded" ] },
+          "else": {
+            "actions": {
+              "INT0071.Create.GraveyardDummy": {
+                "runAfter": {},
+                "type": "Workflow",
+                "inputs": {
+                  "body": {
+                    "Employee ID": "@triggerBody()?['Employee ID']",
+                    "Formatted Name": "@triggerBody()?['Formatted Name']",
+                    "Samaccountname": "@xpath(body('Post_XML'), 'string(/*[local-name()=\"LDAP\"]/*[local-name()=\"Batches\"]/*[local-name()=\"Batch\" and @index=\"0\"]/*[local-name()=\"Entities\"]/*[local-name()=\"Entity\"]/*[local-name()=\"Operations\"]/*[local-name()=\"Operation\"]/*[local-name()=\"SearchResult\"]/*[local-name()=\"DirectoryEntries\"]/*[local-name()=\"DirectoryEntry\"]/*[local-name()=\"Properties\"]/*[local-name()=\"Property\" and @name=\"samaccountname\"]/@*[local-name()=\"value\"])')",
+                    "action": "Rehire Location Change History"
+                  },
+                  "host": {
+                    "triggerName": "request",
+                    "workflow": { "id": "/subscriptions/9fake03d-3c94-40e9-b2cb-18921e5d6cfa/resourceGroups/LogicAppsDev/providers/Microsoft.Logic/workflows/INT0071.Create.GraveyardDummy" }
+                  }
+                }
+              }
+            }
+          },
+          "expression": {
+            "and": [
+              { "contains": [ "@outputs('Ldap_response')['OU']", "@concat('OU=', substring(triggerOutputs()['headers']['OU'],0,2))" ] },
+              { "contains": [ "@outputs('Ldap_response')['OU']", "@concat('OU=', substring(triggerOutputs()['headers']['OU'],2,2))" ] }
+            ]
+          },
+          "type": "If"
+        },
+        "Create_Array": {
+          "runAfter": { "Ldap_response": [ "Succeeded" ] },
+          "type": "Compose",
+          "inputs": "@split(outputs('Ldap_response')['OU'], ',')"
+        },
+        "Filter_Mail": {
+          "runAfter": { "Initialize_ldapResponseJson": [ "Succeeded" ] },
+          "type": "Query",
+          "inputs": {
+            "from": "@variables('ldapResponseJson')['q1:LDAP']['q1:Batches']['q1:Batch']['q1:Entities']['q1:Entity']['q1:Operations']['q1:Operation']['q1:SearchResult']['q1:DirectoryEntries']['q1:DirectoryEntry']['q1:Properties']['q1:Property']",
+            "where": "@equals(item()['@name'], 'mail')"
+          }
+        },
+        "Filter_SamAccountName": {
+          "runAfter": { "Filter_Mail": [ "Succeeded" ] },
+          "type": "Query",
+          "inputs": {
+            "from": "@variables('ldapResponseJson')['q1:LDAP']['q1:Batches']['q1:Batch']['q1:Entities']['q1:Entity']['q1:Operations']['q1:Operation']['q1:SearchResult']['q1:DirectoryEntries']['q1:DirectoryEntry']['q1:Properties']['q1:Property']",
+            "where": "@equals(item()['@name'], 'samaccountname')"
+          }
+        },
+        "Get_Manager": {
+          "runAfter": { "Get_manger_blob": [ "Succeeded" ] },
+          "type": "ApiConnection",
+          "inputs": {
+            "body": "@{replace(body('Get_manger_blob'), '---EMPLOYEEID---', triggerBody()?['Supervisor ID'])}",
+            "headers": { "Content-Type": "application/xml" },
+            "host": { "connection": { "name": "@parameters('$connections')['LDAPAdapter']['connectionId']" } },
+            "method": "post",
+            "path": "/api/ExecuteXml",
+            "queries": { "connectionId": "084da635-2032-47f9-8210-ba0ee2ea57ba " }
+          }
+        },
+        "Get_blob_content": {
+          "runAfter": {},
+          "metadata": { "JTJmaW50MDAxMiUyZlNlbGVjdF9Vc2VyX1JlaGlyZUxlYXZlcnMueG1s": "/int0012/Select_User_RehireLeavers.xml" },
+          "type": "ApiConnection",
+          "inputs": {
+            "host": { "connection": { "name": "@parameters('$connections')['azureblob']['connectionId']" } },
+            "method": "get",
+            "path": "/datasets/default/files/@{encodeURIComponent(encodeURIComponent('JTJmaW50MDAxMiUyZlNlbGVjdF9Vc2VyX1JlaGlyZUxlYXZlcnMueG1s'))}/content",
+            "queries": { "inferContentType": true }
+          }
+        },
+        "Get_manger_blob": {
+          "runAfter": { "Create_Array": [ "Succeeded" ] },
+          "metadata": { "JTJmaW50MDAxMiUyZkdldF9NYW5hZ2VyLnhtbA==": "/int0012/Get_Manager.xml" },
+          "type": "ApiConnection",
+          "inputs": {
+            "host": { "connection": { "name": "@parameters('$connections')['azureblob']['connectionId']" } },
+            "method": "get",
+            "path": "/datasets/default/files/@{encodeURIComponent(encodeURIComponent('JTJmaW50MDAxMiUyZkdldF9NYW5hZ2VyLnhtbA=='))}/content",
+            "queries": { "inferContentType": true }
+          }
+        },
+        "INT0035_CreateTicket": {
+          "runAfter": { "Check_namechange": [ "Succeeded" ] },
+          "type": "Workflow",
+          "inputs": {
+            "body": {
+              "action": "reactivated",
+              "company": "@{triggerBody()?['Company Name']}",
+              "companyName": "@triggerBody()?['Company']",
+              "companySubType": "@triggerBody()?['Company Subtype']",
+              "costCentre": "@triggerBody()?['Cost Center']",
+              "country": "@triggerBody()?['Business Site Name Full']",
+              "createTicketFor": "alfalaval",
+              "department": "@triggerBody()?['Department']",
+              "email": "@variables('Mail')",
+              "firstName": "@triggerBody()?['First Name']",
+              "lastName": "@triggerBody()?['Last Name']",
+              "location": "@triggerBody()?['Business Site Name']",
+              "manager": "@{concat(triggerBody()?['Supervisor ID'], ' - ', triggerBody()?['Supervisor Name'])}",
+              "ou": "@{triggerOutputs()['headers']['OU']}",
+              "samAccountName": "@{body('Filter_SamAccountName')[0]['@value']}",
+              "title": "@triggerBody()?['Business Title']"
+            },
+            "host": {
+              "triggerName": "manual",
+              "workflow": { "id": "/subscriptions/9fake03d-3c94-40e9-b2cb-18921e5d6cfa/resourceGroups/LogicAppsDev/providers/Microsoft.Logic/workflows/INT0035_CreateTicket" }
+            }
+          }
+        },
+        "Initialize_ldapResponseJson": {
+          "runAfter": { "Post_XML_2": [ "Succeeded" ] },
+          "type": "InitializeVariable",
+          "inputs": {
+            "variables": [
+              {
+                "name": "ldapResponseJson",
+                "type": "Object",
+                "value": "@json(body('Post_XML'))"
+              }
+            ]
+          }
+        },
+        "Ldap_response": {
+          "runAfter": { "Post_XML": [ "Succeeded" ] },
+          "type": "Compose",
+          "inputs": { "OU": "@xpath(body('Post_XML'), 'string(/*[local-name()=\"LDAP\"]/*[local-name()=\"Batches\"]/*[local-name()=\"Batch\" and @index=\"0\"]/*[local-name()=\"Entities\"]/*[local-name()=\"Entity\"]/*[local-name()=\"Operations\"]/*[local-name()=\"Operation\"]/*[local-name()=\"SearchResult\"]/*[local-name()=\"DirectoryEntries\"]/*[local-name()=\"DirectoryEntry\"]/*[local-name()=\"Properties\"]/*[local-name()=\"Property\" and @name=\"distinguishedname\"]/@*[local-name()=\"value\"])')" }
+        },
+        "Mail_substring_variable": {
+          "runAfter": { "Filter_SamAccountName": [ "Succeeded" ] },
+          "type": "InitializeVariable",
+          "inputs": {
+            "variables": [
+              {
+                "name": "Mail",
+                "type": "String"
+              }
+            ]
+          }
+        },
+        "Post_XML": {
+          "runAfter": { "Get_blob_content": [ "Succeeded" ] },
+          "type": "ApiConnection",
+          "inputs": {
+            "body": "@{replace(replace(replace(body('Get_blob_content'), '---EMPLOYEEID---', triggerBody()?['Employee ID']), '---OUCountry---', substring(triggerOutputs()['headers']['OU'],0,2)),'---OUName---', substring(triggerOutputs()['headers']['OU'],2,2))}",
+            "headers": { "Content-Type": "application/xml" },
+            "host": { "connection": { "name": "@parameters('$connections')['LDAPAdapter']['connectionId']" } },
+            "method": "post",
+            "path": "/api/ExecuteXml",
+            "queries": { "connectionId": "084da635-2032-47f9-8210-ba0ee2ea57ba " }
+          }
+        },
+        "Post_XML_2": {
+          "runAfter": { "Transform_XML": [ "Succeeded" ] },
+          "type": "ApiConnection",
+          "inputs": {
+            "body": "@{body('Transform_XML')}",
+            "headers": { "Content-Type": "application/xml" },
+            "host": { "connection": { "name": "@parameters('$connections')['LDAPAdapter']['connectionId']" } },
+            "method": "post",
+            "path": "/api/ExecuteXml",
+            "queries": { "connectionId": "084da635-2032-47f9-8210-ba0ee2ea57ba " }
+          }
+        },
+        "Response": {
+          "runAfter": { "INT0035_CreateTicket": [ "Succeeded" ] },
+          "type": "Response",
+          "inputs": { "statusCode": 200 }
+        },
+        "Transform_XML": {
+          "runAfter": { "Check_new_location": [ "Succeeded" ] },
+          "type": "Xslt",
+          "inputs": {
+            "content": "@body('Post_XML')",
+            "integrationAccount": { "map": { "name": "TEST_RehireLeaver" } },
+            "xsltParameters": {
+              "OLD_OUCountry": "@{outputs('Create_Array')[3]}",
+              "OLD_OUSite": "@{outputs('Create_Array')[2]}",
+              "OUCountry": "@concat('OU=',substring(triggerOutputs()['headers']['OU'],0,2))",
+              "OUITSite": "@concat('OU=',substring(triggerOutputs()['headers']['OU'],2,2))",
+              "city": "@triggerBody()?['Business Site Name']",
+              "company": "@triggerBody()?['Company']",
+              "department": "@triggerBody()?['Department']",
+              "manager": "@{outputs('Manager')}",
+              "samaccount": "@{body('INT0038.Samaccount.Create')}",
+              "title": "@triggerBody()?['Business Title']"
+            }
+          }
+        }
+      },
+      "outputs": {}
+    },
+    "parameters": {
+      "$connections": {
+        "value": {
+          "LDAPAdapter": {
+            "connectionId": "/subscriptions/9fake03d-3c94-40e9-b2cb-18921e5d6cfa/resourceGroups/LogicAppsDev/providers/Microsoft.Web/connections/LDAPAdapter",
+            "connectionName": "LDAPAdapter",
+            "id": "/subscriptions/9fake03d-3c94-40e9-b2cb-18921e5d6cfa/resourceGroups/LogicAppsDev/providers/Microsoft.Web/customApis/LDAPAdapter"
+          },
+          "azureblob": {
+            "connectionId": "/subscriptions/9fake03d-3c94-40e9-b2cb-18921e5d6cfa/resourceGroups/LogicAppsDev/providers/Microsoft.Web/connections/azureblob",
+            "connectionName": "azureblob",
+            "id": "/subscriptions/9fake03d-3c94-40e9-b2cb-18921e5d6cfa/providers/Microsoft.Web/locations/northeurope/managedApis/azureblob"
+          }
+        }
+      }
+    },
+    "accessControl": {},
+    "endpointsConfiguration": {
+      "workflow": {
+        "outgoingIpAddresses": [
+          { "address": "40.113.12.95" },
+          { "address": "52.178.165.215" },
+          { "address": "52.178.166.21" },
+          { "address": "40.112.92.104" },
+          { "address": "40.112.95.216" },
+          { "address": "40.113.4.18" },
+          { "address": "40.113.3.202" },
+          { "address": "40.113.1.181" }
+        ],
+        "accessEndpointIpAddresses": [
+          { "address": "13.79.173.49" },
+          { "address": "52.169.218.253" },
+          { "address": "52.169.220.174" },
+          { "address": "40.112.90.39" }
+        ]
+      },
+      "connector": { "outgoingIpAddresses": [ { "address": "104.45.93.9" } ] }
+    }
+  },
+  "id": "/subscriptions/9fake03d-3c94-40e9-b2cb-18921e5d6cfa/resourceGroups/LogicAppsDev/providers/Microsoft.Logic/workflows/INT0012C.Workday.Rehire.Leavers",
+  "name": "INT0012C.Workday.Rehire.Leavers",
+  "type": "Microsoft.Logic/workflows",
+  "location": "northeurope",
+  "tags": {}
+}
