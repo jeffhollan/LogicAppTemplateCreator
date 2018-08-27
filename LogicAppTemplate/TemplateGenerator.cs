@@ -361,8 +361,10 @@ namespace LogicAppTemplate
                     var curr = ((JObject)definition["actions"][action.Name]["inputs"]["function"]).Value<string>("id");
                     var faid = new AzureResourceId(curr);
 
+                    var resourcegroupValue = LogicAppResourceGroup == faid.ResourceGroupName ? "[resourceGroup().name]" : faid.ResourceGroupName;
+
                     faid.SubscriptionId = "',subscription().subscriptionId,'";
-                    faid.ResourceGroupName = "',parameters('" + AddTemplateParameter(action.Name + "-ResourceGroup", "string", faid.ResourceGroupName) + "'),'";
+                    faid.ResourceGroupName = "',parameters('" + AddTemplateParameter(action.Name + "-ResourceGroup", "string", resourcegroupValue) + "'),'";
                     faid.ReplaceValueAfter("sites", "',parameters('" + AddTemplateParameter(action.Name + "-FunctionApp", "string", faid.ValueAfter("sites")) + "'),'");
                     faid.ReplaceValueAfter("functions", "',parameters('" + AddTemplateParameter(action.Name + "-FunctionName", "string", faid.ValueAfter("functions")) + "')");
 
