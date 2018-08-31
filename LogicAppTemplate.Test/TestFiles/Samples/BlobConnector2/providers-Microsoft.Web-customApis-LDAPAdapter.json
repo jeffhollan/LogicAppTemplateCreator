@@ -1,0 +1,54 @@
+{
+  "properties": {
+    "connectionParameters": {
+      "authType": {
+        "type": "string",
+        "allowedValues": [ { "value": "none" } ],
+        "uiDefinition": {
+          "displayName": "Authentication Type",
+          "description": "Authentication type to connect to your API",
+          "tooltip": "Authentication type to connect to your API",
+          "constraints": {
+            "tabIndex": 1,
+            "required": "true",
+            "allowedValues": [
+              {
+                "text": "none",
+                "value": "anonymous"
+              }
+            ],
+            "capability": [ "gateway" ]
+          }
+        }
+      },
+      "gateway": {
+        "type": "gatewaySetting",
+        "gatewaySettings": {
+          "dataSourceType": "CustomConnector",
+          "connectionDetails": []
+        },
+        "uiDefinition": {
+          "constraints": {
+            "tabIndex": 4,
+            "required": "true",
+            "capability": [ "gateway" ]
+          }
+        }
+      }
+    },
+    "runtimeUrls": [ "https://logic-apis-northeurope.azure-apim.net/apim/a428fbd0ecae4f639bb45f994e5d3968", "http://logic-apis-northeurope.azure-apim.net/apim/a428fbd0ecae4f639bb45f994e5d3968" ],
+    "capabilities": [ "gateway" ],
+    "displayName": "LDAPAdapter",
+    "iconUri": "/Content/retail/assets/default-connection-icon.6296199fc1d74aa45ca68e1253762025.2.svg",
+    "apiDefinitions": {
+      "originalSwaggerUrl": "https://wawsproddb328482fefhub8.blob.core.windows.net/api-swagger-files/a428fbd0ecae4f639bb45f994e5d3968.json_original?sv=2017-04-17&sr=b&sig=TEdo7Tvk34gh%2BXxdkzaxLIPX9DOkRfHSEdEoWGrXBpo%3D&se=2018-08-30T08%3A09%3A20Z&sp=r",
+      "modifiedSwaggerUrl": "https://wawsproddb328482fefhub8.blob.core.windows.net/api-swagger-files/a428fbd0ecae4f639bb45f994e5d3968.json?sv=2017-04-17&sr=b&sig=XLxQ8jc0EyPiSUmNOHB7kitp0nexsHmC8IxCbeDG3pY%3D&se=2018-08-30T08%3A09%3A20Z&sp=r"
+    },
+    "apiType": "Rest",
+    "wsdlDefinition": {}
+  },
+  "id": "/subscriptions/9fake3d-3c94-40e9-b2cb-18921e5d6cfa/resourceGroups/LogicAppsDev/providers/Microsoft.Web/customApis/LDAPAdapter",
+  "name": "LDAPAdapter",
+  "type": "Microsoft.Web/customApis",
+  "location": "northeurope"
+}

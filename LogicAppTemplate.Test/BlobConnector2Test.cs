@@ -6,12 +6,12 @@ using System.Linq;
 namespace LogicAppTemplate.Test
 {
     [TestClass]
-    public class BlobConnectorTest
+    public class BlobConnectorTest2
     {
 
         private JObject GetTemplate()
         {
-            var generator = new TemplateGenerator("INT0012C.Workday.Rehire.Leavers", "c107df29-a4af-4bc9-a733-f88f0eaa4296", "blobtest", new MockResourceCollector("BlobConnector"));
+            var generator = new TemplateGenerator("INT0040.HireNew", "9fake3d-3c94-40e9-b2cb-18921e5d6cfa", "LogicAppsDev", new MockResourceCollector("BlobConnector2"));
 
             return generator.GenerateTemplate().GetAwaiter().GetResult();
         }
@@ -72,14 +72,14 @@ namespace LogicAppTemplate.Test
 
 
 
-            var managerblob = actions.Value<JObject>("Get_manger_blob");
+            var blobadsearch = actions.Value<JObject>("Get_Full_AD_Search");
 
-            var managermetadata = managerblob.Value<JObject>("metadata");
+            var managermetadata = blobadsearch.Value<JObject>("metadata");
+            
+            Assert.AreEqual("[parameters('Get_Full_AD_Search-path')]", managermetadata.Value<string>("[base64(parameters('Get_Full_AD_Search-path'))]"));
+
+            Assert.AreEqual("[concat('/datasets/default/files/@{encodeURIComponent(encodeURIComponent(', parameters('__apostrophe'), base64(parameters('Get_Full_AD_Search-path')), parameters('__apostrophe'), '))}/content')]", blobadsearch["inputs"].Value<string>("path"));
             Assert.AreEqual(1, managermetadata.Children().Count());
-            Assert.AreEqual("[parameters('Get_manger_blob-path')]", managermetadata.Value<string>("[base64(parameters('Get_manger_blob-path'))]"));
-
-            Assert.AreEqual("[concat('/datasets/default/files/@{encodeURIComponent(encodeURIComponent(', parameters('__apostrophe'), base64(parameters('Get_manger_blob-path')), parameters('__apostrophe'), '))}/content')]", managerblob["inputs"].Value<string>("path"));
-
         }
     }
 }

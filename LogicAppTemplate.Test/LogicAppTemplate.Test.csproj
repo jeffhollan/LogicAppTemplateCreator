@@ -59,6 +59,9 @@
   </Choose>
   <ItemGroup>
     <Compile Include="AzureResourceIdTests.cs" />
+    <Compile Include="BlobConnector2Test.cs" />
+    <Compile Include="ExpressionTest.cs" />
+    <Compile Include="CustomConnectorTest.cs" />
     <Compile Include="MockResourceCollector.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="BlobConnectorTest.cs" />
@@ -119,6 +122,11 @@
     <EmbeddedResource Include="TestFiles\Samples\BlobConnector\providers-Microsoft.Web-connections-LDAPAdapter.json" />
     <EmbeddedResource Include="TestFiles\Samples\BlobConnector\providers-Microsoft.Web-customApis-LDAPAdapter.json" />
     <EmbeddedResource Include="TestFiles\Samples\BlobConnector\providers-Microsoft.Web-locations-northeurope-managedApis-azureblob.json" />
+    <EmbeddedResource Include="TestFiles\Samples\BlobConnector2\providers-Microsoft.Logic-workflows-INT0040.HireNew.json" />
+    <EmbeddedResource Include="TestFiles\Samples\BlobConnector2\providers-Microsoft.Web-connections-azureblob.json" />
+    <EmbeddedResource Include="TestFiles\Samples\BlobConnector2\providers-Microsoft.Web-connections-LDAPAdapter.json" />
+    <EmbeddedResource Include="TestFiles\Samples\BlobConnector2\providers-Microsoft.Web-customApis-LDAPAdapter.json" />
+    <EmbeddedResource Include="TestFiles\Samples\BlobConnector2\providers-Microsoft.Web-locations-northeurope-managedApis-azureblob.json" />
   </ItemGroup>
   <ItemGroup />
   <Choose>

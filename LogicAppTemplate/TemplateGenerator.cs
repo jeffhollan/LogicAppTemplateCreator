@@ -54,7 +54,7 @@ namespace LogicAppTemplate
         {
             JObject _definition = await resourceCollector.GetResource($"https://management.azure.com/subscriptions/{SubscriptionId}/resourceGroups/{ResourceGroup}/providers/Microsoft.Logic/workflows/{LogicApp}", "2016-06-01");
             return await generateDefinition(_definition);
-        }        
+        }
 
         public async Task<JObject> generateDefinition(JObject definition, bool generateConnection = true)
         {
@@ -69,7 +69,26 @@ namespace LogicAppTemplate
             var modifiedDefinition = definition["properties"]["definition"].ToString().Replace(@"['connectionId']", @"['connectionId']");
             // WriteVerbose("Removing API Host references...");
 
-            workflowTemplateReference["properties"]["definition"] = handleActions(JObject.Parse(modifiedDefinition), (JObject)definition["properties"]["parameters"]);
+            var def = JObject.Parse(modifiedDefinition);
+            //try fixing all properties that start with before handling connections etc[
+            var ll = def.Value<JObject>("actions").Descendants().Where(dd => dd.Type == JTokenType.String && dd.Value<string>().StartsWith("[") && dd.Value<string>().EndsWith("]")).ToList();
+            for (int i = 0; i < ll.Count(); i++)
+            {
+                var tofix = ll[i];
+                var newValue = "[" + tofix.Value<string>();
+                if (tofix.Parent.Type == JTokenType.Property)
+                {
+                    (tofix.Parent as JProperty).Value = newValue;
+                }
+                else
+                {
+                    var parent = tofix.Parent;
+                    tofix.Remove();
+                    parent.Add(newValue);
+                }
+            }
+
+            workflowTemplateReference["properties"]["definition"] = handleActions(def, (JObject)definition["properties"]["parameters"]);
 
             // Diagnostic Settings
             if (DiagnosticSettings)
@@ -118,18 +137,10 @@ namespace LogicAppTemplate
             workflowTemplateReference["properties"]["parameters"]["$connections"] = new JObject(new JProperty("value", new JObject()));
             foreach (JProperty connectionProperty in connections["value"])
             {
-                /*               
-                "Billogram": {
-                "connectionId": "/subscriptions/89d02439-770d-43f3-9e4a-8b910457a10c/resourceGroups/INT001.Invoice/providers/Microsoft.Web/connections/Billogram",
-                "connectionName": "Billogram",
-                "id": "/subscriptions/89d02439-770d-43f3-9e4a-8b910457a10c/resourceGroups/Messaging/providers/Microsoft.Web/customApis/Billogram"
-                } 
-                 */
-
                 string name = connectionProperty.Name;
                 string connectionId = connectionProperty.First.Value<string>("connectionId");
                 string id = connectionProperty.First.Value<string>("id");
-                string connectionName = connectionProperty.First["connectionName"] != null ? connectionProperty.First.Value<string>("connectionName"): connectionId.Split('/').Last();
+                string connectionName = connectionProperty.First["connectionName"] != null ? connectionProperty.First.Value<string>("connectionName") : connectionId.Split('/').Last();
 
                 var cid = apiIdTemplate(id);
                 string concatedId = $"[concat('{cid.ToString()}')]";
@@ -138,52 +149,11 @@ namespace LogicAppTemplate
                 var connectionNameParam = AddTemplateParameter($"{connectionName}_name", "string", connectionName);
                 workflowTemplateReference["properties"]["parameters"]["$connections"]["value"][connectionName] = JObject.FromObject(new
                 {
-                    id = concatedId, 
+                    id = concatedId,
                     connectionId = $"[resourceId('Microsoft.Web/connections', parameters('{connectionNameParam}'))]",
                     connectionName = $"[parameters('{connectionNameParam}')]"
                 });
-                
-                /*
-                "connections_Billogram_id": {
-                    "defaultValue": "/subscriptions/cb693348-19cf-42ee-9a63-1969d567f333/resourceGroups/Shared/providers/Microsoft.Web/customApis/Billogram",
-                    "type": "String"
-                }
-                "workflows_INT001.Invoice_id": {
-                    "defaultValue": "/subscriptions/cb693348-19cf-42ee-9a63-1969d567f333/resourceGroups/Shared/providers/Microsoft.Web/customApis/Billogram",
-                    "type": "String"
-                }
-                        "connections_Billogram_name": {
-                    "defaultValue": "Billogram",
-                    "type": "String"
-                },
-                {
-                    "comments": "Generalized from resource: '/subscriptions/cb693348-19cf-42ee-9a63-1969d567f333/resourceGroups/INT001.Invoice/providers/Microsoft.Web/connections/Billogram'.",
-                    "type": "Microsoft.Web/connections",
-                    "name": "[parameters('connections_Billogram_name')]",
-                    "apiVersion": "2016-06-01",
-                    "location": "westeurope",
-                    "scale": null,
-                    "properties": {
-                        "displayName": "[parameters('connections_Billogram_name')]",
-                        "customParameterValues": {},
-                        "api": {
-                            "id": "[parameters('connections_Billogram_id')]"
-                        }
-                    },
-                    "dependsOn": []
-                }
-                  "parameters": {
-                    "$connections": {
-                        "value": {
-                            "Billogram": {
-                                "connectionId": "[resourceId('Microsoft.Web/connections', parameters('connections_Billogram_name'))]",
-                                "connectionName": "Billogram",
-                                "id": "[parameters('workflows_INT001.Invoice_id')]"
-                            }
-                        }
-                    }
-                }           
-                 */
+              
                 if (generateConnection)
                 {
                     //get api definition
@@ -215,7 +185,7 @@ namespace LogicAppTemplate
             foreach (JObject resourceProperty in resources["value"])
             {
                 string dsName = AddTemplateParameter(Constants.DsName, "string", resourceProperty["name"]);
-                
+
                 Match m = Regex.Match((string)resourceProperty["properties"]["workspaceId"], "resourceGroups/(.*)/providers/Microsoft.OperationalInsights/workspaces/(.*)", RegexOptions.IgnoreCase);
 
                 string dsResourceGroup = AddTemplateParameter(Constants.DsResourceGroup, "string", m.Groups[1].Value);
@@ -241,24 +211,25 @@ namespace LogicAppTemplate
         {
             var rid = new AzureResourceId(apiId);
             rid.SubscriptionId = "',subscription().subscriptionId,'";
-            if(apiId.Contains("/managedApis/"))
+            if (apiId.Contains("/managedApis/"))
             {
-                rid.ReplaceValueAfter("locations", "',parameters('logicAppLocation'),'");                
-            }else
+                rid.ReplaceValueAfter("locations", "',parameters('logicAppLocation'),'");
+            }
+            else
             {
-                
+
                 string resourcegroupValue = LogicAppResourceGroup == rid.ResourceGroupName ? "[resourceGroup().name]" : rid.ResourceGroupName;
                 string resourcegroupParameterName = AddTemplateParameter(apiId.Split('/').Last() + "-ResourceGroup", "string", resourcegroupValue);
                 rid.ResourceGroupName = $"',parameters('{resourcegroupParameterName}'),'";
             }
-            return rid; 
+            return rid;
         }
 
 
 
-        private static string regextoresourcegroup = @"\/subscriptions\/(?<subscription>[0-9a-zA-Z-]*)\/resourceGroups\/(?<resourcegroup>[\w-_d]*)\/";
         private JToken handleActions(JObject definition, JObject parameters)
-        {
+        { 
+
             foreach (JProperty action in definition["actions"])
             {
                 var type = action.Value.SelectToken("type").Value<string>().ToLower();
@@ -266,20 +237,20 @@ namespace LogicAppTemplate
                 if (type == "workflow")
                 {
                     var curr = ((JObject)definition["actions"][action.Name]["inputs"]["host"]["workflow"]).Value<string>("id");
-                    ///subscriptions/fakeecb73-15f5-4c85-bb3e-fakeecb73/resourceGroups/myresourcegrp/providers/Microsoft.Logic/workflows/INT0020-All-Users-Batch2
-                    var wid = new AzureResourceId(curr);                    
+                    
+                    var wid = new AzureResourceId(curr);
                     string resourcegroupValue = LogicAppResourceGroup == wid.ResourceGroupName ? "[resourceGroup().name]" : wid.ResourceGroupName;
                     string resourcegroupParameterName = AddTemplateParameter(action.Name + "-ResourceGroup", "string", resourcegroupValue);
                     string wokflowParameterName = AddTemplateParameter(action.Name + "-LogicAppName", "string", wid.ResourceName);
                     string workflowid = $"[concat('/subscriptions/',subscription().subscriptionId,'/resourceGroups/',parameters('{resourcegroupParameterName}'),'/providers/Microsoft.Logic/workflows/',parameters('{wokflowParameterName}'))]";
                     definition["actions"][action.Name]["inputs"]["host"]["workflow"]["id"] = workflowid;
-                    //string result = "[concat('" + rgx.Replace(matches.Groups[1].Value, "',subscription().subscriptionId,'") + + "']";
+                    
                 }
                 else if (type == "apimanagement")
                 {
                     var apiId = ((JObject)definition["actions"][action.Name]["inputs"]["api"]).Value<string>("id");
                     var aaid = new AzureResourceId(apiId);
-                   
+
 
                     aaid.SubscriptionId = "',subscription().subscriptionId,'";
                     aaid.ResourceGroupName = "', parameters('" + AddTemplateParameter("apimResourceGroup", "string", aaid.ResourceGroupName) + "'),'";
@@ -300,6 +271,7 @@ namespace LogicAppTemplate
 
                     if (definition["actions"][action.Name]["else"] != null && definition["actions"][action.Name]["else"]["actions"] != null)
                         definition["actions"][action.Name]["else"] = handleActions(definition["actions"][action.Name]["else"].ToObject<JObject>(), parameters);
+                  
                 }
                 else if (type == "scope" || type == "foreach" || type == "until")
                 {
@@ -387,33 +359,29 @@ namespace LogicAppTemplate
                         {
                             case "filesystem":
                                 {
-                                    //var metadata = action.Value.SelectToken("metadata");
-                                    var meta = ((JObject)definition["actions"][action.Name]["metadata"]);
-                                    if (meta != null)
+                                    var newValue = AddParameterForMetadataBase64((JObject)action.Value, action.Name + "-folderPath", action.Value["inputs"].Value<string>("path"));
+                                    action.Value["inputs"]["path"] = newValue;
+
+                                    break;
+                                }
+                            case "azuretables":
+                                {
+                                    var inputs = action.Value.Value<JObject>("inputs");
+                                    var path = inputs.Value<string>("path");
+                                    var m = Regex.Match(path, @"/Tables/@{encodeURIComponent\('(.*)'\)");
+                                    if (m.Groups.Count > 1)
                                     {
-                                        var base64string = ((JProperty)meta.First).Name;
-                                        var param = AddParameterForMetadataBase64(meta, action.Name + "-folderPath");
-                                        meta.Parent.Parent["inputs"]["path"] = "[concat('" + action.Value.SelectToken("inputs.path").ToString().Replace($"'{base64string}'", "',base64(parameters('" + param + "')),'") + "')]";
+                                        var tablename = m.Groups[1].Value;
+                                        var param = AddTemplateParameter(action.Name + "-tablename", "string", tablename);
+                                        inputs["path"] = "[concat('" + path.Replace(tablename, $", parameters('{param}') ,") + "')]";                                        
                                     }
+
                                     break;
                                 }
                             case "azureblob":
                                 {
-                                    var meta = ((JObject)definition["actions"][action.Name]["metadata"]);
-                                    if (meta != null)
-                                    {
-                                        var base64string = ((JProperty)meta.First).Name;
-                                        var param = AddParameterForMetadataBase64(meta, action.Name + "-path");
-
-                                        var token = action.Value.SelectToken("inputs.path");
-
-                                        var replaced = token.Value<string>().Replace($"'{base64string}'", $"', parameters('__apostrophe'), base64(parameters('{param}')), parameters('__apostrophe'), '");
-                                        var newValue = $"[concat('{replaced}')]";
-
-                                        meta.Parent.Parent["inputs"]["path"] = newValue;
-
-                                        AddTemplateParameter("__apostrophe", "string", "'");
-                                    }
+                                    var newValue = AddParameterForMetadataBase64((JObject)action.Value, action.Name + "-path", action.Value["inputs"].Value<string>("path"));
+                                    action.Value["inputs"]["path"] = newValue;
                                     break;
                                 }
                         }
@@ -441,25 +409,21 @@ namespace LogicAppTemplate
                         {
                             case "filesystem":
                                 {
-                                    var meta = ((JObject)trigger.Value["metadata"]);
-                                    if (meta != null)
+
+                                    try
                                     {
-                                        try
-                                        {
-
-                                            var base64string = ((JProperty)meta.First).Name;
-                                            var param = AddParameterForMetadataBase64(meta, trigger.Name + "-folderPath");
-                                            meta.Parent.Parent["inputs"]["queries"]["folderId"] = "[base64(parameters('" + param + "'))]";
-                                        }
-                                        catch (FormatException ex)
-                                        {
-
-                                            //folderid is not a valid base64 so we are skipping it for now
-                                            /*var path = ((JProperty)meta.First).Value.ToString();
-                                             var param = AddTemplateParameter(trigger.Name + "-folderPath","string",path);
-                                             meta[((JProperty)meta.First).Name] = $"[parameters('{param}')]";*/
-                                        }
+                                        var newValue = AddParameterForMetadataBase64((JObject)trigger.Value, trigger.Name + "-folderPath", trigger.Value["inputs"]["queries"].Value<string>("folderId"));
+                                        trigger.Value["inputs"]["queries"]["folderId"] = newValue;
                                     }
+                                    catch (FormatException ex)
+                                    {
+
+                                        //folderid is not a valid base64 so we are skipping it for now
+                                        /*var path = ((JProperty)meta.First).Value.ToString();
+                                         var param = AddTemplateParameter(trigger.Name + "-folderPath","string",path);
+                                         meta[((JProperty)meta.First).Name] = $"[parameters('{param}')]";*/
+                                    }
+
                                     break;
                                 }
                         }
@@ -493,39 +457,55 @@ namespace LogicAppTemplate
                 }
             }
 
+            
+
             return definition;
         }
 
-        private string AddParameterForMetadataBase64(JObject meta, string parametername)
+        private string AddParameterForMetadataBase64(JObject action, string parametername, string currentValue)
         {
-            var base64string = ((JProperty)meta.First).Name;
-            var path = Encoding.UTF8.GetString(Convert.FromBase64String(base64string));
-            var param = AddTemplateParameter(parametername, "string", path);
-            meta.Remove(((JProperty)meta.First).Name);
-            meta.Add("[base64(parameters('" + param + "'))]", JToken.Parse("\"[parameters('" + param + "')]\""));
+            var meta = action.Value<JObject>("metadata");
 
-            return param;
-        }
+            if (meta == null)
+                return "";
 
-        private void HandledMetaDataFilePaths(JObject definition, JProperty action)
-        {
-            var metadata = action.Value.SelectToken("metadata");
-            if (metadata != null)
+            var inputs = action.Value<JObject>("inputs");
+
+            var base64string = "";
+            if (meta.Children().Count() == 1)
             {
-
-                byte[] data = Convert.FromBase64String(((JProperty)metadata.First).Name);
-                var folderpath = Encoding.UTF8.GetString(data);
-
-                var param = AddTemplateParameter(action.Name + "-folderPath", "string", folderpath);
-                //remove the metadata tag associated with the folderid
-                var meta = ((JObject)definition["actions"][action.Name]["metadata"]);
-                meta.Remove(((JProperty)metadata.First).Name);
-                meta.Add("[base64(parameters('" + param + "'))]", JToken.Parse("\"[parameters('" + param + "')]\""));
-
-                definition["actions"][action.Name]["inputs"]["path"] = "[concat('/datasets/default/folders/@{encodeURIComponent(''',base64(parameters('" + param + "')),''')}')]";
+                base64string = ((JProperty)meta.First).Name;
             }
+            else
+            {
+                foreach (var property in meta.Children<JProperty>())
+                {
+                    if (currentValue.Contains(property.Name))
+                    {
+                        base64string = property.Name;
+                        break;
+                    }
+                }
+            }
+            var param = AddTemplateParameter(parametername, "string", Base64Decode(base64string));
+            meta.RemoveAll();
+            meta.Add("[base64(parameters('" + param + "'))]", JToken.Parse("\"[parameters('" + param + "')]\""));
+            if(currentValue == base64string)
+            {
+                return $"[base64(parameters('{param}'))]";
+            }
+            var replaced = currentValue.Replace($"'{base64string}'", $"', parameters('__apostrophe'), base64(parameters('{param}')), parameters('__apostrophe'), '");
+
+            var newValue = $"[concat('{replaced}')]";
+            AddTemplateParameter("__apostrophe", "string", "'");
+
+            return newValue;
         }
 
+        private string Base64Decode(string base64string)
+        {
+            return Encoding.UTF8.GetString(Convert.FromBase64String(base64string));
+        }
 
         private string GetConnectionTypeName(JToken ConnectionToken, JObject parameters)
         {
@@ -597,14 +577,14 @@ namespace LogicAppTemplate
             return realParameterName;
         }
 
-      
-        
-        public JObject generateConnectionTemplate(JObject connectionResource, JObject connectionInstance, string connectionName,string concatedId, string connectionNameParam)
+
+
+        public JObject generateConnectionTemplate(JObject connectionResource, JObject connectionInstance, string connectionName, string concatedId, string connectionNameParam)
         {
             //create template
-            var connectionTemplate = new Models.ConnectionTemplate(connectionNameParam, concatedId);           
+            var connectionTemplate = new Models.ConnectionTemplate(connectionNameParam, concatedId);
             //displayName            
-            connectionTemplate.properties.displayName = $"[parameters('{AddTemplateParameter(connectionName+ "_displayName", "string", (string)connectionInstance["properties"]["displayName"])}')]";
+            connectionTemplate.properties.displayName = $"[parameters('{AddTemplateParameter(connectionName + "_displayName", "string", (string)connectionInstance["properties"]["displayName"])}')]";
             JObject connectionParameters = new JObject();
 
             bool useGateway = connectionInstance["properties"]["nonSecretParameterValues"]["gateway"] != null;
@@ -631,6 +611,10 @@ namespace LogicAppTemplate
                         if (parameter.Name == "accessKey" && concatedId.EndsWith("/azureblob')]"))
                         {
                             connectionParameters.Add(parameter.Name, $"[listKeys(resourceId('Microsoft.Storage/storageAccounts', parameters('{connectionName}_accountName')), providers('Microsoft.Storage', 'storageAccounts').apiVersions[0]).keys[0].value]");
+                        }
+                        else if (parameter.Name == "sharedkey" && concatedId.EndsWith("/azuretables')]"))
+                        {
+                            connectionParameters.Add(parameter.Name, $"[listKeys(resourceId('Microsoft.Storage/storageAccounts', parameters('{connectionName}_storageaccount')), '2018-02-01').keys[0].value]");
                         }
                         else
                         {
@@ -666,13 +650,13 @@ namespace LogicAppTemplate
 
             if (useGateway)
             {
-                var currentvalue = (string)connectionInstance["properties"]["nonSecretParameterValues"]["gateway"]["id"];     
+                var currentvalue = (string)connectionInstance["properties"]["nonSecretParameterValues"]["gateway"]["id"];
                 var rid = new AzureResourceId(currentvalue);
                 var gatewayname = AddTemplateParameter($"{connectionName}_gatewayname", "string", rid.ResourceName);
                 var resourcegroup = AddTemplateParameter($"{connectionName}_gatewayresourcegroup", "string", rid.ResourceGroupName);
 
                 var gatewayobject = new JObject();
-                gatewayobject["id"] = $"[concat('subscriptions/',subscription().subscriptionId,'/resourceGroups/',parameters('{resourcegroup}'),'/providers/Microsoft.Web/connectionGateways/',parameters('{gatewayname}'))]";
+                gatewayobject["id"] = $"[concat('/subscriptions/',subscription().subscriptionId,'/resourceGroups/',parameters('{resourcegroup}'),'/providers/Microsoft.Web/connectionGateways/',parameters('{gatewayname}'))]";
                 connectionParameters.Add("gateway", gatewayobject);
                 useGateway = true;
             }
