@@ -65,6 +65,7 @@
     <Compile Include="MockResourceCollector.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="BlobConnectorTest.cs" />
+    <Compile Include="EventGridConnectorTest.cs" />
     <Compile Include="TemplateGeneratorTests.cs" />
     <Compile Include="ParamGeneratorTests.cs" />
     <Compile Include="TableConnectorTest.cs" />
@@ -127,6 +128,9 @@
     <EmbeddedResource Include="TestFiles\Samples\BlobConnector2\providers-Microsoft.Web-connections-LDAPAdapter.json" />
     <EmbeddedResource Include="TestFiles\Samples\BlobConnector2\providers-Microsoft.Web-customApis-LDAPAdapter.json" />
     <EmbeddedResource Include="TestFiles\Samples\BlobConnector2\providers-Microsoft.Web-locations-northeurope-managedApis-azureblob.json" />
+    <EmbeddedResource Include="TestFiles\Samples\EventGridActionConnector\providers-Microsoft.Logic-workflows-INT0005.Publish.json" />
+    <EmbeddedResource Include="TestFiles\Samples\EventGridActionConnector\providers-Microsoft.Web-connections-azureeventgridpublish.json" />
+    <EmbeddedResource Include="TestFiles\Samples\EventGridActionConnector\providers-Microsoft.Web-locations-northeurope-managedApis-azureeventgridpublish.json" />
   </ItemGroup>
   <ItemGroup />
   <Choose>

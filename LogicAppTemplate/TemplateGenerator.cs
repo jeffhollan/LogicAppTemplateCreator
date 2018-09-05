@@ -372,8 +372,9 @@ namespace LogicAppTemplate
                                     if (m.Groups.Count > 1)
                                     {
                                         var tablename = m.Groups[1].Value;
-                                        var param = AddTemplateParameter(action.Name + "-tablename", "string", tablename);
-                                        inputs["path"] = "[concat('" + path.Replace(tablename, $", parameters('{param}') ,") + "')]";                                        
+                                        var param = AddTemplateParameter(action.Name + "-tablename", "string", tablename);                                        
+                                        inputs["path"] = "[concat('" + path.Replace($"'{tablename}'", $"', parameters('__apostrophe'), parameters('{param}'), parameters('__apostrophe'), '") + "')]";
+                                        AddTemplateParameter("__apostrophe", "string", "'");
                                     }
 
                                     break;
@@ -608,13 +609,29 @@ namespace LogicAppTemplate
                         }
 
 
-                        if (parameter.Name == "accessKey" && concatedId.EndsWith("/azureblob')]"))
+                        if ( (parameter.Name == "accessKey" && concatedId.EndsWith("/azureblob')]") ) || parameter.Name == "sharedkey" && concatedId.EndsWith("/azuretables')]"))
                         {
-                            connectionParameters.Add(parameter.Name, $"[listKeys(resourceId('Microsoft.Storage/storageAccounts', parameters('{connectionName}_accountName')), providers('Microsoft.Storage', 'storageAccounts').apiVersions[0]).keys[0].value]");
+                            connectionParameters.Add(parameter.Name, $"[listKeys(resourceId('Microsoft.Storage/storageAccounts', parameters('{connectionName}_accountName')), '2018-02-01').keys[0].value]");
                         }
-                        else if (parameter.Name == "sharedkey" && concatedId.EndsWith("/azuretables')]"))
+                        else if (concatedId.EndsWith("/azureeventgridpublish')]"))
                         {
-                            connectionParameters.Add(parameter.Name, $"[listKeys(resourceId('Microsoft.Storage/storageAccounts', parameters('{connectionName}_storageaccount')), '2018-02-01').keys[0].value]");
+                            var url = connectionInstance["properties"]["nonSecretParameterValues"].Value<string>("endpoint");
+                            var location = connectionInstance.Value<string>("location");
+                            url = url.Replace("https://", "");
+                            var site = url.Substring(0, url.LastIndexOf("." + location));
+
+                            var param = AddTemplateParameter($"{connectionInstance.Value<string>("name")}_instancename", "string", site);
+
+                            if (parameter.Name == "endpoint")
+                            {
+                                connectionParameters.Add(parameter.Name, $"[reference(concat('Microsoft.EventGrid/topics/',parameters('{param}')),'2018-01-01').endpoint]");
+                            }
+                            else if (parameter.Name == "api_key")
+                            {
+                                connectionParameters.Add(parameter.Name, $"[listKeys(resourceId('Microsoft.EventGrid/topics',parameters('{param}')),'2018-01-01').key1]");
+                            }
+                            
+                            
                         }
                         else
                         {

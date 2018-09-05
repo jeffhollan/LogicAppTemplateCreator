@@ -33,7 +33,7 @@ namespace LogicAppTemplate.Test
 
             Assert.AreEqual("[parameters('azureblob_displayName')]", connection["properties"].Value<string>("displayName"));
             Assert.AreEqual("[parameters('azureblob_accountName')]", connection["properties"]["parameterValues"].Value<string>("accountName"));
-            Assert.AreEqual("[listKeys(resourceId('Microsoft.Storage/storageAccounts', parameters('azureblob_accountName')), providers('Microsoft.Storage', 'storageAccounts').apiVersions[0]).keys[0].value]", connection["properties"]["parameterValues"].Value<string>("accessKey"));
+            Assert.AreEqual("[listKeys(resourceId('Microsoft.Storage/storageAccounts', parameters('azureblob_accountName')), '2018-02-01').keys[0].value]", connection["properties"]["parameterValues"].Value<string>("accessKey"));
 
         }
 

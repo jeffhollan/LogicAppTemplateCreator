@@ -1,0 +1,117 @@
+{
+  "properties": {
+    "provisioningState": "Succeeded",
+    "createdTime": "2018-01-17T15:15:51.2496874Z",
+    "changedTime": "2018-09-05T05:34:24.5356152Z",
+    "state": "Enabled",
+    "version": "08586654812209693060",
+    "accessEndpoint": "https://prod-02.northeurope.logic.azure.com:443/workflows/c0262ba17b99410c983189f09dbf2453",
+    "definition": {
+      "$schema": "https://schema.management.azure.com/providers/Microsoft.Logic/schemas/2016-06-01/workflowdefinition.json#",
+      "contentVersion": "1.0.0.0",
+      "parameters": {
+        "$connections": {
+          "defaultValue": {},
+          "type": "Object"
+        },
+        "privatekeysecretid": {
+          "defaultValue": "https://keyvaultdev.vault.azure.net/secrets/mykey",
+          "type": "String"
+        }
+      },
+      "triggers": {
+        "manual": {
+          "type": "Request",
+          "kind": "Http",
+          "inputs": { "schema": {} }
+        }
+      },
+      "actions": {
+        "ConvertXMLToJSON": {
+          "runAfter": { "PGPDecrypt": [ "Succeeded" ] },
+          "type": "Function",
+          "inputs": {
+            "body": "@body('PGPDecrypt')",
+            "function": { "id": "/subscriptions/9fake3d-3c94-40e9-b2cb-18921e5d6cfa/resourceGroups/LogicAppsDev/providers/Microsoft.Web/sites/INT0072-GetGenericModelDev/functions/ConvertXMLToJSON" },
+            "headers": { "Content-Type": "application/xml" },
+            "method": "POST"
+          }
+        },
+        "PGPDecrypt": {
+          "runAfter": {},
+          "type": "Function",
+          "inputs": {
+            "body": "@triggerBody()",
+            "function": { "id": "/subscriptions/9fake3d-3c94-40e9-b2cb-18921e5d6cfa/resourceGroups/LogicAppsDev/providers/Microsoft.Web/sites/FunctionsDev/functions/PGPDecrypt" },
+            "headers": { "accept": "application/xml" },
+            "method": "POST",
+            "queries": { "privatekeysecretid": "@{parameters('privatekeysecretid')}" }
+          }
+        },
+        "Publish_Event": {
+          "runAfter": { "ConvertXMLToJSON": [ "Succeeded" ] },
+          "type": "ApiConnection",
+          "inputs": {
+            "body": [
+              {
+                "data": [ { "data": "@body('ConvertXMLToJSON')" } ],
+                "eventType": "Publish",
+                "id": "WorkerData",
+                "subject": "PublishData"
+              }
+            ],
+            "host": { "connection": { "name": "@parameters('$connections')['azureeventgridpublish']['connectionId']" } },
+            "method": "post",
+            "path": "/eventGrid/api/events"
+          }
+        },
+        "Response": {
+          "runAfter": { "Publish_Event": [ "Succeeded" ] },
+          "type": "Response",
+          "inputs": {
+            "body": "OK",
+            "statusCode": 200
+          }
+        }
+      },
+      "outputs": {}
+    },
+    "parameters": {
+      "$connections": {
+        "value": {
+          "azureeventgridpublish": {
+            "connectionId": "/subscriptions/9fake3d-3c94-40e9-b2cb-18921e5d6cfa/resourceGroups/LogicAppsDev/providers/Microsoft.Web/connections/azureeventgridpublish",
+            "connectionName": "azureeventgridpublish",
+            "id": "/subscriptions/9fake3d-3c94-40e9-b2cb-18921e5d6cfa/providers/Microsoft.Web/locations/northeurope/managedApis/azureeventgridpublish"
+          }
+        }
+      }
+    },
+    "endpointsConfiguration": {
+      "workflow": {
+        "outgoingIpAddresses": [
+          { "address": "40.113.12.95" },
+          { "address": "52.178.165.215" },
+          { "address": "52.178.166.21" },
+          { "address": "40.112.92.104" },
+          { "address": "40.112.95.216" },
+          { "address": "40.113.4.18" },
+          { "address": "40.113.3.202" },
+          { "address": "40.113.1.181" }
+        ],
+        "accessEndpointIpAddresses": [
+          { "address": "13.79.173.49" },
+          { "address": "52.169.218.253" },
+          { "address": "52.169.220.174" },
+          { "address": "40.112.90.39" }
+        ]
+      },
+      "connector": { "outgoingIpAddresses": [ { "address": "104.45.93.9" } ] }
+    }
+  },
+  "id": "/subscriptions/9fake3d-3c94-40e9-b2cb-18921e5d6cfa/resourceGroups/LogicAppsDev/providers/Microsoft.Logic/workflows/INT0005.Workday.Worker.Publish",
+  "name": "INT0005.Publish",
+  "type": "Microsoft.Logic/workflows",
+  "location": "northeurope",
+  "tags": {}
+}

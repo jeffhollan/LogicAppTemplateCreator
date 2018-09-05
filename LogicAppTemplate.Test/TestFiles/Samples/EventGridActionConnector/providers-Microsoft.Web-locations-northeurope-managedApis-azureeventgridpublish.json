@@ -1,0 +1,42 @@
+{
+  "properties": {
+    "name": "azureeventgridpublish",
+    "connectionParameters": {
+      "endpoint": {
+        "type": "string",
+        "uiDefinition": {
+          "displayName": "Topic Endpoint",
+          "description": "DNS endpoint for the application topic for events.",
+          "tooltip": "Provide an endpoint base URL",
+          "constraints": { "required": "true" }
+        }
+      },
+      "api_key": {
+        "type": "securestring",
+        "uiDefinition": {
+          "displayName": "Shared Access Signature",
+          "description": "Primary or secondary key for the application topic.",
+          "tooltip": "Provide Your SAS Key",
+          "constraints": { "required": "true" }
+        }
+      }
+    },
+    "metadata": {
+      "source": "marketplace",
+      "brandColor": "#0072c6"
+    },
+    "runtimeUrls": [ "https://logic-apis-northeurope.azure-apim.net/apim/azureeventgridpublish" ],
+    "generalInformation": {
+      "iconUrl": "https://az818438.vo.msecnd.net/officialicons/azureeventgridpublish/icon_1.0.995.1172_9bfe1659-d484-46e0-8d00-56dabf9c0e83.png",
+      "displayName": "Azure Event Grid Publish",
+      "description": "Azure Event Grid Publish will publish data to any Azure Event Grid Custom Topic.",
+      "releaseTag": "Preview",
+      "tier": "Standard"
+    },
+    "capabilities": [ "actions" ]
+  },
+  "id": "/subscriptions/9fake3d-3c94-40e9-b2cb-18921e5d6cfa/providers/Microsoft.Web/locations/northeurope/managedApis/azureeventgridpublish",
+  "name": "azureeventgridpublish",
+  "type": "Microsoft.Web/locations/managedApis",
+  "location": "northeurope"
+}
