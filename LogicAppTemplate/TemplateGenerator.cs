@@ -54,7 +54,7 @@ namespace LogicAppTemplate
         {
             JObject _definition = await resourceCollector.GetResource($"https://management.azure.com/subscriptions/{SubscriptionId}/resourceGroups/{ResourceGroup}/providers/Microsoft.Logic/workflows/{LogicApp}", "2016-06-01");
             return await generateDefinition(_definition);
-        }        
+        }
 
         public async Task<JObject> generateDefinition(JObject definition, bool generateConnection = true)
         {
@@ -129,20 +129,20 @@ namespace LogicAppTemplate
                 string name = connectionProperty.Name;
                 string connectionId = connectionProperty.First.Value<string>("connectionId");
                 string id = connectionProperty.First.Value<string>("id");
-                string connectionName = connectionProperty.First["connectionName"] != null ? connectionProperty.First.Value<string>("connectionName"): connectionId.Split('/').Last();
+                string connectionName = connectionProperty.First["connectionName"] != null ? connectionProperty.First.Value<string>("connectionName") : connectionId.Split('/').Last();
 
                 var cid = apiIdTemplate(id);
                 string concatedId = $"[concat('{cid.ToString()}')]";
                 //fixes old templates where name sometimes is missing
 
                 var connectionNameParam = AddTemplateParameter($"{connectionName}_name", "string", connectionName);
-                workflowTemplateReference["properties"]["parameters"]["$connections"]["value"][connectionName] = JObject.FromObject(new
+                workflowTemplateReference["properties"]["parameters"]["$connections"]["value"][name] = JObject.FromObject(new
                 {
-                    id = concatedId, 
+                    id = concatedId,
                     connectionId = $"[resourceId('Microsoft.Web/connections', parameters('{connectionNameParam}'))]",
                     connectionName = $"[parameters('{connectionNameParam}')]"
                 });
-                
+
                 /*
                 "connections_Billogram_id": {
                     "defaultValue": "/subscriptions/cb693348-19cf-42ee-9a63-1969d567f333/resourceGroups/Shared/providers/Microsoft.Web/customApis/Billogram",
@@ -215,7 +215,7 @@ namespace LogicAppTemplate
             foreach (JObject resourceProperty in resources["value"])
             {
                 string dsName = AddTemplateParameter(Constants.DsName, "string", resourceProperty["name"]);
-                
+
                 Match m = Regex.Match((string)resourceProperty["properties"]["workspaceId"], "resourceGroups/(.*)/providers/Microsoft.OperationalInsights/workspaces/(.*)", RegexOptions.IgnoreCase);
 
                 string dsResourceGroup = AddTemplateParameter(Constants.DsResourceGroup, "string", m.Groups[1].Value);
@@ -241,17 +241,18 @@ namespace LogicAppTemplate
         {
             var rid = new AzureResourceId(apiId);
             rid.SubscriptionId = "',subscription().subscriptionId,'";
-            if(apiId.Contains("/managedApis/"))
+            if (apiId.Contains("/managedApis/"))
             {
-                rid.ReplaceValueAfter("locations", "',parameters('logicAppLocation'),'");                
-            }else
+                rid.ReplaceValueAfter("locations", "',parameters('logicAppLocation'),'");
+            }
+            else
             {
-                
+
                 string resourcegroupValue = LogicAppResourceGroup == rid.ResourceGroupName ? "[resourceGroup().name]" : rid.ResourceGroupName;
                 string resourcegroupParameterName = AddTemplateParameter(apiId.Split('/').Last() + "-ResourceGroup", "string", resourcegroupValue);
                 rid.ResourceGroupName = $"',parameters('{resourcegroupParameterName}'),'";
             }
-            return rid; 
+            return rid;
         }
 
 
@@ -267,7 +268,7 @@ namespace LogicAppTemplate
                 {
                     var curr = ((JObject)definition["actions"][action.Name]["inputs"]["host"]["workflow"]).Value<string>("id");
                     ///subscriptions/fakeecb73-15f5-4c85-bb3e-fakeecb73/resourceGroups/myresourcegrp/providers/Microsoft.Logic/workflows/INT0020-All-Users-Batch2
-                    var wid = new AzureResourceId(curr);                    
+                    var wid = new AzureResourceId(curr);
                     string resourcegroupValue = LogicAppResourceGroup == wid.ResourceGroupName ? "[resourceGroup().name]" : wid.ResourceGroupName;
                     string resourcegroupParameterName = AddTemplateParameter(action.Name + "-ResourceGroup", "string", resourcegroupValue);
                     string wokflowParameterName = AddTemplateParameter(action.Name + "-LogicAppName", "string", wid.ResourceName);
@@ -279,7 +280,7 @@ namespace LogicAppTemplate
                 {
                     var apiId = ((JObject)definition["actions"][action.Name]["inputs"]["api"]).Value<string>("id");
                     var aaid = new AzureResourceId(apiId);
-                   
+
 
                     aaid.SubscriptionId = "',subscription().subscriptionId,'";
                     aaid.ResourceGroupName = "', parameters('" + AddTemplateParameter("apimResourceGroup", "string", aaid.ResourceGroupName) + "'),'";
@@ -597,14 +598,14 @@ namespace LogicAppTemplate
             return realParameterName;
         }
 
-      
-        
-        public JObject generateConnectionTemplate(JObject connectionResource, JObject connectionInstance, string connectionName,string concatedId, string connectionNameParam)
+
+
+        public JObject generateConnectionTemplate(JObject connectionResource, JObject connectionInstance, string connectionName, string concatedId, string connectionNameParam)
         {
             //create template
-            var connectionTemplate = new Models.ConnectionTemplate(connectionNameParam, concatedId);           
+            var connectionTemplate = new Models.ConnectionTemplate(connectionNameParam, concatedId);
             //displayName            
-            connectionTemplate.properties.displayName = $"[parameters('{AddTemplateParameter(connectionName+ "_displayName", "string", (string)connectionInstance["properties"]["displayName"])}')]";
+            connectionTemplate.properties.displayName = $"[parameters('{AddTemplateParameter(connectionName + "_displayName", "string", (string)connectionInstance["properties"]["displayName"])}')]";
             JObject connectionParameters = new JObject();
 
             bool useGateway = connectionInstance["properties"]["nonSecretParameterValues"]["gateway"] != null;
@@ -666,7 +667,7 @@ namespace LogicAppTemplate
 
             if (useGateway)
             {
-                var currentvalue = (string)connectionInstance["properties"]["nonSecretParameterValues"]["gateway"]["id"];     
+                var currentvalue = (string)connectionInstance["properties"]["nonSecretParameterValues"]["gateway"]["id"];
                 var rid = new AzureResourceId(currentvalue);
                 var gatewayname = AddTemplateParameter($"{connectionName}_gatewayname", "string", rid.ResourceName);
                 var resourcegroup = AddTemplateParameter($"{connectionName}_gatewayresourcegroup", "string", rid.ResourceGroupName);
