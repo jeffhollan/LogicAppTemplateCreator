@@ -60,6 +60,7 @@
   <ItemGroup>
     <Compile Include="AzureResourceIdTests.cs" />
     <Compile Include="BlobConnector2Test.cs" />
+    <Compile Include="StorageQueueConnectorTest.cs" />
     <Compile Include="ExpressionTest.cs" />
     <Compile Include="CustomConnectorTest.cs" />
     <Compile Include="MockResourceCollector.cs" />
@@ -131,6 +132,10 @@
     <EmbeddedResource Include="TestFiles\Samples\EventGridActionConnector\providers-Microsoft.Logic-workflows-INT0005.Publish.json" />
     <EmbeddedResource Include="TestFiles\Samples\EventGridActionConnector\providers-Microsoft.Web-connections-azureeventgridpublish.json" />
     <EmbeddedResource Include="TestFiles\Samples\EventGridActionConnector\providers-Microsoft.Web-locations-northeurope-managedApis-azureeventgridpublish.json" />
+    <EmbeddedResource Include="TestFiles\Samples\StorageQueuesConnector\providers-Microsoft.Logic-workflows-INT0091.MailboxErrorHandling.json" />
+    <EmbeddedResource Include="TestFiles\Samples\StorageQueuesConnector\providers-Microsoft.Web-connections-azurequeues-1.json" />
+    <EmbeddedResource Include="TestFiles\Samples\StorageQueuesConnector\providers-Microsoft.Web-connections-azurequeues.json" />
+    <EmbeddedResource Include="TestFiles\Samples\StorageQueuesConnector\providers-Microsoft.Web-locations-northeurope-managedApis-azurequeues.json" />
   </ItemGroup>
   <ItemGroup />
   <Choose>

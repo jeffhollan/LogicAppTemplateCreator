@@ -385,6 +385,19 @@ namespace LogicAppTemplate
                                     action.Value["inputs"]["path"] = newValue;
                                     break;
                                 }
+                            case "azurequeues":
+                                {
+                                    var inputs = action.Value.Value<JObject>("inputs");
+                                    var path = inputs.Value<string>("path");
+                                    var m = Regex.Match(path, @"/@{encodeURIComponent\('(.*)'\)");
+                                    if (m.Groups.Count > 1)
+                                    {
+                                        var queuename = m.Groups[1].Value;
+                                        var param = AddTemplateParameter(action.Name + "-queuename", "string", queuename);
+                                        inputs["path"] = "[concat('" + path.Replace("'","''").Replace($"'{queuename}'", $"'', parameters('{param}'), ''") + "')]";
+                                    }
+                                    break;
+                                }
                         }
                     }
                 }
@@ -612,6 +625,9 @@ namespace LogicAppTemplate
                         if ( (parameter.Name == "accessKey" && concatedId.EndsWith("/azureblob')]") ) || parameter.Name == "sharedkey" && concatedId.EndsWith("/azuretables')]"))
                         {
                             connectionParameters.Add(parameter.Name, $"[listKeys(resourceId('Microsoft.Storage/storageAccounts', parameters('{connectionName}_accountName')), '2018-02-01').keys[0].value]");
+                        }else if ( parameter.Name == "sharedkey" && concatedId.EndsWith("/azurequeues')]"))
+                        {
+                            connectionParameters.Add(parameter.Name, $"[listKeys(resourceId('Microsoft.Storage/storageAccounts', parameters('{connectionName}_storageaccount')), '2018-02-01').keys[0].value]");
                         }
                         else if (concatedId.EndsWith("/azureeventgridpublish')]"))
                         {
