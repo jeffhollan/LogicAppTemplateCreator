@@ -12,16 +12,22 @@ namespace LogicAppTemplate.Test
         {
             this.basepath = basepath;
         }
-        public Task<JObject> GetResource(string resourceId, string suffix = "")
+        public Task<JObject> GetResource(string resourceId,string suffix = "")
         {
             var t = new Task<JObject>(() => { return JObject.Parse(Utils.GetEmbededFileContent($"LogicAppTemplate.Test.TestFiles.Samples.{basepath}.{resourceId.Split('/').SkipWhile((a) => { return a != "providers"; }).Aggregate<string>((b, c) => { return b + "-" + c; })}.json")); });
+            t.Start();
+            return t;
+        }
+        public Task<string> GetRawResource(string resourceId, string apiversion = "", string suffix = "")
+        {
+            var t = new Task<string>(() => { return Utils.GetEmbededFileContent($"LogicAppTemplate.Test.TestFiles.Samples.{basepath}.{resourceId.Split('/').SkipWhile((a) => { return a != "providers"; }).Aggregate<string>((b, c) => { return b + "-" + c; })}.json");});
             t.Start();
             return t;
         }
 
         public Task<JObject> GetResource(string resourceId, string apiVersion, string suffix = "")
         {
-            var t = new Task<JObject>(() => { return JObject.Parse(Utils.GetEmbededFileContent($"LogicAppTemplate.Test.TestFiles.Samples.{basepath}.{resourceId.Split('/').SkipWhile((a) => { return a != "providers"; }).Aggregate<string>((b, c) => { return b + "-" + c; })}.json")); });
+            var t = new Task<JObject>(() => { return JObject.Parse(Utils.GetEmbededFileContent($"LogicAppTemplate.Test.TestFiles.Samples.{basepath}.{resourceId.Split('/').SkipWhile((a) => { return a != "providers" && a != "integrationAccounts"; }).Aggregate<string>((b, c) => { return b + "-" + c; })}.json")); });
             t.Start();
             return t;
         }

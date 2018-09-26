@@ -84,6 +84,7 @@
     <EmbeddedResource Include="Templates\VSProject\DeployProjectTemplate.deployproj" />
     <EmbeddedResource Include="Templates\VSProject\Deploy-AzureResourceGroup.ps1" />
     <EmbeddedResource Include="Templates\VSProject\Deployment.targets" />
+    <EmbeddedResource Include="Templates\integrationAccountMap.json" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

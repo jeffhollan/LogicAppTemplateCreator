@@ -31,6 +31,7 @@ namespace LogicAppTemplate
         private string SubscriptionId;
         private string ResourceGroup;
         private string LogicApp;
+        private string IntegrationAccountId;
 
         public TemplateGenerator(string LogicApp, string SubscriptionId, string ResourceGroup, IResourceCollector resourceCollector)
         {
@@ -38,13 +39,16 @@ namespace LogicAppTemplate
             this.ResourceGroup = ResourceGroup;
             this.LogicApp = LogicApp;
             this.resourceCollector = resourceCollector;
-            var assembly = System.Reflection.Assembly.GetExecutingAssembly();
-            var resourceName = "LogicAppTemplate.Templates.starterTemplate.json";
+            template = JsonConvert.DeserializeObject<DeploymentTemplate>(GetResourceCotent("LogicAppTemplate.Templates.starterTemplate.json"));
+        }
 
+        private string GetResourceCotent(string resourceName)
+        {
+            var assembly = System.Reflection.Assembly.GetExecutingAssembly();
             using (Stream stream = assembly.GetManifestResourceStream(resourceName))
             using (StreamReader reader = new StreamReader(stream))
             {
-                template = JsonConvert.DeserializeObject<DeploymentTemplate>(reader.ReadToEnd());
+                return reader.ReadToEnd();
             }
         }
 
@@ -60,6 +64,19 @@ namespace LogicAppTemplate
         {
             var rid = new AzureResourceId(definition.Value<string>("id"));
             LogicAppResourceGroup = rid.ResourceGroupName;
+            //Manage Integration account
+            if (definition["properties"]["integrationAccount"] == null)
+            {
+                ((JObject)template.resources[0]["properties"]).Remove("integrationAccount");
+                template.parameters.Remove("IntegrationAccountName");
+                template.parameters.Remove("IntegrationAccountResourceGroupName");
+            }
+            else
+            {
+                template.parameters["IntegrationAccountName"]["defaultValue"] = definition["properties"]["integrationAccount"]["name"];
+                IntegrationAccountId = definition["properties"]["integrationAccount"].Value<string>("id");
+            }
+
 
             template.parameters["logicAppName"]["defaultValue"] = definition.Value<string>("name");
 
@@ -102,18 +119,6 @@ namespace LogicAppTemplate
             {
                 workflowTemplateReference.Remove("resources");
             }
-
-            if (definition["properties"]["integrationAccount"] == null)
-            {
-                ((JObject)template.resources[0]["properties"]).Remove("integrationAccount");
-                template.parameters.Remove("IntegrationAccountName");
-                template.parameters.Remove("IntegrationAccountResourceGroupName");
-            }
-            else
-            {
-                template.parameters["IntegrationAccountName"]["defaultValue"] = definition["properties"]["integrationAccount"]["name"];
-            }
-
 
 
             JObject connections = (JObject)definition["properties"]["parameters"]["$connections"];
@@ -292,9 +297,36 @@ namespace LogicAppTemplate
                 {
                     definition["actions"][action.Name]["inputs"]["integrationAccount"]["schema"]["name"] = "[parameters('" + AddTemplateParameter(action.Name + "-SchemaName", "string", ((JObject)definition["actions"][action.Name]["inputs"]["integrationAccount"]["schema"]).Value<string>("name")) + "')]";
                 }
-                else if (type == "xslt")
+                else if (type == "xslt" || type == "liquid")
                 {
-                    definition["actions"][action.Name]["inputs"]["integrationAccount"]["map"]["name"] = "[parameters('" + AddTemplateParameter(action.Name + "-MapName", "string", ((JObject)definition["actions"][action.Name]["inputs"]["integrationAccount"]["map"]).Value<string>("name")) + "')]";
+                    var mapname = ((JObject)definition["actions"][action.Name]["inputs"]["integrationAccount"]["map"]).Value<string>("name");
+                    var mapParameterName = AddTemplateParameter(action.Name + "-MapName", "string", mapname);
+                    definition["actions"][action.Name]["inputs"]["integrationAccount"]["map"]["name"] = "[parameters('" + mapParameterName + "')]";
+                    //Get the map
+
+                    var mapresource = resourceCollector.GetResource(IntegrationAccountId +"/maps/" + mapname, "2018-07-01-preview").Result;
+
+                    var uri = mapresource["properties"]["contentLink"].Value<string>("uri").Split('?');
+                    var map = resourceCollector.GetRawResource(uri[0],uri[1].Replace("api-version=", "")).Result;
+
+                    //create the resource and add to the template
+                    var newResource = JObject.Parse(GetResourceCotent("LogicAppTemplate.Templates.integrationAccountMap.json"));
+                    //add the current Integration Account parameter name
+                    newResource["name"] = $"[concat(parameters('IntegrationAccountName'), '/' ,parameters('{mapParameterName}'))]";
+
+                    newResource["properties"]["mapType"] = mapresource["properties"]["mapType"];
+                    newResource["properties"]["parametersSchema"] = mapresource["properties"]["parametersSchema"];
+
+                    newResource["properties"]["content"] = map.Replace("\"","\\\"");
+                    newResource["properties"]["contentType"] = "text";
+
+                    //add dependson
+                    if( template.resources.First()["dependsOn"] == null )
+                    {
+                        template.resources.First()["dependsOn"] = new JArray();
+                    }
+                    ((JArray)template.resources.First()["dependsOn"]).Add($"[resourceId('{newResource.Value<string>("type")}', parameters('IntegrationAccountName'),parameters('{mapParameterName}'))]");
+                    template.resources.Add(newResource);
                 }
                 else if (type == "http")
                 {

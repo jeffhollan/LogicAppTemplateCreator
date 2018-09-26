@@ -5,6 +5,7 @@ using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Net.Http.Headers;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
 namespace LogicAppTemplate
@@ -35,26 +36,30 @@ namespace LogicAppTemplate
         }
         private static HttpClient client = new HttpClient() { BaseAddress = new Uri("https://management.azure.com") };
 
-        public async Task<JObject> GetResource(string resourceId, string apiVersion, string suffix = "")
+        public async Task<JObject> GetResource(string resourceId, string apiVersion = null, string suffix = "")
         {
-            string url = resourceId + "?api-version=" + apiVersion + (string.IsNullOrEmpty(suffix) ? "" : $"&{suffix}");
+            return JObject.Parse(await GetRawResource(resourceId, apiVersion, suffix));
+        }
+        public async Task<string> GetRawResource(string resourceId, string apiVersion = null, string suffix = "")
+        {
+            string url = resourceId + (string.IsNullOrEmpty(apiVersion) ? "" : "?api-version=" + apiVersion) + (string.IsNullOrEmpty(suffix) ? "" : $"&{suffix}");
             client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
             var response = await client.GetAsync(url);
 
             if (response.StatusCode == HttpStatusCode.NotFound)
             {
                 return null;
-            }else if (response.StatusCode == HttpStatusCode.Forbidden)
+            }
+            else if (response.StatusCode == HttpStatusCode.Forbidden)
             {
                 throw new Exception("Authorization failed, httpstatus: " + response.StatusCode);
             }
             var responseContent = await response.Content.ReadAsStringAsync();
             if (!string.IsNullOrEmpty(DebugOutputFolder))
             {
-                System.IO.File.WriteAllText(DebugOutputFolder + "\\" + resourceId.Split('/').SkipWhile((a) => { return a != "providers"; }).Aggregate<string>((b, c) => { return b + "-" + c; }) + ".json", responseContent);
+                System.IO.File.WriteAllText(DebugOutputFolder + "\\" + resourceId.Split('/').SkipWhile((a) => { return a != "providers" && a != "integrationAccounts"; }).Aggregate<string>((b, c) => { return b + "-" + c; }) + ".json", responseContent);
             }
-            return JObject.Parse(responseContent);
-
+            return responseContent;
         }
     }
 }
