@@ -1,0 +1,4 @@
+{
+"product_id": "{{content.prodId}}",
+"product_name": "{{content.prodName}}"
+}

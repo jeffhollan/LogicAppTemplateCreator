@@ -1,0 +1,219 @@
+<?xml version="1.0" encoding="utf-8"?>
+<xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
+    xmlns:msxsl="urn:schemas-microsoft-com:xslt" exclude-result-prefixes="msxsl">
+
+	<xsl:output method="xml" indent="yes"/>
+	<xsl:param name="userPrincipalName"/>
+	<xsl:param name="employeeID"/>
+	<xsl:param name="givenName"/>
+	<xsl:param name="SN"/>
+	<xsl:param name="middleName"/>
+	<xsl:param name="displayName"/>
+	<xsl:param name="company"/>
+	<xsl:param name="MISALCompanyCode"/>
+	<xsl:param name="department"/>
+	<xsl:param name="departmentNumber"/>
+	<xsl:param name="ResourceManager"/>
+	<!-- <xsl:param name="ExternalCompanyEmail"/> -->
+	<xsl:param name="count"/>
+	<xsl:param name="employeeType"/>
+	<xsl:param name="c"/>
+	<xsl:param name="co"/>
+	<xsl:param name="l"/>
+	<xsl:param name="manager"/>
+	<xsl:param name="carLicense"/>
+	<xsl:param name="isManager"/>
+	<xsl:param name="gender"/>
+	<xsl:param name="SAMAccount"/>
+	<xsl:param name="OUCountry"/>
+	<xsl:param name="OUITSite"/>
+  <xsl:param name="physicalDeliveryOfficeName"/>
+	<xsl:param name="title"/>
+	<xsl:template match="/*">
+		<ns0:LDAP xmlns:ns0="http://integrationsoftware.se/BizTalk/Adapters/LDAP/Request/1.0">
+			<Batches guid="B7A211D7-20F3-44BC-B078-7F1B6E1C047F" returnResponseMessageOnExceptions="true">
+				<Batch guid="2B25B9E6-4AF2-4094-9AE7-E1E4C99B6C8D" continueOnError ="false">
+					<User>
+						<With>
+							<xsl:attribute name="OU">
+								<xsl:value-of select="concat('OU=Users,', $OUITSite, ',', $OUCountry, ',', 'OU=MyOwnOU' )"/>
+							</xsl:attribute>
+							<xsl:attribute name="DC">
+								<xsl:text>DC=myDC,DC=org</xsl:text>
+							</xsl:attribute>
+							<xsl:attribute name="searchScope">
+								<xsl:text>Base</xsl:text>
+							</xsl:attribute>
+							<xsl:attribute name="returnProperties">
+								<xsl:text>userPrincipalName,mail</xsl:text>
+							</xsl:attribute>
+							<xsl:attribute name="expectedMatchCount">
+								<xsl:text>1</xsl:text>
+							</xsl:attribute>
+						</With>
+						<Operations>
+							<Create>
+								<xsl:attribute name="name">
+									<xsl:value-of select="concat($displayName, $count)"/>
+								</xsl:attribute>							
+								<Properties>
+									<Property>
+										<xsl:attribute name="name">sAMAccountName</xsl:attribute>
+										<xsl:attribute name="value">
+											<xsl:value-of select="$SAMAccount"/>
+										</xsl:attribute>
+									</Property>
+									<Property>
+										<xsl:attribute name="name">userPrincipalName</xsl:attribute>
+										<xsl:attribute name="value">
+											<xsl:value-of select="$userPrincipalName"/>
+										</xsl:attribute>
+									</Property>
+									<Property>
+										<xsl:attribute name="name">mail</xsl:attribute>
+										<xsl:attribute name="value">
+											<xsl:value-of select="$userPrincipalName"/>
+										</xsl:attribute>
+									</Property>
+									<Property>
+										<xsl:attribute name="name">employeeID</xsl:attribute>
+										<xsl:attribute name="value">
+											<xsl:value-of select="$employeeID"/>
+										</xsl:attribute>
+									</Property>
+									<Property>
+										<xsl:attribute name="name">givenName</xsl:attribute>
+										<xsl:attribute name="value">
+											<xsl:value-of select="$givenName"/>
+										</xsl:attribute>
+									</Property>
+									<Property>
+										<xsl:attribute name="name">SN</xsl:attribute>
+										<xsl:attribute name="value">
+											<xsl:value-of select="$SN"/>
+										</xsl:attribute>
+									</Property>
+									<Property>
+										<xsl:attribute name="name">middleName</xsl:attribute>
+										<xsl:attribute name="value">
+											<xsl:value-of select="$middleName"/>
+										</xsl:attribute>
+									</Property>
+									<Property>
+										<xsl:attribute name="name">displayName</xsl:attribute>
+										<xsl:attribute name="value">
+											<xsl:value-of select="$displayName"/>
+										</xsl:attribute>
+									</Property>
+								  <Property>
+								    <xsl:attribute name="name">division</xsl:attribute>
+								    <xsl:attribute name="value">
+								      <xsl:value-of select="$company"/>
+								    </xsl:attribute>
+								  </Property>
+									<Property>
+										<xsl:attribute name="name">company</xsl:attribute>
+										<xsl:attribute name="value">
+											<xsl:value-of select="$MISALCompanyCode"/>
+										</xsl:attribute>
+									</Property>
+									<Property>
+										<xsl:attribute name="name">department</xsl:attribute>
+										<xsl:attribute name="value">
+											<xsl:value-of select="$department"/>
+										</xsl:attribute>
+									</Property>
+									<Property>
+										<xsl:attribute name="name">departmentNumber</xsl:attribute>
+										<xsl:attribute name="value">
+											<xsl:value-of select="$departmentNumber"/>
+										</xsl:attribute>
+									</Property>
+									<Property>
+										<xsl:attribute name="name">employeeType</xsl:attribute>
+										<xsl:attribute name="value">
+											<xsl:value-of select="$employeeType"/>
+										</xsl:attribute>
+									</Property>
+									<Property>
+										<xsl:attribute name="name">c</xsl:attribute>
+										<xsl:attribute name="value">
+											<xsl:value-of select="$c"/>
+										</xsl:attribute>
+									</Property>
+									<Property>
+										<xsl:attribute name="name">co</xsl:attribute>
+										<xsl:attribute name="value">
+											<xsl:value-of select="$co"/>
+										</xsl:attribute>
+									</Property>
+									<Property>
+										<xsl:attribute name="name">l</xsl:attribute>
+										<xsl:attribute name="value">
+											<xsl:value-of select="$l"/>
+										</xsl:attribute>
+									</Property>
+									<Property>
+										<xsl:attribute name="name">carLicense</xsl:attribute>
+										<xsl:attribute name="value">
+											<xsl:value-of select="$carLicense"/>
+										</xsl:attribute>
+									</Property>
+									<Property>
+										<xsl:attribute name="name">title</xsl:attribute>
+										<xsl:attribute name="value">
+											<xsl:value-of select="$title"/>
+										</xsl:attribute>
+									</Property>
+									<Property>
+										<xsl:attribute name="name">primaryTelexNumber</xsl:attribute>
+										<xsl:attribute name="value">
+											<xsl:value-of select="$gender"/>
+										</xsl:attribute>
+									</Property>
+								  <Property>
+								    <xsl:attribute name="name">physicalDeliveryOfficeName</xsl:attribute>
+								    <xsl:attribute name="value">
+								      <!--xsl:value-of select="concat($OUCountry, ' ' , $OUITSite)" /-->
+								      <xsl:value-of select="$physicalDeliveryOfficeName"/>
+								    </xsl:attribute>
+								  </Property>
+									<Property>
+										<xsl:attribute name="name">StaffManager</xsl:attribute>
+										<xsl:attribute name="value">
+											<xsl:choose>
+												<xsl:when test="$isManager = 0">FALSE</xsl:when>
+												<xsl:otherwise>TRUE</xsl:otherwise>
+											</xsl:choose>
+											<!-- <xsl:value-of select="boolean($isManager)"/> -->
+										</xsl:attribute>
+									</Property>
+									<Property>
+										<xsl:attribute name="name">manager</xsl:attribute>
+										<xsl:attribute name="value">
+											<xsl:value-of select="$manager"/>
+										</xsl:attribute>
+									</Property>
+									<Property>
+										<xsl:attribute name="name">userAccountControl</xsl:attribute>
+										<xsl:attribute name="value">544</xsl:attribute>
+									</Property>
+									<!-- 									<Property>
+										<xsl:attribute name="name">MISALCompanyCode</xsl:attribute>
+										<xsl:attribute name="value">
+											<xsl:value-of select="$MISALCompanyCode"/>
+										</xsl:attribute>
+									</Property> -->
+								</Properties>
+							</Create>
+						</Operations>
+					</User>
+				</Batch>
+			</Batches>
+		</ns0:LDAP>
+
+
+
+	</xsl:template>
+
+</xsl:stylesheet>

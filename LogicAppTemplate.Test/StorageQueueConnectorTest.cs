@@ -72,7 +72,7 @@ namespace LogicAppTemplate.Test
             var actions = workflow["properties"]["definition"]["actions"];
 
             var deleteAction = actions.Value<JObject>("Delete_message");
-            Assert.AreEqual("@parameters('$connections')['azurequeues_1']['connectionId']", deleteAction["inputs"]["host"]["connection"].Value<string>("name"));
+            Assert.AreEqual("@parameters('$connections')[parameters('azurequeues-1_name')]['connectionId']", deleteAction["inputs"]["host"]["connection"].Value<string>("name"));
             Assert.AreEqual("[concat('/@{encodeURIComponent(''', parameters('Delete_message-queuename'), ''')}/messages/@{encodeURIComponent(triggerBody()?[''MessageId''])}')]", deleteAction["inputs"].Value<string>("path"));
          
         }

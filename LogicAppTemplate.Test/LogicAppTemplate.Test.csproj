@@ -59,6 +59,7 @@
   </Choose>
   <ItemGroup>
     <Compile Include="AzureResourceIdTests.cs" />
+    <Compile Include="IntegrationAccountTest.cs" />
     <Compile Include="BlobConnector2Test.cs" />
     <Compile Include="StorageQueueConnectorTest.cs" />
     <Compile Include="ExpressionTest.cs" />
@@ -136,6 +137,11 @@
     <EmbeddedResource Include="TestFiles\Samples\StorageQueuesConnector\providers-Microsoft.Web-connections-azurequeues-1.json" />
     <EmbeddedResource Include="TestFiles\Samples\StorageQueuesConnector\providers-Microsoft.Web-connections-azurequeues.json" />
     <EmbeddedResource Include="TestFiles\Samples\StorageQueuesConnector\providers-Microsoft.Web-locations-northeurope-managedApis-azurequeues.json" />
+    <EmbeddedResource Include="TestFiles\Samples\IntegrationAccountMaps\integrationAccounts-2ab2c1d54f50483ca584368cfc062de4-maps-NotificationMap-contents-Value.json" />
+    <EmbeddedResource Include="TestFiles\Samples\IntegrationAccountMaps\integrationAccounts-2ab2c1d54f50483ca584368cfc062de4-maps-TEST_Create_User-contents-Value.json" />
+    <EmbeddedResource Include="TestFiles\Samples\IntegrationAccountMaps\providers-Microsoft.Logic-integrationAccounts-IntegrationAccountDev-maps-NotificationMap.json" />
+    <EmbeddedResource Include="TestFiles\Samples\IntegrationAccountMaps\providers-Microsoft.Logic-integrationAccounts-IntegrationAccountDev-maps-TEST_Create_User.json" />
+    <EmbeddedResource Include="TestFiles\Samples\IntegrationAccountMaps\providers-Microsoft.Logic-workflows-test.json" />
   </ItemGroup>
   <ItemGroup />
   <Choose>
