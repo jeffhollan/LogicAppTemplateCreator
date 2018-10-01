@@ -445,6 +445,19 @@ namespace LogicAppTemplate.Tests
             Assert.AreEqual("[listKeys(resourceId('Microsoft.Storage/storageAccounts', parameters('azureblob_accountName')), '2018-02-01').keys[0].value]", defintion["properties"]["parameterValues"]["accessKey"]);
             Assert.AreEqual("[concat('/subscriptions/', subscription().subscriptionId, '/providers/Microsoft.Web/locations/', parameters('logicAppLocation'), '/managedApis/azureblob')]", defintion["properties"]["api"]["id"]);
         }
+
+        [TestMethod()]
+        public void TestBlobConnectionWithDifferentNameThanConnectionName()
+        {
+            var content = GetEmbededFileContent("LogicAppTemplate.Test.TestFiles.AzureBlobWithDifferentNameThanConnectionName.json");
+
+            var generator = new TemplateGenerator("lanme", "fakeee-15f5-4c85-bb3e-1e108dc79b00", "", null);
+
+            var defintion = generator.generateDefinition(JObject.Parse(content), false).GetAwaiter().GetResult();
+
+            Assert.IsNotNull(defintion["resources"][0]["properties"]["parameters"]["$connections"]["value"]["azureblob_1"]);
+        }
+
         [TestMethod()]
         public void TestBlobAction()
         {

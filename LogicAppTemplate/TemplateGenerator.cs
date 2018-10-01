@@ -153,7 +153,7 @@ namespace LogicAppTemplate
                 //fixes old templates where name sometimes is missing
 
                 var connectionNameParam = AddTemplateParameter($"{connectionName}_name", "string", connectionName);
-                workflowTemplateReference["properties"]["parameters"]["$connections"]["value"][connectionName] = JObject.FromObject(new
+                workflowTemplateReference["properties"]["parameters"]["$connections"]["value"][name] = JObject.FromObject(new
                 {
                     id = concatedId,
                     connectionId = $"[resourceId('Microsoft.Web/connections', parameters('{connectionNameParam}'))]",

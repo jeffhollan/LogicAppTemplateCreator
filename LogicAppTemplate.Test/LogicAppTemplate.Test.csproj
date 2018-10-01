@@ -142,6 +142,7 @@
     <EmbeddedResource Include="TestFiles\Samples\IntegrationAccountMaps\providers-Microsoft.Logic-integrationAccounts-IntegrationAccountDev-maps-NotificationMap.json" />
     <EmbeddedResource Include="TestFiles\Samples\IntegrationAccountMaps\providers-Microsoft.Logic-integrationAccounts-IntegrationAccountDev-maps-TEST_Create_User.json" />
     <EmbeddedResource Include="TestFiles\Samples\IntegrationAccountMaps\providers-Microsoft.Logic-workflows-test.json" />
+    <EmbeddedResource Include="TestFiles\AzureBlobWithDifferentNameThanConnectionName.json" />
   </ItemGroup>
   <ItemGroup />
   <Choose>
