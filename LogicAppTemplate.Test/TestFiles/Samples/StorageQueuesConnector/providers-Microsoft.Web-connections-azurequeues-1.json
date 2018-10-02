@@ -1,0 +1,30 @@
+{
+  "properties": {
+    "displayName": "customerintegblobdev",
+    "statuses": [ { "status": "Connected" } ],
+    "customParameterValues": {},
+    "nonSecretParameterValues": { "storageaccount": "customerintegblobsdev" },
+    "createdTime": "2018-09-05T13:06:55.4402748Z",
+    "changedTime": "2018-09-05T13:06:55.4402748Z",
+    "api": {
+      "name": "azurequeues",
+      "displayName": "Azure Queues",
+      "description": "Azure Queue storage provides cloud messaging between application components. Queue storage also supports managing asynchronous tasks and building process work flows.",
+      "iconUri": "https://connectoricons-prod.azureedge.net/azurequeues/icon_1.0.1038.1222.png",
+      "brandColor": "#0072C6",
+      "category": "Standard",
+      "id": "/subscriptions/9fake3d-3c94-42e9-b2cb-18921e5d6cfa/providers/Microsoft.Web/locations/northeurope/managedApis/azurequeues",
+      "type": "Microsoft.Web/locations/managedApis"
+    },
+    "testLinks": [
+      {
+        "requestUri": "https://management.azure.com:443/subscriptions/9fake3d-3c94-42e9-b2cb-18921e5d6cfa/resourceGroups/LogicAppsDev/providers/Microsoft.Web/connections/azurequeues-1/extensions/proxy/list?api-version=2016-06-01",
+        "method": "get"
+      }
+    ]
+  },
+  "id": "/subscriptions/9fake3d-3c94-42e9-b2cb-18921e5d6cfa/resourceGroups/LogicAppsDev/providers/Microsoft.Web/connections/azurequeues-1",
+  "name": "azurequeues-1",
+  "type": "Microsoft.Web/connections",
+  "location": "northeurope"
+}

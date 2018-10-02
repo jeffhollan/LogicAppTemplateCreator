@@ -1,0 +1,15 @@
+{
+  "properties": {
+    "mapType": "Liquid",
+    "contentLink": {
+      "uri": "https://prod-20.northeurope.logic.azure.com:443/integrationAccounts/2ab2c1d54f50483ca584368cfc062de4/maps/NotificationMap/contents/Value?api-version=2015-08-01-preview&se=2018-09-26T11%3A25%3A52.6266802Z&sp=%2Fmaps%2FNotificationMap%2Fread&sv=1.0&sig=Sn8psuvE2CvN4WNaGLoSfmJy9tMi51HaAwvYeeVx64M",
+      "contentSize": 81
+    },
+    "createdTime": "2018-03-27T08:55:29.2153507Z",
+    "changedTime": "2018-03-27T08:55:29.2156223Z",
+    "metadata": { "fileName": null }
+  },
+  "id": "/subscriptions/9fake3d-3c94-40e9-b2cb-18921e5d6cfa/resourceGroups/LogicAppsDev/providers/Microsoft.Logic/integrationAccounts/IntegrationAccountDev/maps/NotificationMap",
+  "name": "NotificationMap",
+  "type": "Microsoft.Logic/integrationAccounts/maps"
+}

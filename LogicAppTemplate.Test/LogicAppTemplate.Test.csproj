@@ -59,10 +59,18 @@
   </Choose>
   <ItemGroup>
     <Compile Include="AzureResourceIdTests.cs" />
+    <Compile Include="IntegrationAccountTest.cs" />
+    <Compile Include="BlobConnector2Test.cs" />
+    <Compile Include="StorageQueueConnectorTest.cs" />
+    <Compile Include="ExpressionTest.cs" />
+    <Compile Include="CustomConnectorTest.cs" />
     <Compile Include="MockResourceCollector.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="BlobConnectorTest.cs" />
+    <Compile Include="EventGridConnectorTest.cs" />
     <Compile Include="TemplateGeneratorTests.cs" />
     <Compile Include="ParamGeneratorTests.cs" />
+    <Compile Include="TableConnectorTest.cs" />
     <Compile Include="Utils.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -108,6 +116,32 @@
     <EmbeddedResource Include="TestFiles\paramGenerator-nullString.json" />
     <EmbeddedResource Include="TestFiles\Samples\DiagnosticSettings\providers-Microsoft.Logic-workflows-INT001.Invoice.json" />
     <EmbeddedResource Include="TestFiles\Samples\DiagnosticSettings\providers-Microsoft.Logic-workflows-INT001.Invoice-providers-microsoft.insights-diagnosticSettings.json" />
+    <EmbeddedResource Include="TestFiles\Connector-Storage-Table.json" />
+    <EmbeddedResource Include="TestFiles\Samples\TableConnector\providers-Microsoft.Logic-workflows-addDataToTable.json" />
+    <EmbeddedResource Include="TestFiles\Samples\TableConnector\providers-Microsoft.Web-connections-azuretables.json" />
+    <EmbeddedResource Include="TestFiles\Samples\TableConnector\providers-Microsoft.Web-locations-westeurope-managedApis-azuretables.json" />
+    <EmbeddedResource Include="TestFiles\Samples\BlobConnector\providers-Microsoft.Logic-workflows-INT0012C.Workday.Rehire.Leavers.json" />
+    <EmbeddedResource Include="TestFiles\Samples\BlobConnector\providers-Microsoft.Web-connections-azureblob.json" />
+    <EmbeddedResource Include="TestFiles\Samples\BlobConnector\providers-Microsoft.Web-connections-LDAPAdapter.json" />
+    <EmbeddedResource Include="TestFiles\Samples\BlobConnector\providers-Microsoft.Web-customApis-LDAPAdapter.json" />
+    <EmbeddedResource Include="TestFiles\Samples\BlobConnector\providers-Microsoft.Web-locations-northeurope-managedApis-azureblob.json" />
+    <EmbeddedResource Include="TestFiles\Samples\BlobConnector2\providers-Microsoft.Logic-workflows-INT0040.HireNew.json" />
+    <EmbeddedResource Include="TestFiles\Samples\BlobConnector2\providers-Microsoft.Web-connections-azureblob.json" />
+    <EmbeddedResource Include="TestFiles\Samples\BlobConnector2\providers-Microsoft.Web-connections-LDAPAdapter.json" />
+    <EmbeddedResource Include="TestFiles\Samples\BlobConnector2\providers-Microsoft.Web-customApis-LDAPAdapter.json" />
+    <EmbeddedResource Include="TestFiles\Samples\BlobConnector2\providers-Microsoft.Web-locations-northeurope-managedApis-azureblob.json" />
+    <EmbeddedResource Include="TestFiles\Samples\EventGridActionConnector\providers-Microsoft.Logic-workflows-INT0005.Publish.json" />
+    <EmbeddedResource Include="TestFiles\Samples\EventGridActionConnector\providers-Microsoft.Web-connections-azureeventgridpublish.json" />
+    <EmbeddedResource Include="TestFiles\Samples\EventGridActionConnector\providers-Microsoft.Web-locations-northeurope-managedApis-azureeventgridpublish.json" />
+    <EmbeddedResource Include="TestFiles\Samples\StorageQueuesConnector\providers-Microsoft.Logic-workflows-INT0091.MailboxErrorHandling.json" />
+    <EmbeddedResource Include="TestFiles\Samples\StorageQueuesConnector\providers-Microsoft.Web-connections-azurequeues-1.json" />
+    <EmbeddedResource Include="TestFiles\Samples\StorageQueuesConnector\providers-Microsoft.Web-connections-azurequeues.json" />
+    <EmbeddedResource Include="TestFiles\Samples\StorageQueuesConnector\providers-Microsoft.Web-locations-northeurope-managedApis-azurequeues.json" />
+    <EmbeddedResource Include="TestFiles\Samples\IntegrationAccountMaps\integrationAccounts-2ab2c1d54f50483ca584368cfc062de4-maps-NotificationMap-contents-Value.json" />
+    <EmbeddedResource Include="TestFiles\Samples\IntegrationAccountMaps\integrationAccounts-2ab2c1d54f50483ca584368cfc062de4-maps-TEST_Create_User-contents-Value.json" />
+    <EmbeddedResource Include="TestFiles\Samples\IntegrationAccountMaps\providers-Microsoft.Logic-integrationAccounts-IntegrationAccountDev-maps-NotificationMap.json" />
+    <EmbeddedResource Include="TestFiles\Samples\IntegrationAccountMaps\providers-Microsoft.Logic-integrationAccounts-IntegrationAccountDev-maps-TEST_Create_User.json" />
+    <EmbeddedResource Include="TestFiles\Samples\IntegrationAccountMaps\providers-Microsoft.Logic-workflows-test.json" />
     <EmbeddedResource Include="TestFiles\AzureBlobWithDifferentNameThanConnectionName.json" />
   </ItemGroup>
   <ItemGroup />

@@ -1,0 +1,46 @@
+{
+  "properties": {
+    "mapType": "Xslt",
+    "parametersSchema": {
+      "required": [ "userPrincipalName", "employeeID", "givenName", "SN", "middleName", "displayName", "company", "MISALCompanyCode", "department", "departmentNumber", "ResourceManager", "count", "employeeType", "c", "co", "l", "manager", "carLicense", "isManager", "gender", "SAMAccount", "OUCountry", "OUITSite", "physicalDeliveryOfficeName", "title" ],
+      "type": "object",
+      "properties": {
+        "userPrincipalName": { "type": "string" },
+        "employeeID": { "type": "string" },
+        "givenName": { "type": "string" },
+        "SN": { "type": "string" },
+        "middleName": { "type": "string" },
+        "displayName": { "type": "string" },
+        "company": { "type": "string" },
+        "MISALCompanyCode": { "type": "string" },
+        "department": { "type": "string" },
+        "departmentNumber": { "type": "string" },
+        "ResourceManager": { "type": "string" },
+        "count": { "type": "string" },
+        "employeeType": { "type": "string" },
+        "c": { "type": "string" },
+        "co": { "type": "string" },
+        "l": { "type": "string" },
+        "manager": { "type": "string" },
+        "carLicense": { "type": "string" },
+        "isManager": { "type": "string" },
+        "gender": { "type": "string" },
+        "SAMAccount": { "type": "string" },
+        "OUCountry": { "type": "string" },
+        "OUITSite": { "type": "string" },
+        "physicalDeliveryOfficeName": { "type": "string" },
+        "title": { "type": "string" }
+      }
+    },
+    "contentLink": {
+      "uri": "https://prod-20.northeurope.logic.azure.com:443/integrationAccounts/2ab2c1d54f50483ca584368cfc062de4/maps/TEST_Create_User/contents/Value?api-version=2015-08-01-preview&se=2018-09-26T11%3A25%3A53.7829300Z&sp=%2Fmaps%2FTEST_Create_User%2Fread&sv=1.0&sig=GFZq-Iacr4p3eQ0-YVklrb6dvoogjivrWM4a5F3F9z4",
+      "contentSize": 8127
+    },
+    "createdTime": "2018-05-18T13:33:22.9646168Z",
+    "changedTime": "2018-09-19T08:34:01.4272343Z",
+    "metadata": { "fileName": null }
+  },
+  "id": "/subscriptions/9fake3d-3c94-40e9-b2cb-18921e5d6cfa/resourceGroups/LogicAppsDev/providers/Microsoft.Logic/integrationAccounts/IntegrationAccountDev/maps/TEST_Create_User",
+  "name": "TEST_Create_User",
+  "type": "Microsoft.Logic/integrationAccounts/maps"
+}

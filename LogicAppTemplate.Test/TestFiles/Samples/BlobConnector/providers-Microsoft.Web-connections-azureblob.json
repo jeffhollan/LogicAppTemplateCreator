@@ -1,0 +1,30 @@
+{
+  "properties": {
+    "displayName": "alfalavalintegblobsdev",
+    "statuses": [ { "status": "Connected" } ],
+    "customParameterValues": {},
+    "nonSecretParameterValues": { "accountName": "alfalavalintegblobsdev" },
+    "createdTime": "2018-04-11T06:44:46.7348107Z",
+    "changedTime": "2018-04-11T06:44:46.7348107Z",
+    "api": {
+      "name": "azureblob",
+      "displayName": "Azure Blob Storage",
+      "description": "Microsoft Azure Storage provides a massively scalable, durable, and highly available storage for data on the cloud, and serves as the data storage solution for modern applications. Connect to Blob Storage to perform various operations such as create, update, get and delete on blobs in your Azure Storage account.",
+      "iconUri": "https://connectoricons-prod.azureedge.net/azureblob/icon_1.0.1002.1175.png",
+      "brandColor": "#804998",
+      "category": "Standard",
+      "id": "/subscriptions/9fake03d-3c94-40e9-b2cb-18921e5d6cfa/providers/Microsoft.Web/locations/northeurope/managedApis/azureblob",
+      "type": "Microsoft.Web/locations/managedApis"
+    },
+    "testLinks": [
+      {
+        "requestUri": "https://management.azure.com:443/subscriptions/9fake03d-3c94-40e9-b2cb-18921e5d6cfa/resourceGroups/LogicAppsDev/providers/Microsoft.Web/connections/azureblob/extensions/proxy/testconnection?api-version=2016-06-01",
+        "method": "get"
+      }
+    ]
+  },
+  "id": "/subscriptions/9fake03d-3c94-40e9-b2cb-18921e5d6cfa/resourceGroups/LogicAppsDev/providers/Microsoft.Web/connections/azureblob",
+  "name": "azureblob",
+  "type": "Microsoft.Web/connections",
+  "location": "northeurope"
+}

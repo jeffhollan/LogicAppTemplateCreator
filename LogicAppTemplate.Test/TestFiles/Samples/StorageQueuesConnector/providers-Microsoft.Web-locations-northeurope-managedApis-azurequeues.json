@@ -1,0 +1,42 @@
+{
+  "properties": {
+    "name": "azurequeues",
+    "connectionParameters": {
+      "storageaccount": {
+        "type": "string",
+        "uiDefinition": {
+          "displayName": "Storage Account Name",
+          "description": "The name of your storage account",
+          "tooltip": "Provide the name of the storage account used for queues as it appears in the Azure portal",
+          "constraints": { "required": "true" }
+        }
+      },
+      "sharedkey": {
+        "type": "securestring",
+        "uiDefinition": {
+          "displayName": "Shared Storage Key",
+          "description": "The shared storage key of your storage account",
+          "tooltip": "Provide a shared storage key for the storage account used for queues as it appears in the Azure portal",
+          "constraints": { "required": "true" }
+        }
+      }
+    },
+    "metadata": {
+      "source": "marketplace",
+      "brandColor": "#0072C6"
+    },
+    "runtimeUrls": [ "https://logic-apis-northeurope.azure-apim.net/apim/azurequeues" ],
+    "generalInformation": {
+      "iconUrl": "https://connectoricons-prod.azureedge.net/azurequeues/icon_1.0.1038.1222.png",
+      "displayName": "Azure Queues",
+      "description": "Azure Queue storage provides cloud messaging between application components. Queue storage also supports managing asynchronous tasks and building process work flows.",
+      "releaseTag": "Production",
+      "tier": "Standard"
+    },
+    "capabilities": [ "actions", "triggers" ]
+  },
+  "id": "/subscriptions/9fake3d-3c94-42e9-b2cb-18921e5d6cfa/providers/Microsoft.Web/locations/northeurope/managedApis/azurequeues",
+  "name": "azurequeues",
+  "type": "Microsoft.Web/locations/managedApis",
+  "location": "northeurope"
+}

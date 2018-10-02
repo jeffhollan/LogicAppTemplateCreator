@@ -1,0 +1,42 @@
+{
+  "properties": {
+    "name": "azuretables",
+    "connectionParameters": {
+      "storageaccount": {
+        "type": "string",
+        "uiDefinition": {
+          "displayName": "Storage Account Name",
+          "description": "The name of your storage account",
+          "tooltip": "Provide the name of the storage account used for tables as it appears in the Azure portal",
+          "constraints": { "required": "true" }
+        }
+      },
+      "sharedkey": {
+        "type": "securestring",
+        "uiDefinition": {
+          "displayName": "Shared Storage Key",
+          "description": "The shared storage key of your storage account",
+          "tooltip": "Provide a shared storage key for the storage account used for tables as it appears in the Azure portal",
+          "constraints": { "required": "true" }
+        }
+      }
+    },
+    "metadata": {
+      "source": "marketplace",
+      "brandColor": "#804998"
+    },
+    "runtimeUrls": [ "https://logic-apis-westeurope.azure-apim.net/apim/azuretables" ],
+    "generalInformation": {
+      "iconUrl": "https://connectoricons-prod.azureedge.net/azuretables/icon_1.0.1048.1234.png",
+      "displayName": "Azure Table Storage",
+      "description": "Azure Table storage is a service that stores structured NoSQL data in the cloud, providing a key/attribute store with a schemaless design. Sign into your Storage account to create, update, and query tables and more. ",
+      "releaseTag": "Production",
+      "tier": "Standard"
+    },
+    "capabilities": [ "actions" ]
+  },
+  "id": "/subscriptions/c107df29-a4af-4bc9-a733-f88f0eaa4296/providers/Microsoft.Web/locations/westeurope/managedApis/azuretables",
+  "name": "azuretables",
+  "type": "Microsoft.Web/locations/managedApis",
+  "location": "westeurope"
+}

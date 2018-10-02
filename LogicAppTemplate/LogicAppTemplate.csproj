@@ -62,7 +62,9 @@
     <Compile Include="AzureResourceId.cs" />
     <Compile Include="Constants\Constants.cs" />
     <Compile Include="EmptyParameterTemplateGenerator.cs" />
+    <Compile Include="GeneratorIACmdlet.cs" />
     <Compile Include="GeneratorCmdlet.cs" />
+    <Compile Include="IntegrationAccountGenerator.cs" />
     <Compile Include="IResourceCollector.cs" />
     <Compile Include="Models\DiagnosticSettingsTemplate.cs" />
     <Compile Include="Models\NestedResourceTemplate.cs" />
@@ -73,6 +75,8 @@
     <Compile Include="Models\ConnectionTemplate.cs" />
     <Compile Include="Models\DeploymentTemplate.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Templates\IntegationAccountResource.cs" />
+    <Compile Include="Templates\ARMTemplateClass.cs" />
     <Compile Include="VSProjectGenerator.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -84,6 +88,7 @@
     <EmbeddedResource Include="Templates\VSProject\DeployProjectTemplate.deployproj" />
     <EmbeddedResource Include="Templates\VSProject\Deploy-AzureResourceGroup.ps1" />
     <EmbeddedResource Include="Templates\VSProject\Deployment.targets" />
+    <EmbeddedResource Include="Templates\integrationAccountMap.json" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
