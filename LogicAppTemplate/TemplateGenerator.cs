@@ -302,34 +302,7 @@ namespace LogicAppTemplate
                 {
                     var mapname = ((JObject)definition["actions"][action.Name]["inputs"]["integrationAccount"]["map"]).Value<string>("name");
                     var mapParameterName = AddTemplateParameter(action.Name + "-MapName", "string", mapname);
-                    definition["actions"][action.Name]["inputs"]["integrationAccount"]["map"]["name"] = "[parameters('" + mapParameterName + "')]";
-                    //Get the map
-                    if (extractIntegrationAccountArtifacts)
-                    {
-                        var mapresource = resourceCollector.GetResource(IntegrationAccountId + "/maps/" + mapname, "2018-07-01-preview").Result;
-
-                        var uri = mapresource["properties"]["contentLink"].Value<string>("uri").Split('?');
-                        var map = resourceCollector.GetRawResource(uri[0], uri[1].Replace("api-version=", "")).Result;
-
-                        //create the resource and add to the template
-                        var newResource = JObject.Parse(GetResourceContent("LogicAppTemplate.Templates.integrationAccountMap.json"));
-                        //add the current Integration Account parameter name
-                        newResource["name"] = $"[concat(parameters('IntegrationAccountName'), '/' ,parameters('{mapParameterName}'))]";
-
-                        newResource["properties"]["mapType"] = mapresource["properties"]["mapType"];
-                        newResource["properties"]["parametersSchema"] = mapresource["properties"]["parametersSchema"];
-
-                        newResource["properties"]["content"] = map.Replace("\"", "\\\"");
-                        newResource["properties"]["contentType"] = "text";
-
-                        //add dependson
-                        if (template.resources.First()["dependsOn"] == null)
-                        {
-                            template.resources.First()["dependsOn"] = new JArray();
-                        }
-                    ((JArray)template.resources.First()["dependsOn"]).Add($"[resourceId('{newResource.Value<string>("type")}', parameters('IntegrationAccountName'),parameters('{mapParameterName}'))]");
-                        template.resources.Add(newResource);
-                    }
+                    definition["actions"][action.Name]["inputs"]["integrationAccount"]["map"]["name"] = "[parameters('" + mapParameterName + "')]";                 
                 }
                 else if (type == "http")
                 {
@@ -388,7 +361,7 @@ namespace LogicAppTemplate
                     var connection = action.Value.SelectToken("inputs.host.connection");
                     if (connection != null)
                     {
-                        var connectioname = (JObject)definition["actions"][action.Name]["inputs"]["host"]["connection"].Value<string>("name");
+                        var connectioname = definition["actions"][action.Name]["inputs"]["host"]["connection"].Value<string>("name");
 
                         var getConnectionNameType = this.GetConnectionTypeName(connection, parameters);
 
