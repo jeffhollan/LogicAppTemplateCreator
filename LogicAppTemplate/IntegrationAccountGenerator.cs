@@ -47,18 +47,20 @@ namespace LogicAppTemplate
             //create the resource and add to the template
             var obj = new IntegationAccountResource();
             obj.name = $"[concat(parameters('{paramiaName}'), '/' ,parameters('{paramResourceName}'))]";
+            obj.type = resource.Value<string>("type");
             //add the current Integration Account parameter name
             var location = template.AddParameter("integrationAccountLocation", "string", "[resourceGroup().location]");
             obj.location = "[parameters('integrationAccountLocation')]";
-
+            
 
 
             obj.properties["mapType"] = resource["properties"]["mapType"];
             obj.properties["parametersSchema"] = resource["properties"]["parametersSchema"];
 
             obj.properties["content"] = rawresource;
-            obj.properties["contentType"] = "text";
-       
+            obj.properties["contentType"] = obj.properties.Value <string>("mapType") == "Liquid" ? "text/plain" : "application/xml";
+
+
             template.resources.Add(JObject.FromObject( obj));
 
             return JObject.FromObject(template);
