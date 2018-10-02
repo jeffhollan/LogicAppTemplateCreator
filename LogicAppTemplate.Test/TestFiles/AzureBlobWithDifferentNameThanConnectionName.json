@@ -1,0 +1,186 @@
+﻿{
+  "properties": {
+    "provisioningState": "Succeeded",
+    "createdTime": "2017-03-23T12:18:59.9810997Z",
+    "changedTime": "2017-08-21T11:55:21.1998435Z",
+    "state": "Enabled",
+    "version": "08586982903643342035",
+    "accessEndpoint": "https://prod-13.westeurope.logic.azure.com:443/workflows/714b7261a41b49abb021e7dda9df4aae",
+    "definition": {
+      "$schema": "https://schema.management.azure.com/providers/Microsoft.Logic/schemas/2016-06-01/workflowdefinition.json#",
+      "contentVersion": "1.0.0.0",
+      "parameters": {
+        "$connections": {
+          "defaultValue": {},
+          "type": "Object"
+        }
+      },
+      "triggers": {
+        "Recurrence": {
+          "recurrence": {
+            "frequency": "Day",
+            "interval": 1,
+            "schedule": {
+              "hours": [
+                2
+              ],
+              "minutes": [
+                10
+              ]
+            },
+            "startTime": "2017-06-01T01:40:00.5116371Z",
+            "timeZone": "UTC"
+          },
+          "type": "Recurrence",
+          "operationOptions": "SingleInstance"
+        }
+      },
+      "actions": {
+        "Condition": {
+          "actions": {
+            "Get_blob_content": {
+              "runAfter": {},
+              "metadata": {
+                "L2ludDAwMTQvRGF0ZS5qc29u": "/int0014/Date.json"
+              },
+              "type": "ApiConnection",
+              "inputs": {
+                "host": {
+                  "connection": {
+                    "name": "@parameters('$connections')['azureblob_1']['connectionId']"
+                  }
+                },
+                "method": "get",
+                "path": "/datasets/default/files/@{encodeURIComponent(encodeURIComponent('L2ludDAwMTQvRGF0ZS5qc29u'))}/content",
+                "queries": {
+                  "inferContentType": true
+                }
+              }
+            },
+            "INT0014-NewHires": {
+              "runAfter": {
+                "Parse_JSON": [
+                  "Succeeded"
+                ]
+              },
+              "type": "Workflow",
+              "inputs": {
+                "body": {
+                  "Completed_Date_On_or_After": "@{body('Parse_JSON')?['Start_Date']}",
+                  "Completed_Date_On_or_Before": "@{body('Parse_JSON')?['End_Date']}"
+                },
+                "host": {
+                  "triggerName": "manual",
+                  "workflow": {
+                    "id": "/subscriptions/fakeee-15f5-4c85-bb3e-1e108dc79b00/resourceGroups/myresourcegroup/providers/Microsoft.Logic/workflows/INT0014-NewHires"
+                  }
+                },
+                "retryPolicy": {
+                  "type": "none"
+                }
+              }
+            },
+            "Parse_JSON": {
+              "runAfter": {
+                "Get_blob_content": [
+                  "Succeeded"
+                ]
+              },
+              "type": "ParseJson",
+              "inputs": {
+                "content": {
+                  "End_Date": "@utcnow()",
+                  "Start_Date": "@startOfDay(string(body('Get_blob_content')))"
+                },
+                "schema": {
+                  "properties": {
+                    "End_Date": {
+                      "type": "string"
+                    },
+                    "Start_Date": {
+                      "type": "string"
+                    }
+                  },
+                  "type": "object"
+                }
+              }
+            },
+            "Update_blob": {
+              "runAfter": {
+                "INT0014-NewHires": [
+                  "Succeeded"
+                ]
+              },
+              "metadata": {
+                "L2ludDAwMTQvRGF0ZS5qc29u": "/int0014/Date.json"
+              },
+              "type": "ApiConnection",
+              "inputs": {
+                "body": "@body('Parse_JSON')?['End_Date']",
+                "host": {
+                  "connection": {
+                    "name": "@parameters('$connections')['azureblob_1']['connectionId']"
+                  }
+                },
+                "method": "put",
+                "path": "/datasets/default/files/@{encodeURIComponent(encodeURIComponent('L2ludDAwMTQvRGF0ZS5qc29u'))}"
+              }
+            }
+          },
+          "runAfter": {},
+          "expression": "@contains('12345', string(dayOfWeek(addhours(utcnow(), 2))))",
+          "type": "If"
+        }
+      },
+      "outputs": {}
+    },
+    "parameters": {
+      "$connections": {
+        "value": {
+          "azureblob_1": {
+            "connectionId": "/subscriptions/fakeee-15f5-4c85-bb3e-1e108dc79b00/resourceGroups/myresourcegroup/providers/Microsoft.Web/connections/azureblob-1",
+            "connectionName": "azureblob-1",
+            "id": "/subscriptions/fakeee-15f5-4c85-bb3e-1e108dc79b00/providers/Microsoft.Web/locations/westeurope/managedApis/azureblob"
+          }
+        }
+      }
+    },
+    "endpointsConfiguration": {
+      "workflow": {
+        "outgoingIpAddresses": [
+          {
+            "address": "40.68.222.65"
+          },
+          {
+            "address": "40.68.209.23"
+          },
+          {
+            "address": "13.95.147.65"
+          }
+        ],
+        "accessEndpointIpAddresses": [
+          {
+            "address": "13.95.155.53"
+          },
+          {
+            "address": "52.174.54.218"
+          },
+          {
+            "address": "52.174.49.6"
+          }
+        ]
+      },
+      "connector": {
+        "outgoingIpAddresses": [
+          {
+            "address": "40.115.50.13"
+          }
+        ]
+      }
+    }
+  },
+  "id": "/subscriptions/fakeee-15f5-4c85-bb3e-1e108dc79b00/resourceGroups/myresourcegroup/providers/Microsoft.Logic/workflows/INT0014-NewHires-Trigger",
+  "name": "INT0014-NewHires-Trigger",
+  "type": "Microsoft.Logic/workflows",
+  "location": "westeurope"
+}
