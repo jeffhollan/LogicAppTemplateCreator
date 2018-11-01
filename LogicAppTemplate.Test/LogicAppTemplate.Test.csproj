@@ -36,9 +36,8 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="Microsoft.CSharp" />
-    <Reference Include="Newtonsoft.Json, Version=10.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
-      <HintPath>..\packages\Newtonsoft.Json.10.0.3\lib\net45\Newtonsoft.Json.dll</HintPath>
-      <Private>True</Private>
+    <Reference Include="Newtonsoft.Json, Version=11.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <HintPath>..\packages\Newtonsoft.Json.11.0.2\lib\net45\Newtonsoft.Json.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Management.Automation, Version=3.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35" />
@@ -99,7 +98,6 @@
     <EmbeddedResource Include="TestFiles\AzureBlob.json" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="packages.config" />
     <EmbeddedResource Include="TestFiles\misingparameter.json" />
     <EmbeddedResource Include="TestFiles\file-test-triggerandmore.json" />
     <EmbeddedResource Include="TestFiles\Samples\CustomConnector\providers-Microsoft.Logic-workflows-INT001.Invoice.json" />
@@ -110,7 +108,9 @@
     <EmbeddedResource Include="TestFiles\Samples\DiagnosticSettings\providers-Microsoft.Logic-workflows-INT001.Invoice-providers-microsoft.insights-diagnosticSettings.json" />
     <EmbeddedResource Include="TestFiles\AzureBlobWithDifferentNameThanConnectionName.json" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <None Include="packages.config" />
+  </ItemGroup>
   <Choose>
     <When Condition="'$(VisualStudioVersion)' == '10.0' And '$(IsCodedUITest)' == 'True'">
       <ItemGroup>
