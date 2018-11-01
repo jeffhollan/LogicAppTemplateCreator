@@ -4,8 +4,6 @@ This script will create template files from all logic apps in a resource group a
 
 It depends on the following components:
 
-   - [armclient](https://github.com/projectkudu/ARMClient "armclient")
-
    - [AzureRM](https://docs.microsoft.com/en-us/powershell/azure/install-azurerm-ps?view=azurermps-4.2.0 "AzureRM")
 
 ##Parameters
