@@ -62,8 +62,10 @@
     <Compile Include="AzureResourceId.cs" />
     <Compile Include="Constants\Constants.cs" />
     <Compile Include="EmptyParameterTemplateGenerator.cs" />
-    <Compile Include="GeneratorIACmdlet.cs" />
+    <Compile Include="GeneratorCustomConnectorCmdlet.cs" />
+    <Compile Include="GeneratorIAMapCmdlet.cs" />
     <Compile Include="GeneratorCmdlet.cs" />
+    <Compile Include="CustomConnectorGenerator.cs" />
     <Compile Include="IntegrationAccountGenerator.cs" />
     <Compile Include="IResourceCollector.cs" />
     <Compile Include="Models\DiagnosticSettingsTemplate.cs" />

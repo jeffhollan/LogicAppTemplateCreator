@@ -9,14 +9,11 @@ using System.Windows.Forms;
 
 namespace LogicAppTemplate
 {
-    [Cmdlet(VerbsCommon.Get, "IntegrationAccountTemplate", ConfirmImpact = ConfirmImpact.None)]
-    public class GeneratorIACmdlet : PSCmdlet
+    [Cmdlet(VerbsCommon.Get, "CustomConnectorTemplate", ConfirmImpact = ConfirmImpact.None)]
+    public class GeneratorCustomConnectorCmdlet : PSCmdlet
     {
-        [Parameter(Mandatory = true, HelpMessage = "Name of the Artifact")]
-        public string ArtifactName;
-
-        [Parameter(Mandatory = true, HelpMessage = "Name of the IntegrationAccount")]
-        public string IntegrationAccount;
+        [Parameter(Mandatory = true, HelpMessage = "Name of the CustomConnector")]
+        public string CustomConnector;
 
         [Parameter(Mandatory = true, HelpMessage = "Name of the Resource Group")]
         public string ResourceGroup;
@@ -63,7 +60,7 @@ namespace LogicAppTemplate
             {
                 return;
             }
-            IntegrationAccountGenerator generator = new IntegrationAccountGenerator(ArtifactName,IntegrationAccountGenerator.ARtifactType.Maps, IntegrationAccount, SubscriptionId, ResourceGroup,resourceCollector);
+            CustomConnectorGenerator generator = new CustomConnectorGenerator(CustomConnector, SubscriptionId, ResourceGroup,resourceCollector);
 
             try
             {
