@@ -1,0 +1,146 @@
+{
+  "properties": {
+    "provisioningState": "Succeeded",
+    "createdTime": "2018-03-06T10:06:23.4275714Z",
+    "changedTime": "2018-09-24T16:11:42.9730172Z",
+    "state": "Enabled",
+    "version": "08586638013825170244",
+    "accessEndpoint": "https://prod-07.northeurope.logic.azure.com:443/workflows/fe979843949b452fb87c946013adac13",
+    "integrationAccount": {
+      "name": "IntegrationAccountDev",
+      "id": "/subscriptions/9fake3d-3c94-40e9-b2cb-18921e5d6cfa/resourceGroups/LogicAppsDev/providers/Microsoft.Logic/integrationAccounts/IntegrationAccountDev",
+      "type": "Microsoft.Logic/integrationAccounts"
+    },
+    "definition": {
+      "$schema": "https://schema.management.azure.com/providers/Microsoft.Logic/schemas/2016-06-01/workflowdefinition.json#",
+      "contentVersion": "1.0.0.0",
+      "parameters": {},
+      "triggers": {
+        "request": {
+          "type": "Request",
+          "kind": "Http",
+          "inputs": { "schema": {} }
+        }
+      },
+      "actions": {
+        "Compose": {
+          "runAfter": { "Integration_Account_Artifact_Lookup": [ "Succeeded" ] },
+          "type": "Compose",
+          "inputs": "@formatDateTime(triggerBody()['date'], 'yyyyMMdd000000.OZ')"
+        },
+        "HTTP": {
+          "runAfter": { "Compose": [ "Succeeded" ] },
+          "type": "Http",
+          "inputs": {
+            "authentication": {
+              "audience": "https://graph.microsoft.com/",
+              "clientId": "clientid",
+              "secret": "mysecret",
+              "tenant": "tenantid",
+              "type": "ActiveDirectoryOAuth"
+            },
+            "method": "GET",
+            "uri": "https://graph.microsoft.com/beta/users/delta?$skiptoken=s6rzx89m7jSsagD6LwtNtILHNUSOWWZsr4jJZGTK_cfKLWBH7R44v6X5A6_QvJlDjciTLGuLuwTvmjs-QFLx7kHEbQmuLzLii2l4AbDx4dQxxV_LFGIVGcZIG8rjfIgXn9PmPl4aKj76Rz9IvMUjjKwDQNV151BcVgWQQ7NmH8zcSJMmn4cswgJt_1wNNXn0e5451EHUYR74NTp8m8bIJzO-rsWZT_6mC97PSVwvbO0PIj43Qs98ZGcTnO4MteN_e5QTUC_Su3LHdqLMlXLdp_fUkZ4pckqFR2c37Knn6D3acWmG29Ypk62JEKzr8QC9W0UyQY_azxT7fRGs3mMdlaP7z3RO4C4YfSQxh9SaBAatkh28SWRvdX0mpngGQz2ErQJo2uWx8s_iSvXuYKVvVM8mB0NITrGEo5eGe-33HhdRRVOkE09flnQ6zWxZGvFUi0BLKrBGnAJGINLNhzTjXKi8wIIQdhNP_PnHATkljBGU9Gfth1qqnqV_jox2VB9cByMjdg_6IH8TZEUCrKKVIAOjrWPezNrqZrePAb0OzEDrJihS3x8cSVeuTL25rzTmKi1mrBPx9uHj18RzsbWy_uV2rE2_CLf8AvSFQvJUzqCY3wajx1JSXF1HXbgJU3M8wT87d1yrdI_dVXaJre3L9RFQucziXEPjY_4e4SmTGBiXbtASFC9bnPrJaPVfdYnBwSWnpJsOXmRxmuV2p7t8Vga2Uri-cxjfVdCFx8H1qaaKj-BiCpjQR9oAXqMqSsVsBYbHTcuGs6w8KKft19Xl-o0JfnksrH8QNaBLMN4dNZsq-fB77JlOM2eTie9DQpBcFqUJxCXPNV73x8IJjoXOstHMVuCFcMh3Di0-qaAxxEhQZm0SGH3LN3hd6pYksw3CbVFuFI8IbOQeHy7h5NswSwiwOzQdhyYti-sE8REohafaQX4GBsW1slk4Wd1abx-jB0PO3E_LzMhhhG8zUTCw341HQh7HhN-J-agfhB_QiLM6s5C-BBcNqPbUjTcTxbbXw8jkFw2r_SiDyw0gwttw5_MOMp3uBaw5uoglYE5_7x2y1c2g12dC2gc7jvEu8zX7l5ZvIlbfbUXm_rgsNSIdegE_O-t0Tukt1H4lJb095F9JEDQ5iKGh3qIUXHvtHloqQxK8EUG7TY5xUT9LMlPmzDWl4jfSRUDgAhFb2uHP5rLeuZ9FuubMaumDJoFJ2zX3fBsqVVmYhHApmyak4T5-Q6ACNosC7f3OI3ZVE4GbC0c94nV0MOX-C8aNols9Dl9O_soBqTF_AcITQhKA_vp2-w82AVVOK0K5afJkRMOGJVvuLkIuenaTAg_dTF8W_llt2KB7c2CJ1fUjhxyF5NRR7bnpv9i4-_7U8qqARpWfcBX-Ks1zFCQpVyCMp2VWpuapyN2EjJsXgtP5UiFDDm1TqhGMKkGpAFGNaTbogKHJphQsAnIqc7Vt4lvbhjV5y_A_wpHwq2Q8MQFpHForXqF-wJiTqedJXQDF9AlCFUaiWHGRjJX1v9lcKNPYfKjR9QEsQvxyJBToWTU3-lITUsDlsnF_Hq65WWyA258dzbZ2vCYecU_yzk7tt8h0vEaFWg80g5lkBQp5Vyw8Ly9LQuRw76Rwfac5tUqWaG_3lXYeHuBq8uxoY7hT19-R6Lee3t2gaPqGSGV_An0XhV_XWy6P5sFSfwokp50wWUQXMZ16OBfOf9iVVwSkqzYJsyskRah8PEiZOCrpbppk73DKxHcbfOSRk1MmK201Z-jvOcju-fx56E7a_LzjdJLDciKUdMLrvAsBHWRxhYWePg83r8fhlfNDkedU_D9cj6Sm-aN418BiRFP1fNA-MZHHvgwFiwCIgjsnyl7MCj0uddk3f8vBIyEzgCuuHzUekH-0qjSa5r154u0tWzuKuvjTNXOw2t7vncgYN8zAOytdmpo3ob54XGZ5OdTX0Q0fjX9jhgmYh58ETFI9TLCBVt_AeuXsBDu-S2UM3G4F9fyx-wpd6p2bAibklD_NhRVIih8wSbMG-X54ESFm8SO9n2zQnL7o9i5GnDie0maGM9ytMIvBDEmbx0mvdxeM-lWruNb5-dx66TwucLGhVjfj7m6vI_3xH7pWv8f8dn8BtPFBZLPvIjBLuFxx_hESANT5gb8rwqbeUJECazojJEAIw_jDrQokXZ9O7r70QmI-acfSCj0EGJfxAmXA60ngnngDrnPt6AyX3-R_ptHIAN486cghWRV4auoJI_fwWSdXI5_GgpF90aEUD61k2MLYRqGagHlp5ehHP5HEe8_y7UwmfytrZMTQHsh2u-uiMdoips7q-2T6MkcsjWbcWU_izmdXndtc7Bh02RTAa76PQ4sAM0pL7r3nUiB8iSs-B1wUXqamRs7PKsuXlUHaClf6V_53N35DR3DBi4u4QWgt6RNy3oG-Vav-hiaL0yXLC8vbbUoH5-lPkoIRYTkjwdE4a-OwxF8VhJTvoLLL98fT_WymjgC5lfR0_Cq0M8o3XUND0hNr_ps2EKQjqSni4Dvn3cXJdMBLqBxTLO61OKhDDUdOe017lRmzJR1TDT3Z1QkZQqIJ3zmvwezLtx0aDVZ8cZcyE02wA2XM-QA.ptveWGttyxk9Px_7R89bTC6R7XGZCdbK0nsjCew4x8c"
+          }
+        },
+        "Integration_Account_Artifact_Lookup": {
+          "runAfter": { "Transform_JSON_to_JSON": [ "Succeeded" ] },
+          "type": "IntegrationAccountArtifactLookup",
+          "inputs": {
+            "artifactName": "test",
+            "artifactType": "Schema"
+          }
+        },
+        "Response": {
+          "runAfter": { "HTTP": [ "Succeeded" ] },
+          "type": "Response",
+          "inputs": {
+            "body": "@outputs('Compose')",
+            "statusCode": 200
+          }
+        },
+        "Transform_JSON_to_JSON": {
+          "runAfter": {},
+          "type": "Liquid",
+          "kind": "JsonToJson",
+          "inputs": {
+            "content": { "test": "test" },
+            "integrationAccount": { "map": { "name": "NotificationMap" } }
+          }
+        },
+        "Transform_XML": {
+          "runAfter": { "XML_Validation": [ "Succeeded" ] },
+          "type": "Xslt",
+          "inputs": {
+            "content": "<dumm/>",
+            "integrationAccount": { "map": { "name": "TEST_Create_User" } },
+            "xsltParameters": {
+              "OUCountry": "a",
+              "OUITSite": "a",
+              "SAMAccount": "a",
+              "SN": "a",
+              "MISALCompanyCode": "a",
+              "ResourceManager": "a",
+              "c": "a",
+              "carLicense": "a",
+              "co": "a",
+              "company": "a",
+              "count": "1",
+              "department": "a",
+              "departmentNumber": "a",
+              "displayName": "a",
+              "employeeID": "a",
+              "employeeType": "a",
+              "gender": "a",
+              "givenName": "a",
+              "isManager": "a",
+              "l": "a",
+              "manager": "a",
+              "middleName": "a",
+              "physicalDeliveryOfficeName": "a",
+              "title": "a",
+              "userPrincipalName": "a"
+            }
+          }
+        },
+        "XML_Validation": {
+          "runAfter": {},
+          "type": "XmlValidation",
+          "inputs": {
+            "content": "</dummy>",
+            "integrationAccount": { "schema": { "name": "" } }
+          }
+        }
+      },
+      "outputs": {}
+    },
+    "parameters": {},
+    "accessControl": {},
+    "endpointsConfiguration": {
+      "workflow": {
+        "outgoingIpAddresses": [
+          { "address": "40.113.12.95" },
+          { "address": "52.178.165.215" },
+          { "address": "52.178.166.21" },
+          { "address": "40.112.92.104" },
+          { "address": "40.112.95.216" },
+          { "address": "40.113.4.18" },
+          { "address": "40.113.3.202" },
+          { "address": "40.113.1.181" }
+        ],
+        "accessEndpointIpAddresses": [
+          { "address": "13.79.173.49" },
+          { "address": "52.169.218.253" },
+          { "address": "52.169.220.174" },
+          { "address": "40.112.90.39" }
+        ]
+      },
+      "connector": { "outgoingIpAddresses": [ { "address": "104.45.93.9" } ] }
+    }
+  },
+  "id": "/subscriptions/9fake3d-3c94-40e9-b2cb-18921e5d6cfa/resourceGroups/LogicAppsDev/providers/Microsoft.Logic/workflows/test",
+  "name": "test",
+  "type": "Microsoft.Logic/workflows",
+  "location": "northeurope",
+  "tags": {}
+}

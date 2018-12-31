@@ -1,0 +1,30 @@
+{
+  "properties": {
+    "displayName": "LDAPAdapter",
+    "statuses": [ { "status": "Connected" } ],
+    "customParameterValues": {},
+    "nonSecretParameterValues": {
+      "authType": "anonymous",
+      "gateway": {
+        "name": "OPDGIntegrationDevAzure",
+        "id": "/subscriptions/9fake3d-3c94-40e9-b2cb-18921e5d6cfa/resourceGroups/LogicAppsDev/providers/Microsoft.Web/connectionGateways/OPDGIntegrationDevAzure",
+        "type": "Microsoft.Web/connectionGateways"
+      }
+    },
+    "createdTime": "2018-03-08T21:13:34.0276216Z",
+    "changedTime": "2018-03-08T21:13:34.0276216Z",
+    "api": {
+      "name": "LDAPAdapter",
+      "displayName": "LDAPAdapter",
+      "description": "a428fbd0ecae4f639bb45f994e5d3968",
+      "iconUri": "/Content/retail/assets/default-connection-icon.6296199fc1d74aa45ca68e1253762025.2.svg",
+      "id": "/subscriptions/9fake3d-3c94-40e9-b2cb-18921e5d6cfa/resourceGroups/LogicAppsDev/providers/Microsoft.Web/customApis/LDAPAdapter",
+      "type": "Microsoft.Web/customApis"
+    },
+    "testLinks": []
+  },
+  "id": "/subscriptions/9fake3d-3c94-40e9-b2cb-18921e5d6cfa/resourceGroups/LogicAppsDev/providers/Microsoft.Web/connections/LDAPAdapter",
+  "name": "LDAPAdapter",
+  "type": "Microsoft.Web/connections",
+  "location": "northeurope"
+}

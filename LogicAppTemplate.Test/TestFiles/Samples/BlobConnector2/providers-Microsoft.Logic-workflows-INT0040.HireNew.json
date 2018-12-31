@@ -1,0 +1,320 @@
+{
+  "properties": {
+    "provisioningState": "Succeeded",
+    "createdTime": "2018-05-28T13:22:50.6566265Z",
+    "changedTime": "2018-08-27T13:19:23.2971228Z",
+    "state": "Enabled",
+    "version": "08586662309222464576",
+    "accessEndpoint": "https://prod-06.northeurope.logic.azure.com:443/workflows/3f08c38bb62b4e16a99ce0bca3758278",
+    "integrationAccount": {
+      "name": "AlfaLavalIntegrationAccountDev",
+      "id": "/subscriptions/9fake3d-3c94-40e9-b2cb-18921e5d6cfa/resourceGroups/LogicAppsDev/providers/Microsoft.Logic/integrationAccounts/AlfaLavalIntegrationAccountDev",
+      "type": "Microsoft.Logic/integrationAccounts"
+    },
+    "definition": {
+      "$schema": "https://schema.management.azure.com/providers/Microsoft.Logic/schemas/2016-06-01/workflowdefinition.json#",
+      "contentVersion": "1.0.0.0",
+      "parameters": {
+        "$connections": {
+          "defaultValue": {},
+          "type": "Object"
+        }
+      },
+      "triggers": {
+        "request": {
+          "type": "Request",
+          "kind": "Http",
+          "inputs": {
+            "schema": {
+              "properties": {
+                "Business Site Country": { "type": "string" },
+                "Business Site Country PriorValue": { "type": "string" },
+                "Business Site Name": { "type": "string" },
+                "Business Site Name Full": { "type": "string" },
+                "Business Site Name PriorValue": { "type": "string" },
+                "Business Title": { "type": "string" },
+                "Car License": { "type": "string" },
+                "Company": { "type": "string" },
+                "Company Subtype": { "type": "string" },
+                "Cost Center": { "type": "string" },
+                "Department": { "type": "string" },
+                "Employee ID": { "type": "string" },
+                "First Name": { "type": "string" },
+                "First Name PriorValue": { "type": "string" },
+                "Formatted Name": { "type": "string" },
+                "Gender": { "type": "string" },
+                "Is Manager": { "type": "string" },
+                "Last Day Of Work": { "type": "string" },
+                "Last Name": { "type": "string" },
+                "Last Name PriorValue": { "type": "string" },
+                "Middle Name": { "type": "string" },
+                "Organization Company": { "type": "string" },
+                "Supervisor ID": { "type": "string" },
+                "Supervisor Name": { "type": "string" },
+                "Worker Type": { "type": "string" }
+              },
+              "type": "object"
+            }
+          }
+        }
+      },
+      "actions": {
+        "Condition": {
+          "actions": {
+            "Post_XML_2": {
+              "runAfter": { "Transform_XML": [ "Succeeded" ] },
+              "type": "ApiConnection",
+              "inputs": {
+                "body": "@{body('Transform_XML')}",
+                "headers": { "Content-Type": "application/xml" },
+                "host": { "connection": { "name": "@parameters('$connections')['LDAPAdapter']['connectionId']" } },
+                "method": "post",
+                "path": "/api/ExecuteXml",
+                "queries": { "connectionId": "425cdaad-6824-4700-8395-aafd3d2f95b4" }
+              }
+            },
+            "Transform_XML": {
+              "runAfter": {},
+              "type": "Xslt",
+              "inputs": {
+                "content": "<dummy>test</dummy>",
+                "integrationAccount": { "map": { "name": "TEST_Create_User_FRAMO" } },
+                "xsltParameters": {
+                  "OUITSite": "@concat('OU=', body('Filter_OU')[0]['Site Name'])",
+                  "SAMAccount": "@{body('INT0039.Samaccount.Create.Framo')}",
+                  "SN": "@triggerBody()?['Last Name']",
+                  "alfaLavalMISALCompanyCode": "@triggerBody()?['Organization Company']",
+                  "c": "@triggerBody()?['Business Site Country']",
+                  "co": "@triggerBody()?['Business Site Name Full']",
+                  "company": "@triggerBody()?['Company']",
+                  "department": "@triggerBody()?['Department']",
+                  "departmentNumber": "@triggerBody()?['Cost Center']",
+                  "displayName": "@triggerBody()?['Formatted Name']",
+                  "employeeID": "@triggerBody()?['Employee ID']",
+                  "employeeType": "@triggerBody()?['Worker Type']",
+                  "gender": "@triggerBody()?['Gender']",
+                  "givenName": "@triggerBody()?['First Name']",
+                  "isManager": "@triggerBody()?['Is Manager']",
+                  "l": "@triggerBody()?['Business Site Name']",
+                  "manager": "@{if(equals(outputs('Manager'), 'I am writing a very long string to circumvent Azures bad if statements. It evaluates all possible outcomes before checking the statement.'), '', subString(outputs('Manager'), 24, sub(length(outputs('Manager')), 24)))}",
+                  "middleName": "@triggerBody()?['Middle Name']",
+                  "title": "@triggerBody()?['Business Title']",
+                  "userPrincipalName": "@{concat(body('INT0039.Samaccount.Create.Framo'), '@test-framo.com')}"
+                }
+              }
+            }
+          },
+          "runAfter": { "Manager": [ "Succeeded" ] },
+          "else": {
+            "actions": {
+              "Rehire_User": {
+                "runAfter": { "Transform_XML_2": [ "Succeeded" ] },
+                "type": "ApiConnection",
+                "inputs": {
+                  "body": "@{body('Transform_XML_2')}",
+                  "headers": { "Content-Type": "application/xml" },
+                  "host": { "connection": { "name": "@parameters('$connections')['LDAPAdapter']['connectionId']" } },
+                  "method": "post",
+                  "path": "/api/ExecuteXml",
+                  "queries": { "connectionId": "425cdaad-6824-4700-8395-aafd3d2f95b4" }
+                }
+              },
+              "Transform_XML_2": {
+                "runAfter": {},
+                "type": "Xslt",
+                "inputs": {
+                  "content": "<dummy>test</dummy>",
+                  "integrationAccount": { "map": { "name": "TEST_Rehire_FRAMO" } },
+                  "xsltParameters": {
+                    "OUITSite": "@{concat('OU=', body('Filter_OU')[0]['Site Name'])}",
+                    "c": "@triggerBody()?['Business Site Country']",
+                    "co": "@triggerBody()?['Business Site Name Full']",
+                    "company": "@triggerBody()?['Company']",
+                    "department": "@triggerBody()?['Department']",
+                    "departmentNumber": "@triggerBody()?['Cost Center']",
+                    "employeeID": "@triggerBody()?['Employee ID']",
+                    "employeeType": "@triggerBody()?['Worker Type']",
+                    "gender": "@triggerBody()?['Gender']",
+                    "isManager": "@triggerBody()?['Is Manager']",
+                    "l": "@triggerBody()?['Business Site Name']",
+                    "manager": "@{if(equals(outputs('Manager'), 'I am writing a very long string to circumvent Azures bad if statements. It evaluates all possible outcomes before checking the statement.'), '', subString(outputs('Manager'), 24, sub(length(outputs('Manager')), 24)))}",
+                    "title": "@triggerBody()?['Business Title']"
+                  }
+                }
+              }
+            }
+          },
+          "expression": { "and": [ { "equals": [ "@outputs('Ldap__response')?['q1:LDAP']?['q1:Batches']?['q1:Batch']?['q1:BatchSummary']?['q1:ReturnStatus']", "Failed" ] } ] },
+          "type": "If"
+        },
+        "Filter_OU": {
+          "runAfter": { "Get_AD_Country_Sites": [ "Succeeded" ] },
+          "type": "Query",
+          "inputs": {
+            "from": "@json(body('Get_AD_Country_Sites'))",
+            "where": "@and(equals(item()['City'], triggerBody()?['Business Site Name']), equals(item()['Description'], triggerBody()?['Business Site Country']))"
+          }
+        },
+        "Get_AD_Country_Sites": {
+          "runAfter": { "INT0039.Samaccount.Create.Framo": [ "Succeeded" ] },
+          "metadata": {
+            "JTJmaW50MDAxMiUyZkFEX0NvdW50cnkrJTI2K1NpdGVzLmpzb24=": "/int0012/AD_Country & Sites.json",
+            "JTJmaW50MDAxMiUyZkZ1bGxfQURfc2VhcmNoX1NBTUFjY291bnRfRlJBTU8ueG1s": "/int0012/Full_AD_search_SAMAccount_FRAMO.xml"
+          },
+          "type": "ApiConnection",
+          "inputs": {
+            "host": { "connection": { "name": "@parameters('$connections')['azureblob']['connectionId']" } },
+            "method": "get",
+            "path": "/datasets/default/files/@{encodeURIComponent(encodeURIComponent('JTJmaW50MDAxMiUyZkFEX0NvdW50cnkrJTI2K1NpdGVzLmpzb24='))}/content",
+            "queries": { "inferContentType": true }
+          }
+        },
+        "Get_Full_AD_Search": {
+          "runAfter": { "Filter_OU": [ "Succeeded" ] },
+          "metadata": {
+            "JTJmaW50MDAxMiUyZkZ1bGxfQURfc2VhcmNoLnhtbA==": "/int0012/Full_AD_search.xml",
+            "JTJmaW50MDAxMiUyZkZ1bGxfQURfc2VhcmNoX0ZSQU1PLnhtbA==": "/int0012/Full_AD_search_FRAMO.xml"
+          },
+          "type": "ApiConnection",
+          "inputs": {
+            "host": { "connection": { "name": "@parameters('$connections')['azureblob']['connectionId']" } },
+            "method": "get",
+            "path": "/datasets/default/files/@{encodeURIComponent(encodeURIComponent('JTJmaW50MDAxMiUyZkZ1bGxfQURfc2VhcmNoX0ZSQU1PLnhtbA=='))}/content",
+            "queries": { "inferContentType": true }
+          }
+        },
+        "Get_blob_content": {
+          "runAfter": { "Ldap__response": [ "Succeeded" ] },
+          "metadata": { "JTJmaW50MDAxMiUyZkdldF9NYW5hZ2VyX0ZSQU1PLnhtbA==": "/int0012/Get_Manager_FRAMO.xml" },
+          "type": "ApiConnection",
+          "inputs": {
+            "host": { "connection": { "name": "@parameters('$connections')['azureblob']['connectionId']" } },
+            "method": "get",
+            "path": "/datasets/default/files/@{encodeURIComponent(encodeURIComponent('JTJmaW50MDAxMiUyZkdldF9NYW5hZ2VyX0ZSQU1PLnhtbA=='))}/content",
+            "queries": { "inferContentType": true }
+          }
+        },
+        "INT0035_CreateTicket": {
+          "runAfter": { "Condition": [ "Succeeded" ] },
+          "type": "Workflow",
+          "inputs": {
+            "body": {
+              "action": "created",
+              "companyName": "@triggerBody()?['Company']",
+              "companySubType": "@triggerBody()?['Company Subtype']",
+              "costCentre": "@triggerBody()?['Cost Center']",
+              "country": "@triggerBody()?['Business Site Name Full']",
+              "createTicketFor": "framo",
+              "department": "@triggerBody()?['Department']",
+              "email": "@{concat(body('INT0039.Samaccount.Create.Framo'), '@test-framo.com')}",
+              "firstName": "@triggerBody()?['First Name']",
+              "lastName": "@triggerBody()?['Last Name']",
+              "location": "@triggerBody()?['Business Site Name']",
+              "manager": "@{concat(triggerBody()?['Supervisor ID'], ' - ', triggerBody()?['Supervisor Name'])}",
+              "ou": "@{body('Filter_OU')[0]['Site Name']}",
+              "samAccountName": "@body('INT0039.Samaccount.Create.Framo')",
+              "title": "@triggerBody()?['Business Title']"
+            },
+            "host": {
+              "triggerName": "manual",
+              "workflow": { "id": "/subscriptions/9fake3d-3c94-40e9-b2cb-18921e5d6cfa/resourceGroups/LogicAppsDev/providers/Microsoft.Logic/workflows/INT0035_CreateTicket" }
+            }
+          }
+        },
+        "INT0039.Samaccount.Create.Framo": {
+          "runAfter": {},
+          "type": "Workflow",
+          "inputs": {
+            "body": "@triggerBody()",
+            "host": {
+              "triggerName": "request",
+              "workflow": { "id": "/subscriptions/9fake3d-3c94-40e9-b2cb-18921e5d6cfa/resourceGroups/LogicAppsDev/providers/Microsoft.Logic/workflows/INT0039.Samaccount.Create.Framo" }
+            }
+          }
+        },
+        "Ldap__response": {
+          "runAfter": { "Post_XML": [ "Succeeded" ] },
+          "type": "Compose",
+          "inputs": "@json(body('Post_XML'))"
+        },
+        "Manager": {
+          "runAfter": { "Post_XML_3": [ "Succeeded" ] },
+          "type": "Compose",
+          "inputs": "@coalesce(json(body('Post_XML_3'))['q1:LDAP']?['q1:Batches']?['q1:Batch']?['q1:Entities']?['q1:Entity']?['q1:Operations']['q1:Operation']?['q1:SearchResult']?['q1:DirectoryEntries']?['q1:DirectoryEntry']?['q1:Properties']?['q1:Property']['@value'], 'I am writing a very long string to circumvent Azures bad if statements. It evaluates all possible outcomes before checking the statement.')"
+        },
+        "Post_XML": {
+          "runAfter": { "Get_Full_AD_Search": [ "Succeeded" ] },
+          "type": "ApiConnection",
+          "inputs": {
+            "body": "@{replace(body('Get_Full_AD_Search'), '---EMPLOYEEID---', triggerBody()?['Employee ID'])}",
+            "headers": { "Content-Type": "application/xml" },
+            "host": { "connection": { "name": "@parameters('$connections')['LDAPAdapter']['connectionId']" } },
+            "method": "post",
+            "path": "/api/ExecuteXml",
+            "queries": { "connectionId": "425cdaad-6824-4700-8395-aafd3d2f95b4" }
+          }
+        },
+        "Post_XML_3": {
+          "runAfter": { "Get_blob_content": [ "Succeeded" ] },
+          "type": "ApiConnection",
+          "inputs": {
+            "body": "@{replace(body('Get_blob_content'), '---EMPLOYEEID---', triggerBody()?['Supervisor ID'])}",
+            "headers": { "Content-Type": "application/xml" },
+            "host": { "connection": { "name": "@parameters('$connections')['LDAPAdapter']['connectionId']" } },
+            "method": "post",
+            "path": "/api/ExecuteXml",
+            "queries": { "connectionId": "425cdaad-6824-4700-8395-aafd3d2f95b4" }
+          }
+        },
+        "Response": {
+          "runAfter": { "INT0035_CreateTicket": [ "Succeeded" ] },
+          "type": "Response",
+          "inputs": { "statusCode": 200 }
+        }
+      },
+      "outputs": {}
+    },
+    "parameters": {
+      "$connections": {
+        "value": {
+          "LDAPAdapter": {
+            "connectionId": "/subscriptions/9fake3d-3c94-40e9-b2cb-18921e5d6cfa/resourceGroups/LogicAppsDev/providers/Microsoft.Web/connections/LDAPAdapter",
+            "connectionName": "LDAPAdapter",
+            "id": "/subscriptions/9fake3d-3c94-40e9-b2cb-18921e5d6cfa/resourceGroups/LogicAppsDev/providers/Microsoft.Web/customApis/LDAPAdapter"
+          },
+          "azureblob": {
+            "connectionId": "/subscriptions/9fake3d-3c94-40e9-b2cb-18921e5d6cfa/resourceGroups/LogicAppsDev/providers/Microsoft.Web/connections/azureblob",
+            "connectionName": "azureblob",
+            "id": "/subscriptions/9fake3d-3c94-40e9-b2cb-18921e5d6cfa/providers/Microsoft.Web/locations/northeurope/managedApis/azureblob"
+          }
+        }
+      }
+    },
+    "endpointsConfiguration": {
+      "workflow": {
+        "outgoingIpAddresses": [
+          { "address": "40.113.12.95" },
+          { "address": "52.178.165.215" },
+          { "address": "52.178.166.21" },
+          { "address": "40.112.92.104" },
+          { "address": "40.112.95.216" },
+          { "address": "40.113.4.18" },
+          { "address": "40.113.3.202" },
+          { "address": "40.113.1.181" }
+        ],
+        "accessEndpointIpAddresses": [
+          { "address": "13.79.173.49" },
+          { "address": "52.169.218.253" },
+          { "address": "52.169.220.174" },
+          { "address": "40.112.90.39" }
+        ]
+      },
+      "connector": { "outgoingIpAddresses": [ { "address": "104.45.93.9" } ] }
+    }
+  },
+  "id": "/subscriptions/9fake3d-3c94-40e9-b2cb-18921e5d6cfa/resourceGroups/LogicAppsDev/providers/Microsoft.Logic/workflows/INT0040.HireNew",
+  "name": "INT0040.HireNew",
+  "type": "Microsoft.Logic/workflows",
+  "location": "northeurope",
+  "tags": {}
+}

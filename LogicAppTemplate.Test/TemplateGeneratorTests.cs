@@ -187,6 +187,7 @@ namespace LogicAppTemplate.Tests
             var defintion = generator.generateDefinition(JObject.Parse(content)).GetAwaiter().GetResult();
 
             //check parameters
+            Assert.AreEqual("[", defintion["resources"][0]["properties"]["definition"]["actions"]["Condition"]["actions"]["Switch"]["cases"]["Case"].Value<String>("case"));
 
             Assert.AreEqual("[concat('/subscriptions/',subscription().subscriptionId,'/resourceGroups/', parameters('apimResourceGroup'),'/providers/Microsoft.ApiManagement/service/', parameters('apimInstanceName'),'/apis/', parameters('apimApiId'),'')]", defintion["resources"][0]["properties"]["definition"]["actions"]["Condition"]["actions"]["Switch"]["default"]["actions"]["INT002_Create_Actioncode_2"]["inputs"]["api"]["id"]);
             Assert.AreEqual("[concat('/subscriptions/',subscription().subscriptionId,'/resourceGroups/', parameters('apimResourceGroup'),'/providers/Microsoft.ApiManagement/service/', parameters('apimInstanceName'),'/apis/', parameters('apimApiId'),'')]", defintion["resources"][0]["properties"]["definition"]["actions"]["Condition"]["actions"]["Switch"]["cases"]["Case"]["actions"]["For_each"]["actions"]["INT002_Create_Actioncode"]["inputs"]["api"]["id"]);
@@ -265,7 +266,7 @@ namespace LogicAppTemplate.Tests
             //File trigger parameters and base64 handling
             Assert.IsNotNull(defintion["resources"][0]["properties"]["definition"]["actions"]["List_files_in_folder"]["metadata"]["[base64(parameters('List_files_in_folder-folderPath'))]"]);
             Assert.AreEqual("[parameters('List_files_in_folder-folderPath')]", defintion["resources"][0]["properties"]["definition"]["actions"]["List_files_in_folder"]["metadata"]["[base64(parameters('List_files_in_folder-folderPath'))]"]);
-            Assert.AreEqual("[concat('/datasets/default/folders/@{encodeURIComponent(encodeURIComponent(',base64(parameters('List_files_in_folder-folderPath')),'))}')]", defintion["resources"][0]["properties"]["definition"]["actions"]["List_files_in_folder"]["inputs"]["path"]);
+            Assert.AreEqual("[concat('/datasets/default/folders/@{encodeURIComponent(encodeURIComponent(', parameters('__apostrophe'), base64(parameters('List_files_in_folder-folderPath')), parameters('__apostrophe'), '))}')]", defintion["resources"][0]["properties"]["definition"]["actions"]["List_files_in_folder"]["inputs"]["path"]);
             //Assert.AreEqual("[base64(parameters('When_a_file_is_created-folderPath'))]", defintion["resources"][0]["properties"]["definition"]["triggers"]["When_a_file_is_created"]["inputs"]["queries"]["folderId"]);
         }
 
@@ -356,7 +357,7 @@ namespace LogicAppTemplate.Tests
             Assert.AreEqual("[parameters('filesystem_authType')]", defintion["properties"]["parameterValues"]["authType"]);
             Assert.AreEqual("[parameters('filesystem_username')]", defintion["properties"]["parameterValues"]["username"]);
             Assert.AreEqual("[parameters('filesystem_password')]", defintion["properties"]["parameterValues"]["password"]);
-            Assert.AreEqual("[concat('subscriptions/',subscription().subscriptionId,'/resourceGroups/',parameters('filesystem_gatewayresourcegroup'),'/providers/Microsoft.Web/connectionGateways/',parameters('filesystem_gatewayname'))]", defintion["properties"]["parameterValues"]["gateway"]["id"]);
+            Assert.AreEqual("[concat('/subscriptions/',subscription().subscriptionId,'/resourceGroups/',parameters('filesystem_gatewayresourcegroup'),'/providers/Microsoft.Web/connectionGateways/',parameters('filesystem_gatewayname'))]", defintion["properties"]["parameterValues"]["gateway"]["id"]);
 
             Assert.AreEqual("[parameters('filesystem_name')]", defintion["name"]);
             Assert.AreEqual("[parameters('filesystem_displayName')]", defintion["properties"]["displayName"]);
@@ -388,7 +389,7 @@ namespace LogicAppTemplate.Tests
             Assert.AreEqual("[parameters('sql_authType')]", defintion["properties"]["parameterValues"]["authType"]);
             Assert.AreEqual("[parameters('sql_username')]", defintion["properties"]["parameterValues"]["username"]);
             Assert.AreEqual("[parameters('sql_password')]", defintion["properties"]["parameterValues"]["password"]);
-            Assert.AreEqual("[concat('subscriptions/',subscription().subscriptionId,'/resourceGroups/',parameters('sql_gatewayresourcegroup'),'/providers/Microsoft.Web/connectionGateways/',parameters('sql_gatewayname'))]", defintion["properties"]["parameterValues"]["gateway"]["id"]);
+            Assert.AreEqual("[concat('/subscriptions/',subscription().subscriptionId,'/resourceGroups/',parameters('sql_gatewayresourcegroup'),'/providers/Microsoft.Web/connectionGateways/',parameters('sql_gatewayname'))]", defintion["properties"]["parameterValues"]["gateway"]["id"]);
 
             Assert.AreEqual("[parameters('sql_name')]", defintion["name"]);
             Assert.AreEqual("[parameters('sql_displayName')]", defintion["properties"]["displayName"]);
@@ -441,7 +442,7 @@ namespace LogicAppTemplate.Tests
             Assert.AreEqual("[parameters('azureblob_displayName')]", defintion["properties"]["displayName"]);
 
             Assert.AreEqual("[parameters('azureblob_accountName')]", defintion["properties"]["parameterValues"]["accountName"]);
-            Assert.AreEqual("[listKeys(resourceId('Microsoft.Storage/storageAccounts', parameters('azureblob_accountName')), providers('Microsoft.Storage', 'storageAccounts').apiVersions[0]).keys[0].value]", defintion["properties"]["parameterValues"]["accessKey"]);
+            Assert.AreEqual("[listKeys(resourceId('Microsoft.Storage/storageAccounts', parameters('azureblob_accountName')), '2018-02-01').keys[0].value]", defintion["properties"]["parameterValues"]["accessKey"]);
             Assert.AreEqual("[concat('/subscriptions/', subscription().subscriptionId, '/providers/Microsoft.Web/locations/', parameters('logicAppLocation'), '/managedApis/azureblob')]", defintion["properties"]["api"]["id"]);
         }
 

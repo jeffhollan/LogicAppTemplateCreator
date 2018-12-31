@@ -1,0 +1,175 @@
+{
+  "properties": {
+    "provisioningState": "Succeeded",
+    "createdTime": "2018-09-05T12:40:27.0608494Z",
+    "changedTime": "2018-09-06T08:49:50.1827516Z",
+    "state": "Enabled",
+    "version": "08586653830952939030",
+    "accessEndpoint": "https://prod-15.northeurope.logic.azure.com:443/workflows/4bedd7c35bc543deba25d756b327ac17",
+    "definition": {
+      "$schema": "https://schema.management.azure.com/providers/Microsoft.Logic/schemas/2016-06-01/workflowdefinition.json#",
+      "contentVersion": "1.0.0.0",
+      "parameters": {
+        "$connections": {
+          "defaultValue": {},
+          "type": "Object"
+        }
+      },
+      "triggers": {
+        "When_there_are_messages_in_a_queue": {
+          "recurrence": {
+            "frequency": "Minute",
+            "interval": 30
+          },
+          "splitOn": "@triggerBody()?['QueueMessagesList']?['QueueMessage']",
+          "type": "ApiConnection",
+          "inputs": {
+            "host": { "connection": { "name": "@parameters('$connections')['azurequeues']['connectionId']" } },
+            "method": "get",
+            "path": "/@{encodeURIComponent('int0091-mailboxerror-users-new')}/message_trigger"
+          }
+        }
+      },
+      "actions": {
+        "Condition": {
+          "actions": {
+            "Delete_message_2": {
+              "runAfter": { "Put_a_message_on_a_queue": [ "Succeeded" ] },
+              "type": "ApiConnection",
+              "inputs": {
+                "host": { "connection": { "name": "@parameters('$connections')['azurequeues_1']['connectionId']" } },
+                "method": "delete",
+                "path": "/@{encodeURIComponent('int0091-mailboxerror-users-new')}/messages/@{encodeURIComponent(triggerBody()?['MessageId'])}",
+                "queries": { "popreceipt": "@triggerBody()?['PopReceipt']" }
+              }
+            },
+            "Put_a_message_on_a_queue": {
+              "runAfter": {},
+              "type": "ApiConnection",
+              "inputs": {
+                "body": "@triggerBody()?['MessageText']",
+                "host": { "connection": { "name": "@parameters('$connections')['azurequeues_1']['connectionId']" } },
+                "method": "post",
+                "path": "/@{encodeURIComponent('int0091-mailboxerror-users-dead')}/messages"
+              }
+            },
+            "Terminate": {
+              "runAfter": { "Delete_message_2": [ "Succeeded" ] },
+              "type": "Terminate",
+              "inputs": { "runStatus": "Succeeded" }
+            }
+          },
+          "runAfter": { "INT0092.MailboxSetting.Check": [ "Failed" ] },
+          "else": {
+            "actions": {
+              "Terminate_2": {
+                "runAfter": {},
+                "type": "Terminate",
+                "inputs": { "runStatus": "Succeeded" }
+              }
+            }
+          },
+          "expression": { "and": [ { "equals": [ "@triggerBody()['DequeueCount']", 2 ] } ] },
+          "type": "If"
+        },
+        "Delete_message": {
+          "runAfter": { "INT0092.MailboxSetting.Check": [ "Succeeded" ] },
+          "type": "ApiConnection",
+          "inputs": {
+            "host": { "connection": { "name": "@parameters('$connections')['azurequeues_1']['connectionId']" } },
+            "method": "delete",
+            "path": "/@{encodeURIComponent('int0091-mailboxerror-users-new')}/messages/@{encodeURIComponent(triggerBody()?['MessageId'])}",
+            "queries": { "popreceipt": "@triggerBody()?['PopReceipt']" }
+          }
+        },
+        "INT0092.MailboxSetting.Check": {
+          "runAfter": { "Parse_JSON": [ "Succeeded" ] },
+          "type": "Workflow",
+          "inputs": {
+            "body": {
+              "emailAddress": "@body('Parse_JSON')?['emailAddress']",
+              "emailId": "@body('Parse_JSON')?['emailId']",
+              "employeeId": "@body('Parse_JSON')?['employeeId']",
+              "employeeType": "@body('Parse_JSON')?['employeeType']",
+              "employeeTypeTag": "@body('Parse_JSON')?['employeeTypeTag']",
+              "id": "@body('Parse_JSON')?['id']",
+              "mail": "@body('Parse_JSON')?['id']",
+              "mobilePhone": "@body('Parse_JSON')?['mobilePhone']",
+              "onPremisesSamAccountName": "@body('Parse_JSON')?['onPremisesSamAccountName']",
+              "userPrincipalName": "@body('Parse_JSON')?['userPrincipalName']"
+            },
+            "host": {
+              "triggerName": "request",
+              "workflow": { "id": "/subscriptions/9fake3d-3c94-42e9-b2cb-18921e5d6cfa/resourceGroups/LogicAppsDev/providers/Microsoft.Logic/workflows/INT0092.MailboxSetting.Check" }
+            }
+          }
+        },
+        "Parse_JSON": {
+          "runAfter": {},
+          "type": "ParseJson",
+          "inputs": {
+            "content": "@triggerBody()?['MessageText']",
+            "schema": {
+              "properties": {
+                "emailAddress": { "type": "string" },
+                "emailId": { "type": "string" },
+                "employeeId": { "type": "string" },
+                "employeeType": { "type": "string" },
+                "employeeTypeTag": { "type": "string" },
+                "id": { "type": "string" },
+                "mail": { "type": "string" },
+                "mobilePhone": { "type": "string" },
+                "onPremisesSamAccountName": { "type": "string" },
+                "userPrincipalName": { "type": "string" }
+              },
+              "type": "object"
+            }
+          }
+        }
+      },
+      "outputs": {}
+    },
+    "parameters": {
+      "$connections": {
+        "value": {
+          "azurequeues": {
+            "connectionId": "/subscriptions/9fake3d-3c94-42e9-b2cb-18921e5d6cfa/resourceGroups/LogicAppsDev/providers/Microsoft.Web/connections/azurequeues",
+            "connectionName": "azurequeues",
+            "id": "/subscriptions/9fake3d-3c94-42e9-b2cb-18921e5d6cfa/providers/Microsoft.Web/locations/northeurope/managedApis/azurequeues"
+          },
+          "azurequeues_1": {
+            "connectionId": "/subscriptions/9fake3d-3c94-42e9-b2cb-18921e5d6cfa/resourceGroups/LogicAppsDev/providers/Microsoft.Web/connections/azurequeues-1",
+            "connectionName": "azurequeues-1",
+            "id": "/subscriptions/9fake3d-3c94-42e9-b2cb-18921e5d6cfa/providers/Microsoft.Web/locations/northeurope/managedApis/azurequeues"
+          }
+        }
+      }
+    },
+    "endpointsConfiguration": {
+      "workflow": {
+        "outgoingIpAddresses": [
+          { "address": "40.113.12.95" },
+          { "address": "52.178.165.215" },
+          { "address": "52.178.166.21" },
+          { "address": "40.112.92.104" },
+          { "address": "40.112.95.216" },
+          { "address": "40.113.4.18" },
+          { "address": "40.113.3.202" },
+          { "address": "40.113.1.181" }
+        ],
+        "accessEndpointIpAddresses": [
+          { "address": "13.79.173.49" },
+          { "address": "52.169.218.253" },
+          { "address": "52.169.220.174" },
+          { "address": "40.112.90.39" }
+        ]
+      },
+      "connector": { "outgoingIpAddresses": [ { "address": "104.45.93.9" } ] }
+    }
+  },
+  "id": "/subscriptions/9fake3d-3c94-42e9-b2cb-18921e5d6cfa/resourceGroups/LogicAppsDev/providers/Microsoft.Logic/workflows/INT0091.MailboxErrorHandling",
+  "name": "INT0091.MailboxErrorHandling",
+  "type": "Microsoft.Logic/workflows",
+  "location": "northeurope",
+  "tags": {}
+}

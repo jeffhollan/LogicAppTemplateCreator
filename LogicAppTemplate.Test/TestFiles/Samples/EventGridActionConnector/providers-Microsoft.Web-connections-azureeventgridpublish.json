@@ -1,0 +1,25 @@
+{
+  "properties": {
+    "displayName": "PublishMasterData",
+    "statuses": [ { "status": "Connected" } ],
+    "customParameterValues": {},
+    "nonSecretParameterValues": { "endpoint": "https://workermasterdatapublication.northeurope-1.eventgrid.azure.net/api/events" },
+    "createdTime": "2018-07-05T11:01:58.0398359Z",
+    "changedTime": "2018-07-05T11:01:58.0398359Z",
+    "api": {
+      "name": "azureeventgridpublish",
+      "displayName": "Azure Event Grid Publish",
+      "description": "Azure Event Grid Publish will publish data to any Azure Event Grid Custom Topic.",
+      "iconUri": "https://az818438.vo.msecnd.net/officialicons/azureeventgridpublish/icon_1.0.995.1172_9bfe1659-d484-46e0-8d00-56dabf9c0e83.png",
+      "brandColor": "#0072c6",
+      "category": "Standard",
+      "id": "/subscriptions/9fake3d-3c94-40e9-b2cb-18921e5d6cfa/providers/Microsoft.Web/locations/northeurope/managedApis/azureeventgridpublish",
+      "type": "Microsoft.Web/locations/managedApis"
+    },
+    "testLinks": []
+  },
+  "id": "/subscriptions/9fake3d-3c94-40e9-b2cb-18921e5d6cfa/resourceGroups/LogicAppsDev/providers/Microsoft.Web/connections/azureeventgridpublish",
+  "name": "azureeventgridpublish",
+  "type": "Microsoft.Web/connections",
+  "location": "northeurope"
+}
