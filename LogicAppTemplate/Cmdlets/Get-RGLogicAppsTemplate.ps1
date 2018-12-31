@@ -27,6 +27,16 @@ Import-Module $module
 # Create required folders #
 md -Force $destination | Out-Null
 
+Write-Host "Acquiring access token. Please wait for the login scree and logon with a contributor user."
+
+$rmAccount = Login-AzureRmAccount
+$tenantId = (Get-AzureRmSubscription -SubscriptionName $subscriptionname).TenantId
+$tokenCache = $rmAccount.Context.TokenCache
+$cachedTokens = $tokenCache.ReadItems() `
+        | where { $_.TenantId -eq $tenantId } `
+        | Sort-Object -Property ExpiresOn -Descending
+$accessToken = $cachedTokens[0].AccessToken
+
 # Select the correct subscription #
 Get-AzureRmSubscription -SubscriptionName $subscriptionname | Select-AzureRmSubscription | Out-Null
 
@@ -46,7 +56,7 @@ Find-AzureRmResource -ResourceGroupNameContains $resourcegroup -ResourceType Mic
 	$destinationparmfile = $(Join-path $logicappfolder ($_.Name + ".parameters.json"))
 	
 	# Create Logic App Template #
-	armclient token $_.SubscriptionId |	Get-LogicAppTemplate -LogicApp $_.Name -ResourceGroup $_.ResourceGroupName -SubscriptionId $_.SubscriptionId -TenantName $tenantname -Verbose | Out-File $destinationfile -Force
+	Get-LogicAppTemplate -LogicApp $_.Name -ResourceGroup $_.ResourceGroupName -SubscriptionId $_.SubscriptionId -TenantName $tenantname -Token $accessToken -Verbose | Out-File $destinationfile -Force
 	
 	# Generate the Parameter File #
 	Get-ParameterTemplate -TemplateFile $destinationfile | Out-File $destinationparmfile -Force}
