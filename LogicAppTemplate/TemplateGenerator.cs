@@ -674,12 +674,12 @@ namespace LogicAppTemplate
                                 var array = new JArray();
                                 foreach (var allowedValue in parameter.Value["allowedValues"])
                                 {
-                                    array.Add(allowedValue["value"]);
+                                    array.Add(allowedValue["value"].Value<string>().Replace("none", "anonymous"));
                                 }
                                 template.parameters[addedparam]["allowedValues"] = array;
                                 if (parameter.Value["allowedValues"].Count() == 1)
                                 {
-                                    template.parameters[addedparam]["defaultValue"] = parameter.Value["allowedValues"][0]["value"];
+                                    template.parameters[addedparam]["defaultValue"] = parameter.Value["allowedValues"][0]["value"].Value<string>().Replace("none", "anonymous");
                                 }
                             }
 
