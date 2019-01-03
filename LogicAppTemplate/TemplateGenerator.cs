@@ -266,9 +266,12 @@ namespace LogicAppTemplate
 
                     definition["actions"][action.Name]["inputs"]["api"]["id"] = apiId;
 
-                    //handle subscriptionkey
+                    //handle subscriptionkey if not parematrized
                     var subkey = ((JObject)definition["actions"][action.Name]["inputs"]).Value<string>("subscriptionKey");
+                    if (!Regex.Match(subkey, @"parameters\('(.*)'\)").Success)
+                    {
                     definition["actions"][action.Name]["inputs"]["subscriptionKey"] = "[parameters('" + AddTemplateParameter("apimSubscriptionKey", "string", subkey) + "')]";
+                }
                 }
                 else if (type == "if")
                 {
