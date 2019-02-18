@@ -1,20 +1,12 @@
 using LogicAppTemplate.Models;
-using Microsoft.IdentityModel.Clients.ActiveDirectory;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System;
-using System.Collections.Generic;
-using System.Diagnostics;
 using System.IO;
 using System.Linq;
-using System.Management.Automation;
-using System.Net;
-using System.Net.Http;
-using System.Net.Http.Headers;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
-using System.Windows.Forms;
 
 namespace LogicAppTemplate
 {
@@ -638,7 +630,8 @@ namespace LogicAppTemplate
                         if ((parameter.Name == "accessKey" && concatedId.EndsWith("/azureblob')]")) || parameter.Name == "sharedkey" && concatedId.EndsWith("/azuretables')]"))
                         {
                             connectionParameters.Add(parameter.Name, $"[listKeys(resourceId('Microsoft.Storage/storageAccounts', parameters('{connectionName}_accountName')), '2018-02-01').keys[0].value]");
-                        }else if ( parameter.Name == "sharedkey" && concatedId.EndsWith("/azurequeues')]"))
+                        }
+                        else if (parameter.Name == "sharedkey" && concatedId.EndsWith("/azurequeues')]"))
                         {
                             connectionParameters.Add(parameter.Name, $"[listKeys(resourceId('Microsoft.Storage/storageAccounts', parameters('{connectionName}_storageaccount')), '2018-02-01').keys[0].value]");
                         }
@@ -706,8 +699,10 @@ namespace LogicAppTemplate
                 connectionParameters.Add("gateway", gatewayobject);
                 useGateway = true;
             }
+            //only fill connectionParameters when source not empty, otherwise saved credentials will be lost.
+            if (connectionParameters.HasValues)
+                connectionTemplate.properties.parameterValues = connectionParameters;
 
-            connectionTemplate.properties.parameterValues = connectionParameters;
             return JObject.FromObject(connectionTemplate);
         }
 
