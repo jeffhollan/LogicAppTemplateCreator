@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -22,6 +23,9 @@ namespace LogicAppTemplate.Models
         }
         public Api api { get; set; }
         public string displayName { get; set; }
+
+        //only fill connectionParameters when source not empty, otherwise saved credentials will be lost.
+        [JsonProperty(NullValueHandling = NullValueHandling.Ignore)]
         public dynamic parameterValues { get; set; }
     }
 
