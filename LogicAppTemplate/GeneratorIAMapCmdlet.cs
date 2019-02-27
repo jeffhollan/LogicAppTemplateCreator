@@ -15,6 +15,9 @@ namespace LogicAppTemplate
         [Parameter(Mandatory = true, HelpMessage = "Name of the Artifact")]
         public string ArtifactName;
 
+        [Parameter(Mandatory = false, HelpMessage = "Type of Artifact")]
+        public IntegrationAccountGenerator.ARtifactType ArtifactType = IntegrationAccountGenerator.ARtifactType.Maps;
+
         [Parameter(Mandatory = true, HelpMessage = "Name of the IntegrationAccount")]
         public string IntegrationAccount;
 
@@ -63,7 +66,7 @@ namespace LogicAppTemplate
             {
                 return;
             }
-            IntegrationAccountGenerator generator = new IntegrationAccountGenerator(ArtifactName,IntegrationAccountGenerator.ARtifactType.Maps, IntegrationAccount, SubscriptionId, ResourceGroup,resourceCollector);
+            IntegrationAccountGenerator generator = new IntegrationAccountGenerator(ArtifactName, ArtifactType, IntegrationAccount, SubscriptionId, ResourceGroup, resourceCollector);
 
             try
             {
