@@ -53,7 +53,7 @@ namespace LogicAppTemplate.Tests
             //check Upload Attachment
             Assert.AreEqual("[concat('/subscriptions/',subscription().subscriptionId,'/resourceGroups/',parameters('INT0014-NewHires-ResourceGroup'),'/providers/Microsoft.Logic/workflows/',parameters('INT0014-NewHires-LogicAppName'))]", defintion["resources"][0]["properties"]["definition"]["actions"]["INT0014-NewHires"]["inputs"]["host"]["workflow"]["id"]);
         }
-
+     
         [TestMethod()]
         public void TestWorkflowOtherResourceGroup()
         {
@@ -211,7 +211,7 @@ namespace LogicAppTemplate.Tests
             Assert.AreEqual(571, (int)defintion["parameters"]["paramismanager"]["defaultValue"]["1"]);
             Assert.AreEqual(572, (int)defintion["parameters"]["paramismanager"]["defaultValue"]["No"]);
             Assert.AreEqual(571, (int)defintion["parameters"]["paramismanager"]["defaultValue"]["Yes"]);
-            Assert.AreEqual("Object", defintion["parameters"]["paramismanager"]["type"]);           
+            Assert.AreEqual("object", defintion["parameters"]["paramismanager"]["type"]);           
 
         }
 
@@ -553,6 +553,37 @@ namespace LogicAppTemplate.Tests
             Assert.AreEqual(0, defintion["parameters"]["diagnosticSettings_metricsRetentionPolicyDays"]["defaultValue"]);
                                     
             Assert.AreEqual("[parameters('logicAppLocation')]", defintion["resources"][0]["location"]);
+        }
+        [TestMethod()]
+        public void TestShouldNotIncludeIseEnvironment()
+        {
+            var content = GetEmbededFileContent("LogicAppTemplate.Test.TestFiles.WorkflowTest.json");
+
+            var generator = new TemplateGenerator("", "", "", null);
+
+            var definition = generator.generateDefinition(JObject.Parse(content)).GetAwaiter().GetResult();
+
+            Assert.IsTrue(definition["parameters"].Children().Any(x => x.ToString().Contains("logicAppLocation")));
+            Assert.IsFalse(definition["parameters"].Children().Any(x => x.ToString().Contains("integrationServiceEnvironmentName")));
+            Assert.IsFalse(definition["parameters"].Children().Any(x => x.ToString().Contains("integrationServiceEnvironmentResourceGroup")));
+            Assert.IsFalse(definition["resources"].First()["properties"].Children().Any(x => x.ToString().Contains("integrationServiceEnvironment")));
+        }
+
+        [TestMethod()]
+        public void TestShouldIncludeIseEnvironment()
+        {
+            var content = GetEmbededFileContent("LogicAppTemplate.Test.TestFiles.ISE.json");
+
+            var generator = new TemplateGenerator("", "", "", null);
+
+            var definition = generator.generateDefinition(JObject.Parse(content)).GetAwaiter().GetResult();
+
+            Assert.IsTrue(definition["parameters"].Children().Any(x => x.ToString().Contains("logicAppLocation")));
+            Assert.IsTrue(definition["parameters"].Children().Any(x => x.ToString().Contains("integrationServiceEnvironmentName")));
+            Assert.IsTrue(definition["parameters"].Children().Any(x => x.ToString().Contains("integrationServiceEnvironmentResourceGroup")));
+            Assert.IsTrue(definition["resources"].First()["properties"].Children().Any(x => x.ToString().Contains("integrationServiceEnvironment")));
+            Assert.AreEqual(@"[concat('/subscriptions/',subscription().subscriptionId,'/resourcegroups/',parameters('integrationServiceEnvironmentResourceGroupName'),'/providers/Microsoft.Logic/integrationServiceEnvironments/',parameters('integrationServiceEnvironmentName'))]", definition["resources"].First()["properties"]["integrationServiceEnvironment"]["id"]);
+            Assert.AreEqual(@"Microsoft.Logic/integrationServiceEnvironments", definition["resources"].First()["properties"]["integrationServiceEnvironment"]["type"]);
         }
 
         //var resourceName = "LogicAppTemplate.Templates.starterTemplate.json";

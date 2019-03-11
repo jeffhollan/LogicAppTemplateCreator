@@ -55,6 +55,7 @@ namespace LogicAppTemplate
 
         public async Task<JObject> generateDefinition(JObject definition, bool generateConnection = true)
         {
+          
             var rid = new AzureResourceId(definition.Value<string>("id"));
             LogicAppResourceGroup = rid.ResourceGroupName;
             //Manage Integration account
@@ -70,6 +71,17 @@ namespace LogicAppTemplate
                 IntegrationAccountId = definition["properties"]["integrationAccount"].Value<string>("id");
             }
 
+            //ISE
+            if (definition["properties"]["integrationServiceEnvironment"] == null)
+            {
+                ((JObject)template.resources[0]["properties"]).Remove("integrationServiceEnvironment");
+                template.parameters.Remove("integrationServiceEnvironmentName");
+                template.parameters.Remove("integrationServiceEnvironmentResourceGroupName");
+            }
+            else
+            {
+                template.parameters["integrationServiceEnvironmentName"]["defaultValue"] = definition["properties"]["integrationServiceEnvironment"]["name"];
+            }
 
             template.parameters["logicAppName"]["defaultValue"] = definition.Value<string>("name");
 
