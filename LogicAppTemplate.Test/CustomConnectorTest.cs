@@ -37,5 +37,21 @@ namespace LogicAppTemplate.Test
             Assert.AreEqual("[concat('/subscriptions/',subscription().subscriptionId,'/resourceGroups/',parameters('LDAPAdapter_gatewayresourcegroup'),'/providers/Microsoft.Web/connectionGateways/',parameters('LDAPAdapter_gatewayname'))]", connection["properties"]["parameterValues"]["gateway"].Value<string>("id"));
 
         }        
+
+        [TestMethod]
+        public void ShouldBuildCustomConnectorARMTemplate()
+        {
+            AzureResourceCollector resourceCollector = new AzureResourceCollector();
+            resourceCollector.Login(string.Empty);
+
+            
+
+            CustomConnectorGenerator generator = new CustomConnectorGenerator("CC-HR-RSU-Denodo--Dev", "40034f3a-ee77-47f3-919a-486648748bbc", "RG-IT-CoreServices-EAI-Dev", resourceCollector);
+
+            //string raw = "{  \"properties\": {    \"runtimeUrls\": [      \"https://flow-vp45yy5lcy54c-mwh-apim-runtime.westus2.environments.microsoftazurelogicapps.net/apim/7590515e6faf4937928967565606c41d\",      \"http://flow-vp45yy5lcy54c-mwh-apim-runtime.westus2.environments.microsoftazurelogicapps.net/apim/7590515e6faf4937928967565606c41d\"    ],    \"capabilities\": [],    \"description\": \"\",    \"displayName\": \"CC-HR-RSU-Denodo--Dev\",    \"iconUri\": \"/Content/retail/assets/default-connection-icon.d269a5b2275fe149967a9c567c002697.2.svg\",    \"apiDefinitions\": {      \"originalSwaggerUrl\": \"https://wawsprodmwh2031882chub8.blob.core.windows.net/api-swagger-files/flow-vp45yy5lcy54c-mwh-apim/7590515e6faf4937928967565606c41d.json_original?sv=2017-04-17&sr=b&sig=teaqvfjD9j0hSGn4ti%2FGd%2BsMPEKZphBuLbEc3q79%2BM4%3D&se=2019-03-12T21%3A18%3A33Z&sp=r\",      \"modifiedSwaggerUrl\": \"https://wawsprodmwh2031882chub8.blob.core.windows.net/api-swagger-files/flow-vp45yy5lcy54c-mwh-apim/7590515e6faf4937928967565606c41d.json?sv=2017-04-17&sr=b&sig=6U%2BE09HseJu4yejYvh3P382z0l2YqLIHQj3H4B1x4cM%3D&se=2019-03-12T21%3A18%3A33Z&sp=r\"    },    \"apiType\": \"Rest\",    \"wsdlDefinition\": {},    \"integrationServiceEnvironment\": {      \"name\": \"ISE-IT-CoreServices-EAI\",      \"id\": \"/subscriptions/40034f3a-ee77-47f3-919a-486648748bbc/resourceGroups/RG-IT-CoreServices-EAI-Prod/providers/Microsoft.Logic/integrationServiceEnvironments/ISE-IT-CoreServices-EAI\",      \"type\": \"Microsoft.Logic/integrationServiceEnvironments\"    }  },  \"id\": \"/subscriptions/40034f3a-ee77-47f3-919a-486648748bbc/resourceGroups/RG-IT-CoreServices-EAI-Dev/providers/Microsoft.Web/customApis/CC-HR-RSU-Denodo--Dev\",  \"name\": \"CC-HR-RSU-Denodo--Dev\",  \"type\": \"Microsoft.Web/customApis\",  \"location\": \"westus2\"}";
+            //var result = generator.generateDefinition(JObject.Parse(raw)).GetAwaiter().GetResult();
+            var result = generator.GenerateTemplate().GetAwaiter().GetResult();
+            Assert.IsNotNull(result);
+        }
     }
 }
