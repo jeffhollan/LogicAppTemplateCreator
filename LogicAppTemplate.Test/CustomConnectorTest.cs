@@ -30,7 +30,7 @@ namespace LogicAppTemplate.Test
             var connection = defintion.Value<JArray>("resources").Where(jj => jj.Value<string>("type") == "Microsoft.Web/connections" && jj.Value<string>("name") == "[parameters('LDAPAdapter_name')]").First();
             Assert.AreEqual("2016-06-01", connection.Value<string>("apiVersion"));
             Assert.AreEqual("[parameters('logicAppLocation')]", connection.Value<string>("location"));
-            Assert.AreEqual("[concat('/subscriptions/',subscription().subscriptionId,'/resourceGroups/',parameters('LDAPAdapter-ResourceGroup'),'/providers/Microsoft.Web/customApis/LDAPAdapter')]", connection["properties"]["api"].Value<string>("id"));
+            Assert.AreEqual("[concat('/subscriptions/',subscription().subscriptionId,'/resourceGroups/',parameters('LDAPAdapter-ResourceGroup'),'/providers/Microsoft.Web/customApis/',parameters('LDAPAdapter_name'),'')]", connection["properties"]["api"].Value<string>("id"));
 
             Assert.AreEqual("[parameters('LDAPAdapter_displayName')]", connection["properties"].Value<string>("displayName"));
             Assert.AreEqual("[parameters('LDAPAdapter_authType')]", connection["properties"]["parameterValues"].Value<string>("authType"));

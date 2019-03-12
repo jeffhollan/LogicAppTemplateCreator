@@ -152,11 +152,15 @@ namespace LogicAppTemplate
                 string id = connectionProperty.First.Value<string>("id");
                 string connectionName = connectionProperty.First["connectionName"] != null ? connectionProperty.First.Value<string>("connectionName") : connectionId.Split('/').Last();
 
-                var cid = apiIdTemplate(id);
-                string concatedId = $"[concat('{cid.ToString()}')]";
+                
                 //fixes old templates where name sometimes is missing
 
                 var connectionNameParam = AddTemplateParameter($"{connectionName}_name", "string", connectionName);
+
+                var cid = apiIdTemplate(id,connectionNameParam);
+                string concatedId = $"[concat('{cid.ToString()}')]";
+
+
                 workflowTemplateReference["properties"]["parameters"]["$connections"]["value"][name] = JObject.FromObject(new
                 {
                     id = concatedId,
@@ -217,17 +221,20 @@ namespace LogicAppTemplate
             return result;
         }
 
-        private AzureResourceId apiIdTemplate(string apiId)
+        private AzureResourceId apiIdTemplate(string apiId, string connectionNameParameter)
         {
             var rid = new AzureResourceId(apiId);
             rid.SubscriptionId = "',subscription().subscriptionId,'";
             if (apiId.Contains("/managedApis/"))
             {
                 rid.ReplaceValueAfter("locations", "',parameters('logicAppLocation'),'");
-            }
+            } 
             else
             {
-
+                if (apiId.Contains("customApis"))
+                {
+                    rid.ReplaceValueAfter("customApis", "',parameters('" + connectionNameParameter + "'),'");
+                }
                 string resourcegroupValue = LogicAppResourceGroup == rid.ResourceGroupName ? "[resourceGroup().name]" : rid.ResourceGroupName;
                 string resourcegroupParameterName = AddTemplateParameter(apiId.Split('/').Last() + "-ResourceGroup", "string", resourcegroupValue);
                 rid.ResourceGroupName = $"',parameters('{resourcegroupParameterName}'),'";
