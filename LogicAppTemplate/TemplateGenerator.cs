@@ -486,7 +486,7 @@ namespace LogicAppTemplate
             var meta = action.Value<JObject>("metadata");
 
             if (meta == null)
-                return "";
+                return currentValue;
 
             var inputs = action.Value<JObject>("inputs");
 
