@@ -2,6 +2,8 @@
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Newtonsoft.Json.Linq;
 using System.Linq;
+using System.Collections.Generic;
+using System.IO;
 
 namespace LogicAppTemplate.Test
 {
@@ -21,6 +23,7 @@ namespace LogicAppTemplate.Test
 
             return generator.GenerateTemplate().GetAwaiter().GetResult();
         }
+             
 
         [TestMethod]
         public void GenerateTemplate()
@@ -63,5 +66,30 @@ namespace LogicAppTemplate.Test
             Assert.AreEqual("application/xml", map["properties"].Value<string>("contentType"));
 
         }
+
+        [TestMethod]
+        public void ShouldGenerateSchemaTemplate()
+        {         
+
+            var ccDefinition = JObject.Parse(GetEmbededFileContent("LogicAppTemplate.Test.TestFiles.Samples.IntegrationAccountSchemas.SampleDefinition.json"));
+            var rawSwagger = GetEmbededFileContent("LogicAppTemplate.Test.TestFiles.Samples.IntegrationAccountSchemas.SampleMap.json");
+            CustomConnectorGenerator generator = new CustomConnectorGenerator("FakeConnector", "FakeSubscriptionId", "FakeResourceGroup", new AzureResourceCollector());
+            JObject generatedObject = generator.generateDefinition(ccDefinition, rawSwagger).GetAwaiter().GetResult();
+            Assert.IsNotNull(generatedObject);
+            Assert.AreEqual("Microsoft.Logic/integrationAccounts/schemas", generatedObject["resources"].Value<string>("type"));
+            Assert.AreEqual("Xml", generatedObject["resources"]["properties"].Value<string>("schemaType"));
+          
+        }
+
+        private static string GetEmbededFileContent(string resourceName)
+        {
+            var assembly = System.Reflection.Assembly.GetExecutingAssembly();
+            using (Stream stream = assembly.GetManifestResourceStream(resourceName))
+            using (StreamReader reader = new StreamReader(stream))
+            {
+                return reader.ReadToEnd();
+            }
+        }
+
     }
 }

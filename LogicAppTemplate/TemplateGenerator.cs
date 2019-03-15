@@ -81,6 +81,8 @@ namespace LogicAppTemplate
             else
             {
                 template.parameters["integrationServiceEnvironmentName"]["defaultValue"] = definition["properties"]["integrationServiceEnvironment"]["name"];
+                AzureResourceId iseId = new AzureResourceId(definition["properties"]["integrationServiceEnvironment"].Value<string>("id"));
+                template.parameters["integrationServiceEnvironmentResourceGroupName"]["defaultValue"] = iseId.ResourceGroupName;
             }
 
             template.parameters["logicAppName"]["defaultValue"] = definition.Value<string>("name");
