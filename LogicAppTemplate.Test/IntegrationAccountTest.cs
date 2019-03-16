@@ -71,13 +71,13 @@ namespace LogicAppTemplate.Test
         public void ShouldGenerateSchemaTemplate()
         {         
 
-            var ccDefinition = JObject.Parse(GetEmbededFileContent("LogicAppTemplate.Test.TestFiles.Samples.IntegrationAccountSchemas.SampleDefinition.json"));
-            var rawSwagger = GetEmbededFileContent("LogicAppTemplate.Test.TestFiles.Samples.IntegrationAccountSchemas.SampleMap.json");
-            CustomConnectorGenerator generator = new CustomConnectorGenerator("FakeConnector", "FakeSubscriptionId", "FakeResourceGroup", new AzureResourceCollector());
-            JObject generatedObject = generator.generateDefinition(ccDefinition, rawSwagger).GetAwaiter().GetResult();
+            var iaDefinition = JObject.Parse(GetEmbededFileContent("LogicAppTemplate.Test.TestFiles.Samples.IntegrationAccountSchemas.SampleDefinition.json"));
+            var rawSchema = GetEmbededFileContent("LogicAppTemplate.Test.TestFiles.Samples.IntegrationAccountSchemas.SampleMap.xsd");
+            IntegrationAccountGenerator generator = new IntegrationAccountGenerator("ArtifactName",IntegrationAccountGenerator.ARtifactType.Schemas, "IntegrationAccountName", "FakeSubscriptionId", "FakeResourceGroup", new AzureResourceCollector());
+            JObject generatedObject = generator.GenerateSchemaDefinition(iaDefinition, rawSchema).GetAwaiter().GetResult();
             Assert.IsNotNull(generatedObject);
-            Assert.AreEqual("Microsoft.Logic/integrationAccounts/schemas", generatedObject["resources"].Value<string>("type"));
-            Assert.AreEqual("Xml", generatedObject["resources"]["properties"].Value<string>("schemaType"));
+            Assert.AreEqual("Microsoft.Logic/integrationAccounts/schemas", generatedObject["resources"].First.Value<string>("type"));
+            Assert.AreEqual("Xml", generatedObject["resources"].First["properties"].Value<string>("schemaType"));
           
         }
 

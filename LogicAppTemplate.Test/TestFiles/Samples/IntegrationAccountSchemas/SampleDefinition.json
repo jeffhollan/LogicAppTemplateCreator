@@ -1,4 +1,4 @@
-{{
+{
   "properties": {
     "schemaType": "Xml",
     "targetNamespace": "http://IntegrationAccount1.Schema2",
@@ -16,5 +16,5 @@
   "id": "/subscriptions/XXXX4f3a-XXXX-XXXX-XXXX-4866XXXXXbbc/resourceGroups/RG-IT-XXXX-EAI-XXXX/providers/Microsoft.Logic/integrationAccounts/IA-IT-XXX-XXX/schemas/SunlifeEnrollment",
   "name": "SunlifeEnrollment",
   "type": "Microsoft.Logic/integrationAccounts/schemas"
-}}
+}
    

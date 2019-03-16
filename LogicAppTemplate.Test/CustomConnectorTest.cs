@@ -50,8 +50,8 @@ namespace LogicAppTemplate.Test
             JObject generatedObject = generator.generateDefinition(ccDefinition, rawSwagger).GetAwaiter().GetResult();
             Assert.IsNotNull(generatedObject);
             Assert.IsFalse(generatedObject.ToString().ToLower().Contains("connectionid"));
-            Assert.AreEqual(@"[parameters('backendService')]",generatedObject["resources"]["properties"].Value<string>("backendService"));
-            Assert.AreEqual(@"[parameters('serviceHost')]", generatedObject["resources"]["properties"]["swagger"].Value<string>("host"));
+            Assert.AreEqual(@"[parameters('backendService')]",generatedObject["resources"].First["properties"]["backendService"].Value<string>("serviceUrl"));
+            Assert.AreEqual(@"[parameters('serviceHost')]", generatedObject["resources"].First["properties"]["swagger"].Value<string>("host"));
         }
 
         private static string GetEmbededFileContent(string resourceName)
