@@ -42,7 +42,7 @@ namespace LogicAppTemplate
             var location = template.AddParameter("customConnectorLocation", "string", "[resourceGroup().location]");
 
             var uri = resource["properties"]["apiDefinitions"].Value<string>("modifiedSwaggerUrl");
-
+            
             string swaggerRawDefinition = apiDefinition ?? GetCustomConnectorSwagger(uri);
 
             JObject preParsedswaggerDefinition = JObject.Parse(swaggerRawDefinition);
@@ -98,7 +98,11 @@ namespace LogicAppTemplate
 
                 propertiesObject.Add("integrationServiceEnvironment", iseObject);
             }
-                               
+            
+            if (resource["properties"].SelectToken("connectionParameters") != null)
+            {
+                propertiesObject.Add("connectionParameters", resource["properties"]["connectionParameters"]);
+            }
 
             JObject backendObject = new JObject();
             backendObject.Add("serviceUrl", template.WrapParameterName(backendService));   // $"[parameters('{serviceHost}')]");
