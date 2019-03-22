@@ -96,5 +96,8 @@
   "name": "LA-ISE-Sample",
   "type": "Microsoft.Logic/workflows",
   "location": "westus2",
-  "tags": { }
+  "tags": {
+    "Environment": "Dev",
+    "managedBy": "eai@xyz.com"
+  }
 }

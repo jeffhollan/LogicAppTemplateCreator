@@ -581,6 +581,7 @@ namespace LogicAppTemplate.Tests
             Assert.IsTrue(definition["parameters"].Children().Any(x => x.ToString().Contains("logicAppLocation")));
             Assert.IsTrue(definition["parameters"].Children().Any(x => x.ToString().Contains("integrationServiceEnvironmentName")));
             Assert.IsTrue(definition["parameters"].Children().Any(x => x.ToString().Contains("integrationServiceEnvironmentResourceGroup")));
+            Assert.IsTrue(definition["parameters"].Children().Any(x => x.ToString().Contains("Environment_Tag")));
             Assert.IsTrue(definition["resources"].First()["properties"].Children().Any(x => x.ToString().Contains("integrationServiceEnvironment")));
             Assert.AreEqual(@"[concat('/subscriptions/',subscription().subscriptionId,'/resourcegroups/',parameters('integrationServiceEnvironmentResourceGroupName'),'/providers/Microsoft.Logic/integrationServiceEnvironments/',parameters('integrationServiceEnvironmentName'))]", definition["resources"].First()["properties"]["integrationServiceEnvironment"]["id"]);
             Assert.AreEqual(@"Microsoft.Logic/integrationServiceEnvironments", definition["resources"].First()["properties"]["integrationServiceEnvironment"]["type"]);

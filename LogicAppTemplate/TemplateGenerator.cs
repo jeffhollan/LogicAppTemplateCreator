@@ -114,6 +114,15 @@ namespace LogicAppTemplate
 
             workflowTemplateReference["properties"]["definition"] = handleActions(def, (JObject)definition["properties"]["parameters"]);
 
+            if (definition.ContainsKey("tags"))
+            {
+                JToken tags = await HandleTags(definition);
+                if (tags.HasValues)
+                {
+                    workflowTemplateReference.Add("tags", tags);
+                }
+            }
+
             // Diagnostic Settings
             if (DiagnosticSettings)
             {
@@ -185,8 +194,7 @@ namespace LogicAppTemplate
                     template.resources.Insert(1, connectionTemplate);
                 }
             }
-
-
+                     
             // WriteVerbose("Finalizing Template...");
             return JObject.FromObject(template);
         }
@@ -725,6 +733,18 @@ namespace LogicAppTemplate
                 connectionTemplate.properties.parameterValues = connectionParameters;
 
             return JObject.FromObject(connectionTemplate);
+        }
+        private async Task<JObject> HandleTags(JObject definition)
+        {
+            JObject result = new JObject();
+
+            foreach (var property in definition["tags"].ToObject<JObject>().Properties())
+            {
+                var parm= AddTemplateParameter(property.Name + "_Tag", "string", property.Value.ToString());
+                result.Add(property.Name, $"[parameters('{parm}')]" );
+            }
+
+            return result;
         }
 
         public DeploymentTemplate GetTemplate()
