@@ -50,7 +50,12 @@ namespace LogicAppTemplate
 
             //replace the host with a parameter to allow the scenarios where the host could be different between environments
             var serviceHost = template.AddParameter("serviceHost", "string", host);
-            var backendService = template.AddParameter("backendService", "string", "http://" + host + preParsedswaggerDefinition.Value<string>("basePath"));
+            var scheme = "http";
+            if (preParsedswaggerDefinition.ContainsKey("schemes"))
+            {
+                scheme = preParsedswaggerDefinition["schemes"].Children().First().Value<string>();
+            }
+            var backendService = template.AddParameter("backendService", "string",scheme + "://" + host + preParsedswaggerDefinition.Value<string>("basePath"));
             swaggerRawDefinition = swaggerRawDefinition.Replace(host, template.WrapParameterName(serviceHost));
 
             // handle connectionID
