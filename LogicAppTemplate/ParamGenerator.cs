@@ -33,6 +33,13 @@ namespace LogicAppTemplate
             Static
         }
 
+
+        [Parameter(
+           Mandatory = false,
+           HelpMessage = "Whether to generate parameters whose default value is an ARM expression.  If not specified then will not generate parameters per original code"
+           )]
+        public string GenerateExpression;
+
         private ParameterTemplate paramTemplate;
         public ParamGenerator()
         {
@@ -51,31 +58,32 @@ namespace LogicAppTemplate
 
             var logicappTemplate = JObject.Parse(File.ReadAllText(TemplateFile));
             var result = CreateParameterFileFromTemplate(logicappTemplate);
-            
+
 
             WriteObject(result.ToString());
         }
 
         public JObject CreateParameterFileFromTemplate(JObject logicAppTemplate)
         {
-            foreach(var param in logicAppTemplate["parameters"].Children<JProperty>())
+            foreach (var param in logicAppTemplate["parameters"].Children<JProperty>())
             {
                 // Don't create parameters that reference a ARM Template expression
-                if (param.Value.Value<string>("type").Equals("string",StringComparison.CurrentCultureIgnoreCase) && param.Value.Value<string>("defaultValue") != null  && param.Value.Value<string>("defaultValue").StartsWith("["))
+                if (param.Value.Value<string>("type").Equals("string", StringComparison.CurrentCultureIgnoreCase) && param.Value.Value<string>("defaultValue") != null && param.Value.Value<string>("defaultValue").StartsWith("[") &&  string.IsNullOrEmpty(GenerateExpression))
                 {
                     continue;
                 }
 
                 var obj = new JObject();
-                if ( KeyVaultUsage.Static == KeyVault && (string)logicAppTemplate["parameters"][param.Name]["type"] == "securestring")
+                if (KeyVaultUsage.Static == KeyVault && (string)logicAppTemplate["parameters"][param.Name]["type"] == "securestring")
                 {
                     dynamic k = new ExpandoObject();
                     k.keyVault = new ExpandoObject();
                     k.keyVault.id = "/subscriptions/{subscriptionid}/resourceGroups/{resourcegroupname}/providers/Microsoft.KeyVault/vaults/{vault-name}";
                     k.secretName = param.Name;
-                    obj["reference"] = JObject.FromObject(k);                    
+                    obj["reference"] = JObject.FromObject(k);
                 }
-                else {
+                else
+                {
                     obj["value"] = logicAppTemplate["parameters"][param.Name]["defaultValue"];
                 }
 
