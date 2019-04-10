@@ -36,6 +36,9 @@ namespace LogicAppTemplate
         [Parameter(Mandatory = false, HelpMessage = "If true, diagnostic settings will be included in the ARM template")]
         public bool DiagnosticSettings = false;
 
+        [Parameter(Mandatory = false, HelpMessage = "If true, generate an output variable with the trigger url.")]
+        public bool GenerateHttpTriggerUrlOutput = false;
+
         protected override void ProcessRecord()
         {
             AzureResourceCollector resourceCollector = new AzureResourceCollector();
@@ -63,8 +66,11 @@ namespace LogicAppTemplate
             {
                 return;
             }
-            TemplateGenerator generator = new TemplateGenerator(LogicApp, SubscriptionId, ResourceGroup, resourceCollector);
-            generator.DiagnosticSettings = DiagnosticSettings;
+            TemplateGenerator generator = new TemplateGenerator(LogicApp, SubscriptionId, ResourceGroup, resourceCollector)
+            {
+                DiagnosticSettings = DiagnosticSettings,
+                GenerateHttpTriggerUrlOutput = GenerateHttpTriggerUrlOutput
+            };
 
             try
             {
