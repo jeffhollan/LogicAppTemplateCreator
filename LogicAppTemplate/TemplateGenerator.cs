@@ -18,7 +18,7 @@ namespace LogicAppTemplate
         private JObject workflowTemplateReference;
 
         private string LogicAppResourceGroup;
-
+        private bool stripPassword = false;
         IResourceCollector resourceCollector;
         private string SubscriptionId;
         private string ResourceGroup;
@@ -26,12 +26,13 @@ namespace LogicAppTemplate
         private string IntegrationAccountId;
         private bool extractIntegrationAccountArtifacts = false;
 
-        public TemplateGenerator(string LogicApp, string SubscriptionId, string ResourceGroup, IResourceCollector resourceCollector)
+        public TemplateGenerator(string LogicApp, string SubscriptionId, string ResourceGroup, IResourceCollector resourceCollector, bool stripPassword = false)
         {
             this.SubscriptionId = SubscriptionId;
             this.ResourceGroup = ResourceGroup;
             this.LogicApp = LogicApp;
             this.resourceCollector = resourceCollector;
+            this.stripPassword = stripPassword;
             template = JsonConvert.DeserializeObject<DeploymentTemplate>(GetResourceContent("LogicAppTemplate.Templates.starterTemplate.json"));
         }
 
@@ -592,11 +593,16 @@ namespace LogicAppTemplate
 
         private string AddTemplateParameter(string paramname, string type, JProperty defaultvalue)
         {
+
+            if (this.stripPassword && (paramname.EndsWith("Username", StringComparison.InvariantCultureIgnoreCase) || paramname.EndsWith("Password", StringComparison.InvariantCultureIgnoreCase)))
+            {
+                defaultvalue.Value = "*Stripped*";
+            }
             string realParameterName = paramname;
             JObject param = new JObject();
             param.Add("type", JToken.FromObject(type));
             param.Add(defaultvalue);
-
+            
             if (template.parameters[paramname] == null)
             {
                 template.parameters.Add(paramname, param);
@@ -604,7 +610,7 @@ namespace LogicAppTemplate
             else
             {
                 if (!template.parameters[paramname].Value<string>("defaultValue").Equals(defaultvalue.Value.ToString()))
-                {
+                {                    
                     foreach (var p in template.parameters)
                     {
                         if (p.Key.StartsWith(paramname))
