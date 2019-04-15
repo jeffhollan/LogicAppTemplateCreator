@@ -7,8 +7,8 @@ using System.Windows.Forms;
 
 namespace LogicAppTemplate
 {
-    [Cmdlet(VerbsCommon.Get, "IntegrationAccountMapTemplate", ConfirmImpact = ConfirmImpact.None)]
-    public class GeneratorIAMapCmdlet : PSCmdlet
+    [Cmdlet(VerbsCommon.Get, "IntegrationAccountSchemaTemplate", ConfirmImpact = ConfirmImpact.None)]
+    public class GeneratorIASchemaCmdlet : PSCmdlet
     {
         [Parameter(Mandatory = true, HelpMessage = "Name of the Artifact")]
         public string ArtifactName;
@@ -61,7 +61,7 @@ namespace LogicAppTemplate
             {
                 return;
             }
-            IntegrationAccountGenerator generator = new IntegrationAccountGenerator(ArtifactName, IntegrationAccountGenerator.ARtifactType.Maps, IntegrationAccount, SubscriptionId, ResourceGroup, resourceCollector);
+            IntegrationAccountGenerator generator = new IntegrationAccountGenerator(ArtifactName, IntegrationAccountGenerator.ARtifactType.Schemas, IntegrationAccount, SubscriptionId, ResourceGroup, resourceCollector);
 
             try
             {

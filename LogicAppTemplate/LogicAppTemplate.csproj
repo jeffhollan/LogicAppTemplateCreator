@@ -60,6 +60,7 @@
     <Compile Include="Constants\Constants.cs" />
     <Compile Include="EmptyParameterTemplateGenerator.cs" />
     <Compile Include="GeneratorCustomConnectorCmdlet.cs" />
+    <Compile Include="GeneratorIASchemaCmdlet.cs" />
     <Compile Include="GeneratorIAMapCmdlet.cs" />
     <Compile Include="GeneratorCmdlet.cs" />
     <Compile Include="CustomConnectorGenerator.cs" />
