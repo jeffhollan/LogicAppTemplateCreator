@@ -635,6 +635,13 @@ namespace LogicAppTemplate
                         {
                             connectionParameters.Add(parameter.Name, $"[listKeys(resourceId('Microsoft.Storage/storageAccounts', parameters('{connectionName}_storageaccount')), '2018-02-01').keys[0].value]");
                         }
+                        else if (parameter.Name == "connectionString" && concatedId.EndsWith("/servicebus')]"))
+                        {
+                            //Need to check the if the params are available or added by standard?
+                            var paramNamespace = AddTemplateParameter($"{connectionInstance.Value<string>("name")}_namespace", "string", "");
+                            var paramAuthorizationRules = AddTemplateParameter($"{connectionInstance.Value<string>("name")}_authorizationRules", "string", "");
+                            connectionParameters.Add(parameter.Name, $"[listKeys(resourceId('Microsoft.ServiceBus/namespaces/authorizationRules', parameters('{paramNamespace}'),parameters('{paramAuthorizationRules}')), '2017-04-01').primaryConnectionString]");
+                        }
                         else if (concatedId.EndsWith("/azureeventgridpublish')]"))
                         {
                             var url = connectionInstance["properties"]["nonSecretParameterValues"].Value<string>("endpoint");
@@ -652,14 +659,14 @@ namespace LogicAppTemplate
                             {
                                 connectionParameters.Add(parameter.Name, $"[listKeys(resourceId('Microsoft.EventGrid/topics',parameters('{param}')),'2018-01-01').key1]");
                             }
-
-
                         }
                         else
                         {
                             //todo check this!
                             var addedparam = AddTemplateParameter($"{connectionName}_{parameter.Name}", (string)(parameter.Value)["type"], connectionInstance["properties"]["nonSecretParameterValues"][parameter.Name]);
                             connectionParameters.Add(parameter.Name, $"[parameters('{addedparam}')]");
+
+                            //whatif we get an null value for i.e. SQL Connectionstring?
 
                             //If has an enum
                             if (parameter.Value["allowedValues"] != null)
