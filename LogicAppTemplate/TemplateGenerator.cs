@@ -25,14 +25,16 @@ namespace LogicAppTemplate
         private string LogicApp;
         private string IntegrationAccountId;
         private bool extractIntegrationAccountArtifacts = false;
+        private bool disableState = false;
 
-        public TemplateGenerator(string LogicApp, string SubscriptionId, string ResourceGroup, IResourceCollector resourceCollector, bool stripPassword = false)
+        public TemplateGenerator(string LogicApp, string SubscriptionId, string ResourceGroup, IResourceCollector resourceCollector, bool stripPassword = false, bool disableState = false)
         {
             this.SubscriptionId = SubscriptionId;
             this.ResourceGroup = ResourceGroup;
             this.LogicApp = LogicApp;
             this.resourceCollector = resourceCollector;
             this.stripPassword = stripPassword;
+            this.disableState = disableState;
             template = JsonConvert.DeserializeObject<DeploymentTemplate>(GetResourceContent("LogicAppTemplate.Templates.starterTemplate.json"));
         }
 
@@ -86,6 +88,11 @@ namespace LogicAppTemplate
                 template.parameters["integrationServiceEnvironmentResourceGroupName"]["defaultValue"] = iseId.ResourceGroupName;
             }
 
+            if (disableState)
+            {
+                ((JObject)template.resources[0]["properties"]).Add("state", "Disabled");
+            }          
+            
             template.parameters["logicAppName"]["defaultValue"] = definition.Value<string>("name");
 
             workflowTemplateReference = template.resources.Where(t => ((string)t["type"]) == "Microsoft.Logic/workflows").FirstOrDefault();
