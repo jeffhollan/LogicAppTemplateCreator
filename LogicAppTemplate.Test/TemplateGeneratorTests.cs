@@ -211,7 +211,7 @@ namespace LogicAppTemplate.Tests
             Assert.AreEqual(571, (int)defintion["parameters"]["paramismanager"]["defaultValue"]["1"]);
             Assert.AreEqual(572, (int)defintion["parameters"]["paramismanager"]["defaultValue"]["No"]);
             Assert.AreEqual(571, (int)defintion["parameters"]["paramismanager"]["defaultValue"]["Yes"]);
-            Assert.AreEqual("Object", defintion["parameters"]["paramismanager"]["type"]);           
+            Assert.AreEqual("object", defintion["parameters"]["paramismanager"]["type"]);           
 
         }
 
