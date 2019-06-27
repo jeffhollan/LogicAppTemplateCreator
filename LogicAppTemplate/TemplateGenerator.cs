@@ -46,6 +46,7 @@ namespace LogicAppTemplate
         }
 
         public bool DiagnosticSettings { get; set; }
+        public bool FixedFunctionAppName { get; set; }
 
         public async Task<JObject> GenerateTemplate()
         {
@@ -121,7 +122,8 @@ namespace LogicAppTemplate
                 if (!parameter.Name.StartsWith("$"))
                 {
                     var name = "param" + parameter.Name;
-                    template.parameters.Add(name, JObject.FromObject(new { type = parameter.Value["type"].Value<string>().ToLower(), defaultValue = parameter.Value["defaultValue"] }));
+                    
+                    template.parameters.Add(name, JObject.FromObject(new { type = parameter.Value["type"].Value<string>().ToLower(), defaultValue = (parameter.Value["type"].Value<string>().ToLower() == "securestring") ? string.Empty : parameter.Value["defaultValue"] }));
                     parameter.Value["defaultValue"] = "[parameters('" + name + "')]";
                 }
             }
@@ -337,11 +339,12 @@ namespace LogicAppTemplate
                     var faid = new AzureResourceId(curr);
 
                     var resourcegroupValue = LogicAppResourceGroup == faid.ResourceGroupName ? "[resourceGroup().name]" : faid.ResourceGroupName;
+                                        
 
                     faid.SubscriptionId = "',subscription().subscriptionId,'";
-                    faid.ResourceGroupName = "',parameters('" + AddTemplateParameter(action.Name + "-ResourceGroup", "string", resourcegroupValue) + "'),'";
-                    faid.ReplaceValueAfter("sites", "',parameters('" + AddTemplateParameter(action.Name + "-FunctionApp", "string", faid.ValueAfter("sites")) + "'),'");
-                    faid.ReplaceValueAfter("functions", "',parameters('" + AddTemplateParameter(action.Name + "-FunctionName", "string", faid.ValueAfter("functions")) + "')");
+                    faid.ResourceGroupName = "',parameters('" + AddTemplateParameter((FixedFunctionAppName ? "FunctionApp-" : action.Name + "-") + "ResourceGroup", "string", resourcegroupValue) + "'),'";
+                    faid.ReplaceValueAfter("sites", "',parameters('" + AddTemplateParameter((FixedFunctionAppName ? "" : action.Name + "-") + "FunctionApp", "string", faid.ValueAfter("sites")) + "'),'");
+                    faid.ReplaceValueAfter("functions", "',parameters('" + AddTemplateParameter((FixedFunctionAppName ? "" : action.Name + "-") + "FunctionName", "string", faid.ValueAfter("functions")) + "')");
 
                     definition["actions"][action.Name]["inputs"]["function"]["id"] = "[concat('" + faid.ToString() + ")]";
                 }
