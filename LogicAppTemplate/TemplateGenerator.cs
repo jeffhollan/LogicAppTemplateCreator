@@ -46,7 +46,8 @@ namespace LogicAppTemplate
         }
 
         public bool DiagnosticSettings { get; set; }
-
+        public bool IncludeInitializeVariable { get; set; }
+        
         public async Task<JObject> GenerateTemplate()
         {
             JObject _definition = await resourceCollector.GetResource($"https://management.azure.com/subscriptions/{SubscriptionId}/resourceGroups/{ResourceGroup}/providers/Microsoft.Logic/workflows/{LogicApp}", "2016-06-01");
@@ -242,6 +243,11 @@ namespace LogicAppTemplate
                     string wokflowParameterName = AddTemplateParameter(action.Name + "-LogicAppName", "string", wid.ResourceName);
                     string workflowid = $"[concat('/subscriptions/',subscription().subscriptionId,'/resourceGroups/',parameters('{resourcegroupParameterName}'),'/providers/Microsoft.Logic/workflows/',parameters('{wokflowParameterName}'))]";
                     definition["actions"][action.Name]["inputs"]["host"]["workflow"]["id"] = workflowid;
+
+                }
+                else if(type == "initializevariable" && IncludeInitializeVariable)
+                {
+                    definition["actions"][action.Name]["inputs"]["variables"][0]["value"] = "[parameters('" + AddTemplateParameter(action.Name + "-Value", "string", ((JObject)definition["actions"][action.Name]["inputs"]["variables"][0]).Value<string>("value")) + "')]";                    
 
                 }
                 else if (type == "apimanagement")

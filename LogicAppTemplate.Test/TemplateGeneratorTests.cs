@@ -308,6 +308,36 @@ namespace LogicAppTemplate.Tests
         }
 
         [TestMethod()]
+        public void TestExtractVariablesNotSet()
+        {
+            var content = GetEmbededFileContent("LogicAppTemplate.Test.TestFiles.Http-Variable.json");
+
+            var generator = new TemplateGenerator("", "", "", null);
+            var defintion = generator.generateDefinition(JObject.Parse(content)).GetAwaiter().GetResult();
+
+            Assert.IsNull(defintion["parameters"]["Initialize_variable-Value"]);
+
+            Console.WriteLine();
+        }
+
+        [TestMethod()]
+        public void TestExtractVariablesSet()
+        {
+            var content = GetEmbededFileContent("LogicAppTemplate.Test.TestFiles.Http-Variable.json");
+
+            var generator = new TemplateGenerator("", "", "", null);
+            generator.IncludeInitializeVariable = true;
+
+            var defintion = generator.generateDefinition(JObject.Parse(content)).GetAwaiter().GetResult();
+
+            //check parameters
+            Assert.AreEqual(defintion["parameters"]["Initialize_variable-Value"]["defaultValue"], "https://www.nationalbanken.dk/");
+
+            Console.WriteLine();
+
+        }
+
+        [TestMethod()]
         public void TestHTTPAuthentication()
         {
             var content = GetEmbededFileContent("LogicAppTemplate.Test.TestFiles.HTTP-Authentication.json");

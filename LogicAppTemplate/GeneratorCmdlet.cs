@@ -36,6 +36,10 @@ namespace LogicAppTemplate
         [Parameter(Mandatory = false, HelpMessage = "If true, diagnostic settings will be included in the ARM template")]
         public bool DiagnosticSettings = false;
 
+        [Parameter(Mandatory = false, HelpMessage = "If true, Initialize Variable actions will be included in the ARM template")]
+        public SwitchParameter IncludeInitializeVariable;
+
+
         protected override void ProcessRecord()
         {
             AzureResourceCollector resourceCollector = new AzureResourceCollector();
@@ -65,6 +69,7 @@ namespace LogicAppTemplate
             }
             TemplateGenerator generator = new TemplateGenerator(LogicApp, SubscriptionId, ResourceGroup, resourceCollector);
             generator.DiagnosticSettings = DiagnosticSettings;
+            generator.IncludeInitializeVariable = IncludeInitializeVariable;
 
             try
             {

@@ -70,6 +70,7 @@
     <Compile Include="TemplateGeneratorTests.cs" />
     <Compile Include="ParamGeneratorTests.cs" />
     <Compile Include="TableConnectorTest.cs" />
+    <EmbeddedResource Include="TestFiles\Http-Variable.json" />
     <Compile Include="Utils.cs" />
   </ItemGroup>
   <ItemGroup>
