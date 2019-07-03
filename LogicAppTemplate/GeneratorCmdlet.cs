@@ -34,7 +34,7 @@ namespace LogicAppTemplate
         public string DebugOutPutFolder = "";
 
         [Parameter(Mandatory = false, HelpMessage = "If true, diagnostic settings will be included in the ARM template")]
-        public bool DiagnosticSettings = false;
+        public SwitchParameter DiagnosticSettings;
 
         protected override void ProcessRecord()
         {
