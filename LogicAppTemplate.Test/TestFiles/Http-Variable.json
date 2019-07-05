@@ -130,13 +130,13 @@
                 },
                 "type": "InitializeVariable"
             },
-            "Initialize-Float-0.00": {
+            "Initialize-Float-0.01": {
                 "inputs": {
                     "variables": [
                         {
                             "name": "TestFloatValue",
                             "type": "Float",
-                            "value": 0
+                            "value": 0.01
                         }
                     ]
                 },
@@ -206,7 +206,7 @@
                     ]
                 },
                 "runAfter": {
-                    "Initialize-Float-0.00": [
+                    "Initialize-Float-0.01": [
                         "Succeeded"
                     ]
                 },

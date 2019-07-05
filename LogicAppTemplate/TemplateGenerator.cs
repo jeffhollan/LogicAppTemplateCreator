@@ -247,13 +247,12 @@ namespace LogicAppTemplate
                 }
                 else if(type == "initializevariable" && IncludeInitializeVariable && definition["actions"][action.Name]["inputs"]["variables"][0]["value"] != null)
                 {
-                    var variableType = definition["actions"][action.Name]["inputs"]["variables"][0]["type"];
-                    //var variableValue = ((JObject)definition["actions"][action.Name]["inputs"]["variables"][0]).Value<string>("value");
-                    var temp = definition["actions"][action.Name]["inputs"]["variables"][0]["value"].Type;
+                    var variableType = definition["actions"][action.Name]["inputs"]["variables"][0]["type"];                                        
                     string paramType = string.Empty;
 
+                    //missing securestring & secureObject
                     switch (variableType.Value<string>())
-                    {//string, securestring, int, bool, object, secureObject, and array.
+                    {
                         case "Array":
                         case "Object":
                         case "String":
@@ -272,26 +271,27 @@ namespace LogicAppTemplate
                             paramType = "string";
                             break;
                     }
-
-                    definition["actions"][action.Name]["inputs"]["variables"][0]["value"] = "[parameters('" + AddTemplateParameter(action.Name + "-Value", paramType, definition["actions"][action.Name]["inputs"]["variables"][0]["value"]) + "')]";
-                    /*
-                    if (definition["actions"][action.Name]["inputs"]["variables"][0]["value"].Type != JTokenType.Array)
+                    
+                    //Arrays and Objects can't be expressions 
+                    if (definition["actions"][action.Name]["inputs"]["variables"][0]["value"].Type != JTokenType.Array
+                        && definition["actions"][action.Name]["inputs"]["variables"][0]["value"].Type != JTokenType.Object)
                     {
-                        if (definition["actions"][action.Name]["inputs"]["variables"][0].Value<string>("value").StartsWith("@"))
+                        //If variable is an expression OR float, we need to change the type of the parameter to string
+                        if (definition["actions"][action.Name]["inputs"]["variables"][0].Value<string>("value").StartsWith("@")
+                            || variableType.Value<string>() == "Float")
                         {
-                            //definition["actions"][action.Name]["inputs"]["variables"][0]["value"] = "[parameters('" + AddTemplateParameter(action.Name + "-Value", "string", ((JObject)definition["actions"][action.Name]["inputs"]["variables"][0]).Value<string>("value")) + "')]";
-                            definition["actions"][action.Name]["inputs"]["variables"][0]["value"] = "[parameters('" + AddTemplateParameter(action.Name + "-Value", paramType, definition["actions"][action.Name]["inputs"]["variables"][0]["value"]) + "')]";
+                            definition["actions"][action.Name]["inputs"]["variables"][0]["value"] = "[parameters('" + AddTemplateParameter(action.Name + "-Value", "string", ((JObject)definition["actions"][action.Name]["inputs"]["variables"][0]).Value<string>("value")) + "')]";
                         }
                         else
                         {
+                            //Same as the one from in the outer if sentence
                             definition["actions"][action.Name]["inputs"]["variables"][0]["value"] = "[parameters('" + AddTemplateParameter(action.Name + "-Value", paramType, definition["actions"][action.Name]["inputs"]["variables"][0]["value"]) + "')]";
-                        }
+                        }                        
                     }
                     else
                     {
                         definition["actions"][action.Name]["inputs"]["variables"][0]["value"] = "[parameters('" + AddTemplateParameter(action.Name + "-Value", paramType, definition["actions"][action.Name]["inputs"]["variables"][0]["value"]) + "')]";
-                    }
-                    */
+                    }                    
                 }
                 else if (type == "apimanagement")
                 {
