@@ -245,10 +245,53 @@ namespace LogicAppTemplate
                     definition["actions"][action.Name]["inputs"]["host"]["workflow"]["id"] = workflowid;
 
                 }
-                else if(type == "initializevariable" && IncludeInitializeVariable)
+                else if(type == "initializevariable" && IncludeInitializeVariable && definition["actions"][action.Name]["inputs"]["variables"][0]["value"] != null)
                 {
-                    definition["actions"][action.Name]["inputs"]["variables"][0]["value"] = "[parameters('" + AddTemplateParameter(action.Name + "-Value", "string", ((JObject)definition["actions"][action.Name]["inputs"]["variables"][0]).Value<string>("value")) + "')]";                    
+                    var variableType = definition["actions"][action.Name]["inputs"]["variables"][0]["type"];
+                    //var variableValue = ((JObject)definition["actions"][action.Name]["inputs"]["variables"][0]).Value<string>("value");
+                    var temp = definition["actions"][action.Name]["inputs"]["variables"][0]["value"].Type;
+                    string paramType = string.Empty;
 
+                    switch (variableType.Value<string>())
+                    {//string, securestring, int, bool, object, secureObject, and array.
+                        case "Array":
+                        case "Object":
+                        case "String":
+                            paramType = variableType.Value<string>().ToLower();
+                            break;
+                        case "Boolean":
+                            paramType = "bool";
+                            break;
+                        case "Float":
+                            paramType = "string";
+                            break;
+                        case "Integer":
+                            paramType = "int";
+                            break;
+                        default:
+                            paramType = "string";
+                            break;
+                    }
+
+                    definition["actions"][action.Name]["inputs"]["variables"][0]["value"] = "[parameters('" + AddTemplateParameter(action.Name + "-Value", paramType, definition["actions"][action.Name]["inputs"]["variables"][0]["value"]) + "')]";
+                    /*
+                    if (definition["actions"][action.Name]["inputs"]["variables"][0]["value"].Type != JTokenType.Array)
+                    {
+                        if (definition["actions"][action.Name]["inputs"]["variables"][0].Value<string>("value").StartsWith("@"))
+                        {
+                            //definition["actions"][action.Name]["inputs"]["variables"][0]["value"] = "[parameters('" + AddTemplateParameter(action.Name + "-Value", "string", ((JObject)definition["actions"][action.Name]["inputs"]["variables"][0]).Value<string>("value")) + "')]";
+                            definition["actions"][action.Name]["inputs"]["variables"][0]["value"] = "[parameters('" + AddTemplateParameter(action.Name + "-Value", paramType, definition["actions"][action.Name]["inputs"]["variables"][0]["value"]) + "')]";
+                        }
+                        else
+                        {
+                            definition["actions"][action.Name]["inputs"]["variables"][0]["value"] = "[parameters('" + AddTemplateParameter(action.Name + "-Value", paramType, definition["actions"][action.Name]["inputs"]["variables"][0]["value"]) + "')]";
+                        }
+                    }
+                    else
+                    {
+                        definition["actions"][action.Name]["inputs"]["variables"][0]["value"] = "[parameters('" + AddTemplateParameter(action.Name + "-Value", paramType, definition["actions"][action.Name]["inputs"]["variables"][0]["value"]) + "')]";
+                    }
+                    */
                 }
                 else if (type == "apimanagement")
                 {
