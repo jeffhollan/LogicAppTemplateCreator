@@ -80,7 +80,7 @@ namespace LogicAppTemplate
                 }
                 else if (ClearParameterValues)
                 {
-                    obj["value"] = string.Empty;
+                    obj["value"] = JValue.Parse("[]");
                 }
                 else {
                     obj["value"] = logicAppTemplate["parameters"][param.Name]["defaultValue"];
