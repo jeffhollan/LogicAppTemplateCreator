@@ -26,7 +26,7 @@ namespace LogicAppTemplate.Test
             Assert.IsNull(defintion["parameters"]["INT0014-NewHires-ResourceGroup"]);
             Assert.IsNull(defintion["parameters"]["logicAppLocation"]);
 
-            Assert.AreNotEqual(defintion["parameters"]["logicAppName"]["value"], "");
+            Assert.AreNotEqual(defintion["parameters"]["logicAppName"]["value"].ToString(), "[]");
             Assert.AreEqual("INT0014-NewHires-Trigger", defintion["parameters"]["logicAppName"]["value"]);
         }
 
