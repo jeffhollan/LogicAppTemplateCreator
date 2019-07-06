@@ -252,10 +252,9 @@ This will enable you to get a valid token for your personal user account.</maml:
           <maml:para>This will connect to the Azure Portal, ask for your credentails like you are used to.
 It will switch context to the supplied subscription id ("5c92054d-fab6-4dd7-9195-15cd935fa0a4").
 The subscription must exists in your default / standard AAD.
-It will located the "LogicAppsDEV" ressource group.
+It will locate the "LogicAppsDEV" ressource group.
 Inside the ressource group it will locate the "AwesomeLogicApp" logic app.</maml:para>
           <maml:para>The cmdlet will output the entire json string to the pipeline / console.
-
 
 </maml:para>
         </dev:remarks>
@@ -267,12 +266,11 @@ Inside the ressource group it will locate the "AwesomeLogicApp" logic app.</maml
           <maml:para>This will connect to the Azure Portal, ask for your credentails like you are used to.
 It will switch context to the supplied subscription id ("5c92054d-fab6-4dd7-9195-15cd935fa0a4").
 The subscription must exists in your default / standard AAD.
-It will located the "LogicAppsDEV" ressource group.
+It will locate the "LogicAppsDEV" ressource group.
 Inside the ressource group it will locate the "AwesomeLogicApp" logic app.</maml:para>
           <maml:para>The output from Get-LogicAppTemplate is piped to Out-File.
 The file will saved to "c:\temp\AwesomeLogicApp.json".
 The file is saved with utf8 encoding.
-
 </maml:para>
         </dev:remarks>
       </command:example>
@@ -284,7 +282,7 @@ The file is saved with utf8 encoding.
 It will use the "contoso.onmicrosoft.com" as the tenant name while looking for the subscriptionId.
 It will switch context to the supplied subscription id ("5c92054d-fab6-4dd7-9195-15cd935fa0a4").
 The subscription must exists in your default / standard AAD.
-It will located the "LogicAppsDEV" ressource group.
+It will locate the "LogicAppsDEV" ressource group.
 Inside the ressource group it will locate the "AwesomeLogicApp" logic app.</maml:para>
           <maml:para>The cmdlet will output the entire json string to the pipeline / console.
 </maml:para>
@@ -296,7 +294,7 @@ Inside the ressource group it will locate the "AwesomeLogicApp" logic app.</maml
         <dev:remarks>
           <maml:para>This will connect to the Azure Portal, and use the provided token to authenticate to gain access. It will switch context to the supplied subscription id ("5c92054d-fab6-4dd7-9195-15cd935fa0a4").
 The subscription must exists in your default / standard AAD.
-It will located the "LogicAppsDEV" ressource group.
+It will locate the "LogicAppsDEV" ressource group.
 Inside the ressource group it will locate the "AwesomeLogicApp" logic app.</maml:para>
           <maml:para>The cmdlet will output the entire json string to the pipeline / console.
 </maml:para>
