@@ -31,7 +31,7 @@ PS C:\> Get-LogicAppTemplate -LogicApp "AwesomeLogicApp" -ResourceGroup "LogicAp
 This will connect to the Azure Portal, ask for your credentails like you are used to.  
 It will switch context to the supplied subscription id ("5c92054d-fab6-4dd7-9195-15cd935fa0a4").  
 The subscription must exists in your default / standard AAD.  
-It will located the "LogicAppsDEV" ressource group.  
+It will locate the "LogicAppsDEV" ressource group.  
 Inside the ressource group it will locate the "AwesomeLogicApp" logic app.
 
 The cmdlet will output the entire json string to the pipeline / console.  
@@ -44,7 +44,7 @@ PS C:\> Get-LogicAppTemplate -LogicApp "AwesomeLogicApp" -ResourceGroup "LogicAp
 This will connect to the Azure Portal, ask for your credentails like you are used to.  
 It will switch context to the supplied subscription id ("5c92054d-fab6-4dd7-9195-15cd935fa0a4").  
 The subscription must exists in your default / standard AAD.  
-It will located the "LogicAppsDEV" ressource group.  
+It will locate the "LogicAppsDEV" ressource group.  
 Inside the ressource group it will locate the "AwesomeLogicApp" logic app.
 
 The output from Get-LogicAppTemplate is piped to Out-File.  
@@ -60,7 +60,7 @@ This will connect to the Azure Portal, ask for your credentails like you are use
 It will use the "contoso.onmicrosoft.com" as the tenant name while looking for the subscriptionId.  
 It will switch context to the supplied subscription id ("5c92054d-fab6-4dd7-9195-15cd935fa0a4").  
 The subscription must exists in your default / standard AAD.  
-It will located the "LogicAppsDEV" ressource group.  
+It will locate the "LogicAppsDEV" ressource group.  
 Inside the ressource group it will locate the "AwesomeLogicApp" logic app.
 
 The cmdlet will output the entire json string to the pipeline / console.
@@ -73,7 +73,7 @@ PS C:\> Get-LogicAppTemplate -LogicApp "AwesomeLogicApp" -ResourceGroup "LogicAp
 This will connect to the Azure Portal, and use the provided token to authenticate to gain access.
 It will switch context to the supplied subscription id ("5c92054d-fab6-4dd7-9195-15cd935fa0a4").  
 The subscription must exists in your default / standard AAD.  
-It will located the "LogicAppsDEV" ressource group.  
+It will locate the "LogicAppsDEV" ressource group.  
 Inside the ressource group it will locate the "AwesomeLogicApp" logic app.
 
 The cmdlet will output the entire json string to the pipeline / console.
