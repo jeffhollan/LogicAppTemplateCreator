@@ -92,6 +92,7 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="docs\Get-LogicAppTemplate.md" />
+    <None Include="docs\Get-ParameterTemplate.md" />
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
