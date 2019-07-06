@@ -40,7 +40,7 @@ namespace LogicAppTemplate.Test
 
             //check parameters
             Assert.IsNotNull(defintion["parameters"]["logicAppName"]);
-            Assert.AreEqual(defintion["parameters"]["logicAppName"]["value"], "");
+            Assert.AreEqual(defintion["parameters"]["logicAppName"]["value"].ToString(), "[]");
         }
 
         [TestMethod]
