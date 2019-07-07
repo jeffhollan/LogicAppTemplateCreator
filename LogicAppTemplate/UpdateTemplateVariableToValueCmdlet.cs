@@ -51,7 +51,11 @@ namespace LogicAppTemplate
         public JObject UpdateTemplateVariable(string logicAppTemplateJson)
         {
             string pattern = string.Format("@{{variables('{0}')}}", Variable);
-            return JObject.Parse(logicAppTemplateJson.Replace(pattern, Value));
+            string res = logicAppTemplateJson.Replace(pattern, Value);
+
+            pattern = string.Format("@variables('{0}')", Variable);
+            res = res.Replace(pattern, Value);
+            return JObject.Parse(res);
         }
 
         protected override void ProcessRecord()
