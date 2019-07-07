@@ -60,6 +60,7 @@
     <Compile Include="AzureResourceIdTests.cs" />
     <Compile Include="IntegrationAccountTest.cs" />
     <Compile Include="BlobConnector2Test.cs" />
+    <Compile Include="ParamGeneratorTests.cs" />
     <Compile Include="StorageQueueConnectorTest.cs" />
     <Compile Include="ExpressionTest.cs" />
     <Compile Include="CustomConnectorTest.cs" />
@@ -68,7 +69,7 @@
     <Compile Include="BlobConnectorTest.cs" />
     <Compile Include="EventGridConnectorTest.cs" />
     <Compile Include="TemplateGeneratorTests.cs" />
-    <Compile Include="ParamGeneratorTests.cs" />
+    <Compile Include="VariableUpdaterTests.cs" />
     <Compile Include="TableConnectorTest.cs" />
     <Compile Include="Utils.cs" />
   </ItemGroup>
@@ -144,6 +145,7 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
+    <EmbeddedResource Include="TestFiles\VariableReference.json" />
   </ItemGroup>
   <Choose>
     <When Condition="'$(VisualStudioVersion)' == '10.0' And '$(IsCodedUITest)' == 'True'">
