@@ -92,9 +92,21 @@
     <EmbeddedResource Include="Templates\integrationAccountMap.json" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="docs\Get-LogicAppTemplate.md" />
+    <None Include="docs\Get-ParameterTemplate.md" />
     <None Include="packages.config" />
   </ItemGroup>
+  <ItemGroup>
+    <None Include="docs\PlatyPS-Commands.ps1" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="docs\en-US\LogicAppTemplate.dll-Help.xml" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <PropertyGroup>
+    <PostBuildEvent>robocopy.exe "$(ProjectDir)docs\en-US" "$(TargetDir)en-US" &gt;nul 2&gt;&amp;1
+exit 0</PostBuildEvent>
+  </PropertyGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
   <Target Name="BeforeBuild">

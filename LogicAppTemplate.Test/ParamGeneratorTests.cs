@@ -25,7 +25,22 @@ namespace LogicAppTemplate.Test
             //check parameters
             Assert.IsNull(defintion["parameters"]["INT0014-NewHires-ResourceGroup"]);
             Assert.IsNull(defintion["parameters"]["logicAppLocation"]);
+
+            Assert.AreNotEqual(defintion["parameters"]["logicAppName"]["value"].ToString(), "[]");
             Assert.AreEqual("INT0014-NewHires-Trigger", defintion["parameters"]["logicAppName"]["value"]);
+        }
+
+        [TestMethod]
+        public void GenerateParameterFileFromTemplateClearVariables()
+        {
+            var content = GetEmbededFileContent("LogicAppTemplate.Test.TestFiles.paramGeneratorLogicAppTemplate.json");
+            var generator = new ParamGenerator();
+            generator.ClearParameterValues = true;
+            var defintion = generator.CreateParameterFileFromTemplate(JObject.Parse(content));
+
+            //check parameters
+            Assert.IsNotNull(defintion["parameters"]["logicAppName"]);
+            Assert.AreEqual(defintion["parameters"]["logicAppName"]["value"].ToString(), "[]");
         }
 
         [TestMethod]
