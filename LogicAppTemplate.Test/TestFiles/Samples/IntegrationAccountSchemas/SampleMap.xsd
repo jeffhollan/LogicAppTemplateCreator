@@ -1,0 +1,449 @@
+<?xml version="1.0" encoding="utf-16"?>
+<xs:schema xmlns="http://IntegrationAccount1.Schema2" xmlns:b="http://schemas.microsoft.com/BizTalk/2003" targetNamespace="http://IntegrationAccount1.Schema2" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+  <xs:annotation>
+    <xs:appinfo>
+      <schemaEditorExtension:schemaInfo namespaceAlias="b" extensionClass="Microsoft.Azure.Integration.DesignTools.FlatFileExtension.FlatFileExtension" standardName="Flat File" xmlns:schemaEditorExtension="http://schemas.microsoft.com/BizTalk/2003/SchemaEditorExtensions" />
+      <b:schemaInfo standard="Flat File" codepage="1252" default_pad_char=" " pad_char_type="char" count_positions_by_byte="false" parser_optimization="speed" lookahead_depth="3" suppress_empty_nodes="false" generate_empty_nodes="true" allow_early_termination="false" early_terminate_optional_fields="false" allow_message_breakup_of_infix_root="false" compile_parse_tables="false" root_reference="Employees" />
+    </xs:appinfo>
+  </xs:annotation>
+  <xs:element name="Employees">
+    <xs:annotation>
+      <xs:appinfo>
+        <b:recordInfo structure="delimited" child_delimiter_type="hex" child_delimiter="0xD 0xA" child_order="postfix" sequence_number="1" preserve_delimiter_for_empty_data="true" suppress_trailing_delimiters="false" />
+      </xs:appinfo>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:sequence>
+        <xs:annotation>
+          <xs:appinfo>
+            <groupInfo sequence_number="0" xmlns="http://schemas.microsoft.com/BizTalk/2003" />
+          </xs:appinfo>
+        </xs:annotation>
+        <xs:element name="Header">
+          <xs:annotation>
+            <xs:appinfo>
+              <b:recordInfo structure="positional" sequence_number="1" preserve_delimiter_for_empty_data="true" suppress_trailing_delimiters="false" />
+            </xs:appinfo>
+          </xs:annotation>
+          <xs:complexType>
+            <xs:sequence>
+              <xs:annotation>
+                <xs:appinfo>
+                  <groupInfo sequence_number="0" xmlns="http://schemas.microsoft.com/BizTalk/2003" />
+                </xs:appinfo>
+              </xs:annotation>
+              <xs:element minOccurs="1" name="RecordTypeCode" type="xs:string">
+                <xs:annotation>
+                  <xs:appinfo>
+                    <b:fieldInfo justification="left" pos_offset="0" pos_length="1" sequence_number="1" />
+                  </xs:appinfo>
+                </xs:annotation>
+              </xs:element>
+              <xs:element minOccurs="1" name="TapeId" type="xs:string">
+                <xs:annotation>
+                  <xs:appinfo>
+                    <b:fieldInfo justification="left" pos_offset="0" pos_length="3" sequence_number="2" />
+                  </xs:appinfo>
+                </xs:annotation>
+              </xs:element>
+              <xs:element minOccurs="1" name="ClientId" type="xs:string">
+                <xs:annotation>
+                  <xs:appinfo>
+                    <b:fieldInfo justification="left" pos_offset="0" pos_length="5" sequence_number="3" />
+                  </xs:appinfo>
+                </xs:annotation>
+              </xs:element>
+              <xs:element minOccurs="1" name="RecordCount" type="xs:string">
+                <xs:annotation>
+                  <xs:appinfo>
+                    <b:fieldInfo justification="left" pos_offset="0" pos_length="9" sequence_number="4" />
+                  </xs:appinfo>
+                </xs:annotation>
+              </xs:element>
+              <xs:element minOccurs="1" name="Filler" type="xs:string">
+                <xs:annotation>
+                  <xs:appinfo>
+                    <b:fieldInfo sequence_number="5" justification="left" pos_length="1982" />
+                  </xs:appinfo>
+                </xs:annotation>
+              </xs:element>
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+        <xs:element maxOccurs="unbounded" name="Body">
+          <xs:annotation>
+            <xs:appinfo>
+              <b:recordInfo structure="positional" sequence_number="2" preserve_delimiter_for_empty_data="true" suppress_trailing_delimiters="false" />
+            </xs:appinfo>
+          </xs:annotation>
+          <xs:complexType>
+            <xs:sequence>
+              <xs:annotation>
+                <xs:appinfo>
+                  <groupInfo sequence_number="0" xmlns="http://schemas.microsoft.com/BizTalk/2003" />
+                </xs:appinfo>
+              </xs:annotation>
+              <xs:element minOccurs="1" name="RecordTypeCode" type="xs:string">
+                <xs:annotation>
+                  <xs:appinfo>
+                    <b:fieldInfo justification="left" pos_offset="0" pos_length="1" sequence_number="1" />
+                  </xs:appinfo>
+                </xs:annotation>
+              </xs:element>
+              <xs:element minOccurs="1" name="TapeId" type="xs:string">
+                <xs:annotation>
+                  <xs:appinfo>
+                    <b:fieldInfo justification="left" pos_offset="0" pos_length="3" sequence_number="2" />
+                  </xs:appinfo>
+                </xs:annotation>
+              </xs:element>
+              <xs:element minOccurs="1" name="ClientId" type="xs:string">
+                <xs:annotation>
+                  <xs:appinfo>
+                    <b:fieldInfo justification="left" pos_offset="0" pos_length="5" sequence_number="3" />
+                  </xs:appinfo>
+                </xs:annotation>
+              </xs:element>
+              <xs:element minOccurs="1" name="PlanId" type="xs:string">
+                <xs:annotation>
+                  <xs:appinfo>
+                    <b:fieldInfo sequence_number="4" pos_offset="0" pos_length="2" justification="left" />
+                  </xs:appinfo>
+                </xs:annotation>
+              </xs:element>
+              <xs:element minOccurs="1" name="MemberNumber" type="xs:string">
+                <xs:annotation>
+                  <xs:appinfo>
+                    <b:fieldInfo sequence_number="5" pos_offset="0" pos_length="9" justification="left" />
+                  </xs:appinfo>
+                </xs:annotation>
+              </xs:element>
+              <xs:element minOccurs="1" name="SocialInsuranceNumber" type="xs:string">
+                <xs:annotation>
+                  <xs:appinfo>
+                    <b:fieldInfo sequence_number="6" pos_offset="0" pos_length="9" justification="left" />
+                  </xs:appinfo>
+                </xs:annotation>
+              </xs:element>
+              <xs:element minOccurs="1" name="LastName" type="xs:string">
+                <xs:annotation>
+                  <xs:appinfo>
+                    <b:fieldInfo sequence_number="7" pos_offset="0" pos_length="32" justification="left" />
+                  </xs:appinfo>
+                </xs:annotation>
+              </xs:element>
+              <xs:element minOccurs="1" name="FirstName" type="xs:string">
+                <xs:annotation>
+                  <xs:appinfo>
+                    <b:fieldInfo sequence_number="8" pos_offset="0" pos_length="32" justification="left" />
+                  </xs:appinfo>
+                </xs:annotation>
+              </xs:element>
+              <xs:element minOccurs="1" name="AddressLine1" type="xs:string">
+                <xs:annotation>
+                  <xs:appinfo>
+                    <b:fieldInfo sequence_number="9" pos_offset="0" pos_length="32" justification="left" />
+                  </xs:appinfo>
+                </xs:annotation>
+              </xs:element>
+              <xs:element minOccurs="1" name="AddressLine2" type="xs:string">
+                <xs:annotation>
+                  <xs:appinfo>
+                    <b:fieldInfo sequence_number="10" pos_offset="0" pos_length="32" justification="left" />
+                  </xs:appinfo>
+                </xs:annotation>
+              </xs:element>
+              <xs:element minOccurs="1" name="AddressLine3" type="xs:string">
+                <xs:annotation>
+                  <xs:appinfo>
+                    <b:fieldInfo sequence_number="11" pos_offset="0" pos_length="32" justification="left" />
+                  </xs:appinfo>
+                </xs:annotation>
+              </xs:element>
+              <xs:element minOccurs="1" name="AddressLine4" type="xs:string">
+                <xs:annotation>
+                  <xs:appinfo>
+                    <b:fieldInfo sequence_number="12" pos_offset="0" pos_length="32" justification="left" />
+                  </xs:appinfo>
+                </xs:annotation>
+              </xs:element>
+              <xs:element minOccurs="1" name="PostalCode" type="xs:string">
+                <xs:annotation>
+                  <xs:appinfo>
+                    <b:fieldInfo sequence_number="13" pos_offset="0" pos_length="6" justification="left" />
+                  </xs:appinfo>
+                </xs:annotation>
+              </xs:element>
+              <xs:element minOccurs="1" name="ResidenceCode" type="xs:string">
+                <xs:annotation>
+                  <xs:appinfo>
+                    <b:fieldInfo sequence_number="14" pos_offset="0" pos_length="3" justification="left" />
+                  </xs:appinfo>
+                </xs:annotation>
+              </xs:element>
+              <xs:element minOccurs="1" name="Filler" type="xs:string">
+                <xs:annotation>
+                  <xs:appinfo>
+                    <b:fieldInfo sequence_number="15" pos_offset="0" pos_length="977" justification="left" />
+                  </xs:appinfo>
+                </xs:annotation>
+              </xs:element>
+              <xs:element minOccurs="1" name="ProvinceOfEmployment" type="xs:string">
+                <xs:annotation>
+                  <xs:appinfo>
+                    <b:fieldInfo sequence_number="16" pos_offset="0" pos_length="3" justification="left" />
+                  </xs:appinfo>
+                </xs:annotation>
+              </xs:element>
+              <xs:element minOccurs="1" name="Filler1" type="xs:string">
+                <xs:annotation>
+                  <xs:appinfo>
+                    <b:fieldInfo sequence_number="17" pos_offset="0" pos_length="8" justification="left" />
+                  </xs:appinfo>
+                </xs:annotation>
+              </xs:element>
+              <xs:element minOccurs="1" name="DateOfBirth" type="xs:string">
+                <xs:annotation>
+                  <xs:appinfo>
+                    <b:fieldInfo sequence_number="18" pos_offset="0" pos_length="8" justification="left" />
+                  </xs:appinfo>
+                </xs:annotation>
+              </xs:element>
+              <xs:element minOccurs="1" name="DateOfHire" type="xs:string">
+                <xs:annotation>
+                  <xs:appinfo>
+                    <b:fieldInfo sequence_number="19" pos_offset="0" pos_length="8" justification="left" />
+                  </xs:appinfo>
+                </xs:annotation>
+              </xs:element>
+              <xs:element minOccurs="1" name="DateOfCoverage" type="xs:string">
+                <xs:annotation>
+                  <xs:appinfo>
+                    <b:fieldInfo sequence_number="20" pos_offset="0" pos_length="8" justification="left" />
+                  </xs:appinfo>
+                </xs:annotation>
+              </xs:element>
+              <xs:element minOccurs="1" name="Filler2" type="xs:string">
+                <xs:annotation>
+                  <xs:appinfo>
+                    <b:fieldInfo sequence_number="21" pos_offset="0" pos_length="18" justification="left" />
+                  </xs:appinfo>
+                </xs:annotation>
+              </xs:element>
+              <xs:element minOccurs="1" name="LanguageCode" type="xs:string">
+                <xs:annotation>
+                  <xs:appinfo>
+                    <b:fieldInfo sequence_number="22" pos_offset="0" pos_length="1" justification="left" />
+                  </xs:appinfo>
+                </xs:annotation>
+              </xs:element>
+              <xs:element minOccurs="1" name="Filler3" type="xs:string">
+                <xs:annotation>
+                  <xs:appinfo>
+                    <b:fieldInfo sequence_number="23" pos_offset="0" pos_length="52" justification="left" />
+                  </xs:appinfo>
+                </xs:annotation>
+              </xs:element>
+              <xs:element minOccurs="1" name="EmploymentStatus" type="xs:string">
+                <xs:annotation>
+                  <xs:appinfo>
+                    <b:fieldInfo sequence_number="24" pos_offset="0" pos_length="1" justification="left" />
+                  </xs:appinfo>
+                </xs:annotation>
+              </xs:element>
+              <xs:element minOccurs="1" name="EffectiveDate" type="xs:string">
+                <xs:annotation>
+                  <xs:appinfo>
+                    <b:fieldInfo sequence_number="25" pos_offset="0" pos_length="8" justification="left" />
+                  </xs:appinfo>
+                </xs:annotation>
+              </xs:element>
+              <xs:element minOccurs="1" name="Filler4" type="xs:string">
+                <xs:annotation>
+                  <xs:appinfo>
+                    <b:fieldInfo sequence_number="26" pos_offset="0" pos_length="5" justification="left" />
+                  </xs:appinfo>
+                </xs:annotation>
+              </xs:element>
+              <xs:element minOccurs="1" name="Gender" type="xs:string">
+                <xs:annotation>
+                  <xs:appinfo>
+                    <b:fieldInfo sequence_number="27" pos_offset="0" pos_length="1" justification="left" />
+                  </xs:appinfo>
+                </xs:annotation>
+              </xs:element>
+              <xs:element minOccurs="1" name="Filler5" type="xs:string">
+                <xs:annotation>
+                  <xs:appinfo>
+                    <b:fieldInfo sequence_number="28" pos_offset="0" pos_length="30" justification="left" />
+                  </xs:appinfo>
+                </xs:annotation>
+              </xs:element>
+              <xs:element minOccurs="1" name="PlanFlag" type="xs:string">
+                <xs:annotation>
+                  <xs:appinfo>
+                    <b:fieldInfo sequence_number="29" pos_offset="0" pos_length="1" justification="left" />
+                  </xs:appinfo>
+                </xs:annotation>
+              </xs:element>
+              <xs:element minOccurs="1" name="Filler6" type="xs:string">
+                <xs:annotation>
+                  <xs:appinfo>
+                    <b:fieldInfo sequence_number="30" pos_offset="0" pos_length="67" justification="left" />
+                  </xs:appinfo>
+                </xs:annotation>
+              </xs:element>
+              <xs:element minOccurs="1" name="EADProvinceOfEmployment" type="xs:string">
+                <xs:annotation>
+                  <xs:appinfo>
+                    <b:fieldInfo sequence_number="31" pos_offset="0" pos_length="3" justification="left" />
+                  </xs:appinfo>
+                </xs:annotation>
+              </xs:element>
+              <xs:element minOccurs="1" name="Filler7" type="xs:string">
+                <xs:annotation>
+                  <xs:appinfo>
+                    <b:fieldInfo sequence_number="32" pos_offset="0" pos_length="16" justification="left" />
+                  </xs:appinfo>
+                </xs:annotation>
+              </xs:element>
+              <xs:element minOccurs="1" name="EADDateOfHire" type="xs:string">
+                <xs:annotation>
+                  <xs:appinfo>
+                    <b:fieldInfo sequence_number="33" pos_offset="0" pos_length="8" justification="left" />
+                  </xs:appinfo>
+                </xs:annotation>
+              </xs:element>
+              <xs:element minOccurs="1" name="EADLanguageCode" type="xs:string">
+                <xs:annotation>
+                  <xs:appinfo>
+                    <b:fieldInfo sequence_number="34" pos_offset="0" pos_length="1" justification="left" />
+                  </xs:appinfo>
+                </xs:annotation>
+              </xs:element>
+              <xs:element minOccurs="1" name="Filler8" type="xs:string">
+                <xs:annotation>
+                  <xs:appinfo>
+                    <b:fieldInfo sequence_number="35" pos_offset="0" pos_length="1" justification="left" />
+                  </xs:appinfo>
+                </xs:annotation>
+              </xs:element>
+              <xs:element minOccurs="1" name="EADDateOfBirth" type="xs:string">
+                <xs:annotation>
+                  <xs:appinfo>
+                    <b:fieldInfo sequence_number="36" pos_offset="0" pos_length="8" justification="left" />
+                  </xs:appinfo>
+                </xs:annotation>
+              </xs:element>
+              <xs:element minOccurs="1" name="EADDateOfCoverage" type="xs:string">
+                <xs:annotation>
+                  <xs:appinfo>
+                    <b:fieldInfo sequence_number="37" pos_offset="0" pos_length="8" justification="left" />
+                  </xs:appinfo>
+                </xs:annotation>
+              </xs:element>
+              <xs:element minOccurs="1" name="Filler9" type="xs:string">
+                <xs:annotation>
+                  <xs:appinfo>
+                    <b:fieldInfo sequence_number="38" pos_offset="0" pos_length="10" justification="left" />
+                  </xs:appinfo>
+                </xs:annotation>
+              </xs:element>
+              <xs:element minOccurs="1" name="Subdivision" type="xs:string">
+                <xs:annotation>
+                  <xs:appinfo>
+                    <b:fieldInfo sequence_number="39" pos_offset="0" pos_length="2" justification="left" />
+                  </xs:appinfo>
+                </xs:annotation>
+              </xs:element>
+              <xs:element minOccurs="1" name="Filler10" type="xs:string">
+                <xs:annotation>
+                  <xs:appinfo>
+                    <b:fieldInfo sequence_number="40" pos_offset="0" pos_length="15" justification="left" />
+                  </xs:appinfo>
+                </xs:annotation>
+              </xs:element>
+              <xs:element minOccurs="1" name="EnrollmentFlag" type="xs:string">
+                <xs:annotation>
+                  <xs:appinfo>
+                    <b:fieldInfo sequence_number="41" pos_offset="0" pos_length="1" justification="left" />
+                  </xs:appinfo>
+                </xs:annotation>
+              </xs:element>
+              <xs:element minOccurs="1" name="EmailFlag" type="xs:string">
+                <xs:annotation>
+                  <xs:appinfo>
+                    <b:fieldInfo sequence_number="42" pos_offset="0" pos_length="1" justification="left" />
+                  </xs:appinfo>
+                </xs:annotation>
+              </xs:element>
+              <xs:element minOccurs="1" name="EmailAddress" type="xs:string">
+                <xs:annotation>
+                  <xs:appinfo>
+                    <b:fieldInfo sequence_number="43" pos_offset="0" pos_length="64" justification="left" />
+                  </xs:appinfo>
+                </xs:annotation>
+              </xs:element>
+              <xs:element minOccurs="1" name="PhoneFlag" type="xs:string">
+                <xs:annotation>
+                  <xs:appinfo>
+                    <b:fieldInfo sequence_number="44" pos_offset="0" pos_length="1" justification="left" />
+                  </xs:appinfo>
+                </xs:annotation>
+              </xs:element>
+              <xs:element minOccurs="1" name="PhoneCountryCode" type="xs:string">
+                <xs:annotation>
+                  <xs:appinfo>
+                    <b:fieldInfo sequence_number="45" pos_offset="0" pos_length="5" justification="left" />
+                  </xs:appinfo>
+                </xs:annotation>
+              </xs:element>
+              <xs:element minOccurs="1" name="PhoneCityCode" type="xs:string">
+                <xs:annotation>
+                  <xs:appinfo>
+                    <b:fieldInfo sequence_number="46" pos_offset="0" pos_length="5" justification="left" />
+                  </xs:appinfo>
+                </xs:annotation>
+              </xs:element>
+              <xs:element minOccurs="1" name="Phone" type="xs:string">
+                <xs:annotation>
+                  <xs:appinfo>
+                    <b:fieldInfo sequence_number="47" pos_offset="0" pos_length="12" justification="left" />
+                  </xs:appinfo>
+                </xs:annotation>
+              </xs:element>
+              <xs:element minOccurs="1" name="PhoneExtention" type="xs:string">
+                <xs:annotation>
+                  <xs:appinfo>
+                    <b:fieldInfo sequence_number="48" pos_offset="0" pos_length="5" justification="left" />
+                  </xs:appinfo>
+                </xs:annotation>
+              </xs:element>
+              <xs:element minOccurs="1" name="Filler11" type="xs:string">
+                <xs:annotation>
+                  <xs:appinfo>
+                    <b:fieldInfo sequence_number="49" pos_offset="0" pos_length="63" justification="left" />
+                  </xs:appinfo>
+                </xs:annotation>
+              </xs:element>
+              <xs:element minOccurs="1" name="AnnualIncomeEstimate" type="xs:string">
+                <xs:annotation>
+                  <xs:appinfo>
+                    <b:fieldInfo sequence_number="50" pos_offset="0" pos_length="11" justification="left" />
+                  </xs:appinfo>
+                </xs:annotation>
+              </xs:element>
+              <xs:element minOccurs="1" name="Filler12" type="xs:string">
+                <xs:annotation>
+                  <xs:appinfo>
+                    <b:fieldInfo sequence_number="51" pos_offset="0" pos_length="334" justification="left" />
+                  </xs:appinfo>
+                </xs:annotation>
+              </xs:element>
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+</xs:schema>

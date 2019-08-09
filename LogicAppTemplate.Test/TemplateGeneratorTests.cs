@@ -14,7 +14,7 @@ using LogicAppTemplate.Test;
 
 namespace LogicAppTemplate.Tests
 {
-    
+
     [TestClass()]
     public class TemplateGeneratorTests
     {
@@ -22,17 +22,17 @@ namespace LogicAppTemplate.Tests
         [TestMethod()]
         public void generateDefinitionTest()
         {
-            
+
         }
 
         [TestMethod()]
         public void ConvertWithTokenTest()
         {
-           /* LogicAppTemplate.TemplateGenerator generator = new TemplateGenerator(armtoken);
-            var result = generator.ConvertWithToken(subscriptionId: "80d4fe69-c95b-4dd2-a938-9250f1c8ab03", resourceGroup: "Foo", logicAppName: "Bar", bearerToken: armtoken).Result;
-            Console.WriteLine(result.ToString(Newtonsoft.Json.Formatting.Indented));
-            Assert.IsInstanceOfType(result, typeof(JObject));
-            Assert.IsNotNull(result);*/
+            /* LogicAppTemplate.TemplateGenerator generator = new TemplateGenerator(armtoken);
+             var result = generator.ConvertWithToken(subscriptionId: "80d4fe69-c95b-4dd2-a938-9250f1c8ab03", resourceGroup: "Foo", logicAppName: "Bar", bearerToken: armtoken).Result;
+             Console.WriteLine(result.ToString(Newtonsoft.Json.Formatting.Indented));
+             Assert.IsInstanceOfType(result, typeof(JObject));
+             Assert.IsNotNull(result);*/
         }
 
 
@@ -41,25 +41,25 @@ namespace LogicAppTemplate.Tests
         {
             var content = GetEmbededFileContent("LogicAppTemplate.Test.TestFiles.WorkflowTest.json");
 
-            var generator = new TemplateGenerator("","","",null);
+            var generator = new TemplateGenerator("", "", "", null);
 
             var defintion = generator.generateDefinition(JObject.Parse(content)).GetAwaiter().GetResult();
 
             //check parameters
-            Assert.AreEqual("[resourceGroup().name]",defintion["parameters"]["INT0014-NewHires-ResourceGroup"]["defaultValue"]);
+            Assert.AreEqual("[resourceGroup().name]", defintion["parameters"]["INT0014-NewHires-ResourceGroup"]["defaultValue"]);
             Assert.AreEqual("[resourceGroup().location]", defintion["parameters"]["logicAppLocation"]["defaultValue"]);
             Assert.AreEqual("INT0014-NewHires-Trigger", defintion["parameters"]["logicAppName"]["defaultValue"]);
 
             //check Upload Attachment
             Assert.AreEqual("[concat('/subscriptions/',subscription().subscriptionId,'/resourceGroups/',parameters('INT0014-NewHires-ResourceGroup'),'/providers/Microsoft.Logic/workflows/',parameters('INT0014-NewHires-LogicAppName'))]", defintion["resources"][0]["properties"]["definition"]["actions"]["INT0014-NewHires"]["inputs"]["host"]["workflow"]["id"]);
         }
-
+     
         [TestMethod()]
         public void TestWorkflowOtherResourceGroup()
         {
             var content = GetEmbededFileContent("LogicAppTemplate.Test.TestFiles.WorkflowTestOtherResourcegroup.json");
 
-            var generator = new TemplateGenerator("","","",null);
+            var generator = new TemplateGenerator("", "", "", null);
 
             var defintion = generator.generateDefinition(JObject.Parse(content)).GetAwaiter().GetResult();
 
@@ -77,7 +77,7 @@ namespace LogicAppTemplate.Tests
         {
             var content = GetEmbededFileContent("LogicAppTemplate.Test.TestFiles.APIM.json");
 
-            var generator = new TemplateGenerator("","","",null);
+            var generator = new TemplateGenerator("", "", "", null);
 
             var defintion = generator.generateDefinition(JObject.Parse(content)).GetAwaiter().GetResult();
             //check parameters
@@ -97,7 +97,7 @@ namespace LogicAppTemplate.Tests
         {
             var content = GetEmbededFileContent("LogicAppTemplate.Test.TestFiles.APIMMultipleSame.json");
 
-            var generator = new TemplateGenerator("","","",null);
+            var generator = new TemplateGenerator("", "", "", null);
 
             var defintion = generator.generateDefinition(JObject.Parse(content)).GetAwaiter().GetResult();
 
@@ -127,7 +127,7 @@ namespace LogicAppTemplate.Tests
         {
             var content = GetEmbededFileContent("LogicAppTemplate.Test.TestFiles.APIMMultipleDiffrent.json");
 
-            var generator = new TemplateGenerator("","","",null);
+            var generator = new TemplateGenerator("", "", "", null);
 
             var defintion = generator.generateDefinition(JObject.Parse(content)).GetAwaiter().GetResult();
 
@@ -156,7 +156,7 @@ namespace LogicAppTemplate.Tests
             Assert.IsNull(defintion["parameters"]["apimInstanceName3"]);
             Assert.IsNull(defintion["parameters"]["apimApiId3"]);
             Assert.IsNull(defintion["parameters"]["apimSubscriptionKey3"]);
-            
+
             //check upload Attachment3 should be same as 1
             Assert.AreEqual("[concat('/subscriptions/',subscription().subscriptionId,'/resourceGroups/', parameters('apimResourceGroup'),'/providers/Microsoft.ApiManagement/service/', parameters('apimInstanceName'),'/apis/', parameters('apimApiId'),'')]", defintion["resources"][0]["properties"]["definition"]["actions"]["UploadAttachment3"]["inputs"]["api"]["id"]);
             Assert.AreEqual("[parameters('apimSubscriptionKey')]", defintion["resources"][0]["properties"]["definition"]["actions"]["UploadAttachment3"]["inputs"]["subscriptionKey"]);
@@ -166,7 +166,7 @@ namespace LogicAppTemplate.Tests
         {
             var content = GetEmbededFileContent("LogicAppTemplate.Test.TestFiles.complex-logicapp-if.json");
 
-            var generator = new TemplateGenerator("","","",null);
+            var generator = new TemplateGenerator("", "", "", null);
 
             var defintion = generator.generateDefinition(JObject.Parse(content)).GetAwaiter().GetResult();
 
@@ -182,7 +182,7 @@ namespace LogicAppTemplate.Tests
         {
             var content = GetEmbededFileContent("LogicAppTemplate.Test.TestFiles.complex-logicapp-switch.json");
 
-            var generator = new TemplateGenerator("","","",null);
+            var generator = new TemplateGenerator("", "", "", null);
 
             var defintion = generator.generateDefinition(JObject.Parse(content)).GetAwaiter().GetResult();
 
@@ -200,7 +200,7 @@ namespace LogicAppTemplate.Tests
         {
             var content = GetEmbededFileContent("LogicAppTemplate.Test.TestFiles.parameter-test-object.json");
 
-            var generator = new TemplateGenerator("","","",null);
+            var generator = new TemplateGenerator("", "", "", null);
 
             var defintion = generator.generateDefinition(JObject.Parse(content)).GetAwaiter().GetResult();
 
@@ -211,7 +211,7 @@ namespace LogicAppTemplate.Tests
             Assert.AreEqual(571, (int)defintion["parameters"]["paramismanager"]["defaultValue"]["1"]);
             Assert.AreEqual(572, (int)defintion["parameters"]["paramismanager"]["defaultValue"]["No"]);
             Assert.AreEqual(571, (int)defintion["parameters"]["paramismanager"]["defaultValue"]["Yes"]);
-            Assert.AreEqual("object", defintion["parameters"]["paramismanager"]["type"]);           
+            Assert.AreEqual("object", defintion["parameters"]["paramismanager"]["type"]);
 
         }
 
@@ -220,11 +220,11 @@ namespace LogicAppTemplate.Tests
         {
             var content = GetEmbededFileContent("LogicAppTemplate.Test.TestFiles.file-test-trigger-gateway.json");
 
-            var generator = new TemplateGenerator("", "fakeb73-d0ff-455d-a2bf-eae0b300696d", "",null);
-            var defintion = generator.generateDefinition(JObject.Parse(content),false).GetAwaiter().GetResult();
+            var generator = new TemplateGenerator("", "fakeb73-d0ff-455d-a2bf-eae0b300696d", "", null);
+            var defintion = generator.generateDefinition(JObject.Parse(content), false).GetAwaiter().GetResult();
 
             //check parameters
-            Assert.AreEqual(defintion["parameters"]["When_a_file_is_createdFrequency"]["defaultValue"],"Minute");
+            Assert.AreEqual(defintion["parameters"]["When_a_file_is_createdFrequency"]["defaultValue"], "Minute");
             Assert.AreEqual(defintion["parameters"]["When_a_file_is_createdInterval"]["defaultValue"], 3);
             Assert.AreEqual(defintion["parameters"]["filesystem-1_name"]["defaultValue"], "filesystem-1");
 
@@ -234,7 +234,7 @@ namespace LogicAppTemplate.Tests
             Assert.AreEqual("[parameters('When_a_file_is_createdInterval')]", defintion["resources"][0]["properties"]["definition"]["triggers"]["When_a_file_is_created"]["recurrence"]["interval"]);
 
             //make sure no depends on is added
-            Assert.AreEqual(0,defintion["resources"][0]["dependsOn"].Count());
+            Assert.AreEqual(0, defintion["resources"][0]["dependsOn"].Count());
 
             //File trigger parameters and base64 handling
             Assert.IsNotNull(defintion["resources"][0]["properties"]["definition"]["triggers"]["When_a_file_is_created"]["metadata"]["[base64(parameters('When_a_file_is_created-folderPath'))]"]);
@@ -247,7 +247,7 @@ namespace LogicAppTemplate.Tests
         {
             var content = GetEmbededFileContent("LogicAppTemplate.Test.TestFiles.file-test-readfolder.json");
 
-            var generator = new TemplateGenerator("", "fakeecb73-d0ff-455d-a2bf-eae0b300696d", "",null);
+            var generator = new TemplateGenerator("", "fakeecb73-d0ff-455d-a2bf-eae0b300696d", "", null);
             var defintion = generator.generateDefinition(JObject.Parse(content), false).GetAwaiter().GetResult();
 
             //check parameters
@@ -275,7 +275,7 @@ namespace LogicAppTemplate.Tests
         {
             var content = GetEmbededFileContent("LogicAppTemplate.Test.TestFiles.IntegrationAccount-FlatFileAndTransform.json");
 
-            var generator = new TemplateGenerator("","","",null);
+            var generator = new TemplateGenerator("", "", "", null);
 
             var defintion = generator.generateDefinition(JObject.Parse(content)).GetAwaiter().GetResult();
 
@@ -297,7 +297,7 @@ namespace LogicAppTemplate.Tests
         {
             var content = GetEmbededFileContent("LogicAppTemplate.Test.TestFiles.HTTP-basic.json");
 
-            var generator = new TemplateGenerator("","","",null);
+            var generator = new TemplateGenerator("", "", "", null);
 
             var defintion = generator.generateDefinition(JObject.Parse(content)).GetAwaiter().GetResult();
 
@@ -405,7 +405,7 @@ namespace LogicAppTemplate.Tests
         {
             var content = GetEmbededFileContent("LogicAppTemplate.Test.TestFiles.HTTP-Authentication.json");
 
-            var generator = new TemplateGenerator("","","",null);
+            var generator = new TemplateGenerator("", "", "", null);
 
             var defintion = generator.generateDefinition(JObject.Parse(content)).GetAwaiter().GetResult();
 
@@ -438,9 +438,9 @@ namespace LogicAppTemplate.Tests
         {
             var apiresource = JObject.Parse(GetEmbededFileContent("LogicAppTemplate.Test.TestFiles.ApiSource.filegateway.json"));
             var apiresourceInstance = JObject.Parse(GetEmbededFileContent("LogicAppTemplate.Test.TestFiles.ApiSource.filegatewayInstance.json"));
-            var generator = new TemplateGenerator("","","",null);
+            var generator = new TemplateGenerator("", "", "", null);
 
-            var defintion = generator.generateConnectionTemplate(apiresource, apiresourceInstance,"filesystem", "[concat('/subscriptions/', subscription().subscriptionId, '/providers/Microsoft.Web/locations/', parameters('logicAppLocation'), '/managedApis/filesystem')]", "filesystem_name");
+            var defintion = generator.generateConnectionTemplate(apiresource, apiresourceInstance, "filesystem", "[concat('/subscriptions/', subscription().subscriptionId, '/providers/Microsoft.Web/locations/', parameters('logicAppLocation'), '/managedApis/filesystem')]", "filesystem_name");
 
             var template = generator.GetTemplate();
             Assert.AreEqual("windows", template.parameters["filesystem_authType"]["defaultValue"]);
@@ -468,9 +468,9 @@ namespace LogicAppTemplate.Tests
         {
             var apiresource = JObject.Parse(GetEmbededFileContent("LogicAppTemplate.Test.TestFiles.ApiSource.sqlgateway.json"));
             var apiresourceInstance = JObject.Parse(GetEmbededFileContent("LogicAppTemplate.Test.TestFiles.ApiSource.sqlgatewayInstance.json"));
-            var generator = new TemplateGenerator("","","",null);
+            var generator = new TemplateGenerator("", "", "", null);
 
-            var defintion = generator.generateConnectionTemplate(apiresource, apiresourceInstance,"sql", "[concat('/subscriptions/', subscription().subscriptionId, '/providers/Microsoft.Web/locations/', parameters('logicAppLocation'), '/managedApis/', 'sql')]","sql_name");
+            var defintion = generator.generateConnectionTemplate(apiresource, apiresourceInstance, "sql", "[concat('/subscriptions/', subscription().subscriptionId, '/providers/Microsoft.Web/locations/', parameters('logicAppLocation'), '/managedApis/', 'sql')]", "sql_name");
 
             var template = generator.GetTemplate();
             Assert.AreEqual("windows", template.parameters["sql_authType"]["defaultValue"]);
@@ -486,7 +486,7 @@ namespace LogicAppTemplate.Tests
 
             Assert.AreEqual("[parameters('sql_name')]", defintion["name"]);
             Assert.AreEqual("[parameters('sql_displayName')]", defintion["properties"]["displayName"]);
-            
+
             Assert.AreEqual("SQL server OnPrem", template.parameters["sql_displayName"]["defaultValue"]);
             Assert.AreEqual("[concat('/subscriptions/', subscription().subscriptionId, '/providers/Microsoft.Web/locations/', parameters('logicAppLocation'), '/managedApis/', 'sql')]", defintion["properties"]["api"]["id"]);
 
@@ -497,12 +497,12 @@ namespace LogicAppTemplate.Tests
         {
             var apiresource = JObject.Parse(GetEmbededFileContent("LogicAppTemplate.Test.TestFiles.ApiSource.sqlcloud.json"));
             var apiresourceInstance = JObject.Parse(GetEmbededFileContent("LogicAppTemplate.Test.TestFiles.ApiSource.sqlcloudInstance.json"));
-            var generator = new TemplateGenerator("","","",null);
+            var generator = new TemplateGenerator("", "", "", null);
 
-            var defintion = generator.generateConnectionTemplate(apiresource, apiresourceInstance,"sql-1", "[concat('/subscriptions/', subscription().subscriptionId, '/providers/Microsoft.Web/locations/', parameters('logicAppLocation'), '/managedApis/', 'sql')]","sql-1_name");
+            var defintion = generator.generateConnectionTemplate(apiresource, apiresourceInstance, "sql-1", "[concat('/subscriptions/', subscription().subscriptionId, '/providers/Microsoft.Web/locations/', parameters('logicAppLocation'), '/managedApis/', 'sql')]", "sql-1_name");
 
             var template = generator.GetTemplate();
-            Assert.IsNull(template.parameters["sql-1_authType"]);           
+            Assert.IsNull(template.parameters["sql-1_authType"]);
             Assert.AreEqual("Username credential", template.parameters["sql-1_username"]["metadata"]["description"]);
 
             Assert.AreEqual("[parameters('sql-1_server')]", defintion["properties"]["parameterValues"]["server"]);
@@ -525,9 +525,9 @@ namespace LogicAppTemplate.Tests
         {
             var apiresource = JObject.Parse(GetEmbededFileContent("LogicAppTemplate.Test.TestFiles.ApiSource.azureblob.json"));
             var apiresourceInstance = JObject.Parse(GetEmbededFileContent("LogicAppTemplate.Test.TestFiles.ApiSource.azureblobinstance.json"));
-            var generator = new TemplateGenerator("","","",null);
+            var generator = new TemplateGenerator("", "", "", null);
 
-            var defintion = generator.generateConnectionTemplate(apiresource, apiresourceInstance, "azureblob","[concat('/subscriptions/', subscription().subscriptionId, '/providers/Microsoft.Web/locations/', parameters('logicAppLocation'), '/managedApis/azureblob')]","azureblob_name");
+            var defintion = generator.generateConnectionTemplate(apiresource, apiresourceInstance, "azureblob", "[concat('/subscriptions/', subscription().subscriptionId, '/providers/Microsoft.Web/locations/', parameters('logicAppLocation'), '/managedApis/azureblob')]", "azureblob_name");
 
             var template = generator.GetTemplate();
 
@@ -574,7 +574,7 @@ namespace LogicAppTemplate.Tests
         {
             var content = GetEmbededFileContent("LogicAppTemplate.Test.TestFiles.misingparameter.json");
 
-            var generator = new TemplateGenerator("", "FAKEd0d-bcaf-4a6f-b27a-9fe3f331692c", "",null);
+            var generator = new TemplateGenerator("", "FAKEd0d-bcaf-4a6f-b27a-9fe3f331692c", "", null);
 
             var defintion = generator.generateDefinition(JObject.Parse(content), false).GetAwaiter().GetResult();
 
@@ -588,7 +588,7 @@ namespace LogicAppTemplate.Tests
         {
             var content = GetEmbededFileContent("LogicAppTemplate.Test.TestFiles.file-test-triggerandmore.json");
 
-            var generator = new TemplateGenerator("", "c107df29-a4af-4bc9-a733-f88f0eaa4296", "",null);
+            var generator = new TemplateGenerator("", "c107df29-a4af-4bc9-a733-f88f0eaa4296", "", null);
 
             var defintion = generator.generateDefinition(JObject.Parse(content), false).GetAwaiter().GetResult();
 
@@ -604,14 +604,14 @@ namespace LogicAppTemplate.Tests
 
             var defintion = generator.GenerateTemplate().GetAwaiter().GetResult();
 
-            Assert.AreEqual("[concat('/subscriptions/',subscription().subscriptionId,'/resourceGroups/',parameters('Billogram-ResourceGroup'),'/providers/Microsoft.Web/customApis/Billogram')]", defintion["resources"][0]["properties"]["parameters"]["$connections"]["value"]["Billogram"]["id"]);
+            Assert.AreEqual("[concat('/subscriptions/',subscription().subscriptionId,'/resourceGroups/',parameters('Billogram-ResourceGroup'),'/providers/Microsoft.Web/customApis/',parameters('Billogram_name'),'')]", defintion["resources"][0]["properties"]["parameters"]["$connections"]["value"]["Billogram"]["id"]);
 
             Assert.AreEqual("Microsoft.Web/connections", defintion["resources"][1]["type"]);
             Assert.AreEqual("[parameters('logicAppLocation')]", defintion["resources"][1]["location"]);
             Assert.AreEqual("[parameters('Billogram_name')]", defintion["resources"][1]["name"]);
             //subscriptions/89d02439-770d-43f3-9e4a-8b910457a10c/resourceGroups/Messaging/providers/Microsoft.Web/customApis/Billogram
             //subscriptions/fakeecb73-d0ff-455d-a2bf-eae0b300696d/providers/Microsoft.Web/locations/westeurope/managedApis/filesystem
-            Assert.AreEqual("[concat('/subscriptions/',subscription().subscriptionId,'/resourceGroups/',parameters('Billogram-ResourceGroup'),'/providers/Microsoft.Web/customApis/Billogram')]", defintion["resources"][1]["properties"]["api"]["id"]);
+            Assert.AreEqual("[concat('/subscriptions/',subscription().subscriptionId,'/resourceGroups/',parameters('Billogram-ResourceGroup'),'/providers/Microsoft.Web/customApis/',parameters('Billogram_name'),'')]", defintion["resources"][1]["properties"]["api"]["id"]);
         }
 
         [TestMethod()]
@@ -622,7 +622,7 @@ namespace LogicAppTemplate.Tests
             generator.DiagnosticSettings = true;
 
             var defintion = generator.GenerateTemplate().GetAwaiter().GetResult();
-           
+
             Assert.AreEqual("providers/diagnosticSettings", defintion["resources"][0]["resources"][0]["type"]);
             Assert.AreEqual("[concat('Microsoft.Insights/', parameters('diagnosticSettings_name'))]", defintion["resources"][0]["resources"][0]["name"]);
             Assert.AreEqual("[concat('/subscriptions/', subscription().subscriptionId, '/resourceGroups/', parameters('diagnosticSettings_resourceGroupName'), '/providers/Microsoft.OperationalInsights/workspaces/', parameters('diagnosticSettings_workspaceName'))]", defintion["resources"][0]["resources"][0]["properties"]["workspaceId"]);
@@ -644,15 +644,57 @@ namespace LogicAppTemplate.Tests
             Assert.AreEqual(false, defintion["parameters"]["diagnosticSettings_metricsEnabled"]["defaultValue"]);
             Assert.AreEqual(false, defintion["parameters"]["diagnosticSettings_metricsRetentionPolicyEnabled"]["defaultValue"]);
             Assert.AreEqual(0, defintion["parameters"]["diagnosticSettings_metricsRetentionPolicyDays"]["defaultValue"]);
-                                    
+
             Assert.AreEqual("[parameters('logicAppLocation')]", defintion["resources"][0]["location"]);
+        }
+        [TestMethod()]
+        public void TestShouldNotIncludeIseEnvironment()
+        {
+            var content = GetEmbededFileContent("LogicAppTemplate.Test.TestFiles.WorkflowTest.json");
+
+            var generator = new TemplateGenerator("", "", "", null);
+
+            var definition = generator.generateDefinition(JObject.Parse(content)).GetAwaiter().GetResult();
+
+            Assert.IsTrue(definition["parameters"].Children().Any(x => x.ToString().Contains("logicAppLocation")));
+            Assert.IsFalse(definition["parameters"].Children().Any(x => x.ToString().Contains("integrationServiceEnvironmentName")));
+            Assert.IsFalse(definition["parameters"].Children().Any(x => x.ToString().Contains("integrationServiceEnvironmentResourceGroup")));
+            Assert.IsFalse(definition["resources"].First()["properties"].Children().Any(x => x.ToString().Contains("integrationServiceEnvironment")));
+        }
+
+        [TestMethod()]
+        public void TestShouldIncludeIseEnvironment()
+        {
+            var content = GetEmbededFileContent("LogicAppTemplate.Test.TestFiles.ISE.json");
+
+            var generator = new TemplateGenerator("", "", "", null);
+
+            var definition = generator.generateDefinition(JObject.Parse(content)).GetAwaiter().GetResult();
+
+            Assert.IsTrue(definition["parameters"].Children().Any(x => x.ToString().Contains("logicAppLocation")));
+            Assert.IsTrue(definition["parameters"].Children().Any(x => x.ToString().Contains("integrationServiceEnvironmentName")));
+            Assert.IsTrue(definition["parameters"].Children().Any(x => x.ToString().Contains("integrationServiceEnvironmentResourceGroup")));
+            Assert.IsTrue(definition["parameters"].Children().Any(x => x.ToString().Contains("Environment_Tag")));
+            Assert.IsTrue(definition["resources"].First()["properties"].Children().Any(x => x.ToString().Contains("integrationServiceEnvironment")));
+            Assert.AreEqual(@"[concat('/subscriptions/',subscription().subscriptionId,'/resourcegroups/',parameters('integrationServiceEnvironmentResourceGroupName'),'/providers/Microsoft.Logic/integrationServiceEnvironments/',parameters('integrationServiceEnvironmentName'))]", definition["resources"].First()["properties"]["integrationServiceEnvironment"]["id"]);
+            Assert.AreEqual(@"Microsoft.Logic/integrationServiceEnvironments", definition["resources"].First()["properties"]["integrationServiceEnvironment"]["type"]);
+        }
+
+        [TestMethod()]
+        public void TestGenerateHttpTriggerUrlOutput()
+        {
+            var content = GetEmbededFileContent("LogicAppTemplate.Test.TestFiles.APIM.json");
+            var generator = new TemplateGenerator("lanme", "fakeee-15f5-4c85-bb3e-1e108dc79b00", "", null) { GenerateHttpTriggerUrlOutput = true };
+            var definition = generator.generateDefinition(JObject.Parse(content), false).GetAwaiter().GetResult();
+
+            Assert.IsNotNull(definition?["outputs"]?["httpTriggerUrl"]);
         }
 
         //var resourceName = "LogicAppTemplate.Templates.starterTemplate.json";
         private static string GetEmbededFileContent(string resourceName)
         {
             var assembly = System.Reflection.Assembly.GetExecutingAssembly();
-            
+
 
             using (Stream stream = assembly.GetManifestResourceStream(resourceName))
             using (StreamReader reader = new StreamReader(stream))
