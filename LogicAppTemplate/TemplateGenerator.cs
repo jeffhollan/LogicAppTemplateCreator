@@ -24,17 +24,16 @@ namespace LogicAppTemplate
         private string ResourceGroup;
         private string LogicApp;
         private string IntegrationAccountId;
-        private bool extractIntegrationAccountArtifacts = false;
-        private bool disableState = false;
+        private bool disabledState = false;
 
-        public TemplateGenerator(string LogicApp, string SubscriptionId, string ResourceGroup, IResourceCollector resourceCollector, bool stripPassword = false, bool disableState = false)
+        public TemplateGenerator(string LogicApp, string SubscriptionId, string ResourceGroup, IResourceCollector resourceCollector, bool stripPassword = false, bool disabledState = false)
         {
             this.SubscriptionId = SubscriptionId;
             this.ResourceGroup = ResourceGroup;
             this.LogicApp = LogicApp;
             this.resourceCollector = resourceCollector;
             this.stripPassword = stripPassword;
-            this.disableState = disableState;
+            this.disabledState = disabledState;
             template = JsonConvert.DeserializeObject<DeploymentTemplate>(GetResourceContent("LogicAppTemplate.Templates.starterTemplate.json"));
         }
 
@@ -91,7 +90,7 @@ namespace LogicAppTemplate
                 template.parameters["integrationServiceEnvironmentResourceGroupName"]["defaultValue"] = iseId.ResourceGroupName;
             }
 
-            if (disableState)
+            if (disabledState)
             {
                 ((JObject)template.resources[0]["properties"]).Add("state", "Disabled");
             }          

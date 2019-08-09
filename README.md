@@ -14,7 +14,7 @@ Example when user is connected to multitenants:
 `Get-LogicAppTemplate -LogicApp MyApp -ResourceGroup Integrate2016 -SubscriptionId 80d4fe69-xxxx-4dd2-a938-9250f1c8ab03 -TenantName contoso.onmicrosoft.com`
 
 Example with diagnostic settings:
-`Get-LogicAppTemplate -LogicApp MyApp -ResourceGroup Integrate2016 -SubscriptionId 80d4fe69-xxxx-4dd2-a938-9250f1c8ab03 -DiagnosticSettings $true`
+`Get-LogicAppTemplate -LogicApp MyApp -ResourceGroup Integrate2016 -SubscriptionId 80d4fe69-xxxx-4dd2-a938-9250f1c8ab03 -DiagnosticSettings`
 
 ### Specifications
 
@@ -27,8 +27,12 @@ Example with diagnostic settings:
 | TenantName | Name of the Tenant i.e. contoso.onmicrosoft.com | false |
 | Token | An AAD Token to access the resources - should not include `Bearer`, only the token | false |
 | ClaimsDump | A dump of claims piped in from `armclient` - should not be manually set | false |
-| DiagnosticSettings | If true, diagnostic settings are included in the ARM template | false |
-| GenerateHttpTriggerUrlOutput | If true, generate an output variable with the http trigger url. | false |
+| DiagnosticSettings | If supplied, diagnostic settings are included in the ARM template | false |
+| IncludeInitializeVariable | If supplied, Initialize Variable actions will be included in the ARM template | false |
+| FixedFunctionAppName | If supplied, the functionApp gets a static name | false |
+| GenerateHttpTriggerUrlOutput | If supplied, generate an output variable with the http trigger url. | false |
+| StripPassword | If supplied, the passwords will be stripped out of the output | false |
+| DisabledState | If supplied, the LA ARM Template will be set to Disabled and won't be automatically run when deployed | false |
 
 After extraction a parameters file can be created off the LogicAppTemplate. (works on any ARM template file):
 
@@ -44,6 +48,7 @@ For extraction with KeyVault reference liks created use: (only static reference)
 | --------- | ---------- | -------|
 | TemplateFile | File path to the template file | true |
 | KeyVault | Enum describing how to handle KeyVault possible values Static Noce, default None | false |
+| GenerateExpression | Whether to generate parameters whose default value is an ARM expression.  If not specified then will not generate parameters per original code | false |
 
 ### Other supported commands:
 
