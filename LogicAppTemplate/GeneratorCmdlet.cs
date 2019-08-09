@@ -49,7 +49,7 @@ namespace LogicAppTemplate
         public SwitchParameter StripPassword;
 
         [Parameter(Mandatory = false, HelpMessage = "If supplied, the LA ARM Template will be set to Disabled and won't be automatically run when deployed")]
-        public SwitchParameter DisableState;
+        public SwitchParameter DisabledState;
 
         protected override void ProcessRecord()
         {
@@ -79,11 +79,11 @@ namespace LogicAppTemplate
                 return;
             }
             
-            TemplateGenerator generator = new TemplateGenerator(LogicApp, SubscriptionId, ResourceGroup, resourceCollector,StripPassword, DisableState)
+            TemplateGenerator generator = new TemplateGenerator(LogicApp, SubscriptionId, ResourceGroup, resourceCollector,StripPassword, DisabledState)
             {
                 DiagnosticSettings = this.DiagnosticSettings,
                 GenerateHttpTriggerUrlOutput = this.GenerateHttpTriggerUrlOutput,
-                IncludeInitializeVariable = IncludeInitializeVariable
+                IncludeInitializeVariable = this.IncludeInitializeVariable
             };
             
             try
