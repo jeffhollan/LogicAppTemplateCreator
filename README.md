@@ -16,6 +16,17 @@ Example when user is connected to multitenants:
 Example with diagnostic settings:
 `Get-LogicAppTemplate -LogicApp MyApp -ResourceGroup Integrate2016 -SubscriptionId 80d4fe69-xxxx-4dd2-a938-9250f1c8ab03 -DiagnosticSettings`
 
+### Important Change 2019-08-09
+There has been a change from previous version on parameters that where Boolean are now SwitchParameter there will be an error when you run it the first time.
+Error is easy fixed, in your script just remove the $true part in your command se example bellow:
+```powershell
+ -DiagnosticSettings $true 
+ ```
+ To:
+ ```powershell
+ -DiagnosticSettings
+ ```
+
 ### Specifications
 
 | Parameter | Description | Required |
