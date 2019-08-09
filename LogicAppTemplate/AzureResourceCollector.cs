@@ -42,6 +42,11 @@ namespace LogicAppTemplate
         }
         public async Task<string> GetRawResource(string resourceId, string apiVersion = null, string suffix = "")
         {
+            if (resourceId.ToLower().Contains("integrationserviceenvironment"))
+            {
+                apiVersion = "2018-07-01-preview";
+            }
+
             string url = resourceId + (string.IsNullOrEmpty(apiVersion) ? "" : "?api-version=" + apiVersion) + (string.IsNullOrEmpty(suffix) ? "" : $"&{suffix}");
             client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
             var response = await client.GetAsync(url);

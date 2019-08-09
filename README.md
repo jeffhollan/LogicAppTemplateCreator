@@ -42,3 +42,9 @@ For extraction with KeyVault reference liks created use: (only static reference)
 | --------- | ---------- | -------|
 | TemplateFile | File path to the template file | true |
 | KeyVault | Enum describing how to handle KeyVault possible values Static Noce, default None | false |
+
+### Other supported commands:
+
+* Get-IntegrationAccountSchemaTemplate: extract a schema from an integration account
+* Get-IntegrationAccountMapTemplate: extract a map from an integration account
+* Get-CustomConnectorTemplate: extract a custom connector

@@ -1,0 +1,103 @@
+{
+  "properties": {
+    "provisioningState": "Succeeded",
+    "createdTime": "2019-03-10T22:02:36.3089355Z",
+    "changedTime": "2019-03-10T23:41:22.1146981Z",
+    "state": "Enabled",
+    "version": "08586493456033812564",
+    "accessEndpoint": "https://prod-01-ise-it-coreserv-vp45yy5lcy54c.westus2.environments.microsoftazurelogicapps.net:443/workflows/79511508956b4038be884b06ffc9105e",
+    "integrationServiceEnvironment": {
+      "name": "ISE-Env",
+      "id": "/subscriptions/XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXX/resourceGroups/RG-ISE-Env/providers/Microsoft.Logic/integrationServiceEnvironments/ISE-Env",
+      "type": "Microsoft.Logic/integrationServiceEnvironments"
+    },
+    "definition": {
+      "$schema": "https://schema.management.azure.com/providers/Microsoft.Logic/schemas/2016-06-01/workflowdefinition.json#",
+      "contentVersion": "1.0.0.0",
+      "parameters": { },
+      "triggers": {
+        "manual": {
+          "type": "Request",
+          "kind": "Http",
+          "inputs": {
+            "schema": { }
+          }
+        }
+      },
+      "actions": {
+        "Response": {
+          "runAfter": { },
+          "type": "Response",
+          "kind": "Http",
+          "inputs": {
+            "statusCode": 200
+          }
+        }
+      },
+      "outputs": { }
+    },
+    "parameters": { },
+    "endpointsConfiguration": {
+      "workflow": {
+        "outgoingIpAddresses": [
+          {
+            "address": "13.66.208.176"
+          },
+          {
+            "address": "10.50.101.0/27"
+          }
+        ],
+        "accessEndpointIpAddresses": [
+          {
+            "address": "13.66.210.183"
+          }
+        ]
+      },
+      "connector": {
+        "outgoingIpAddresses": [
+          {
+            "address": "13.66.140.128/28"
+          },
+          {
+            "address": "13.66.218.78"
+          },
+          {
+            "address": "13.66.219.14"
+          },
+          {
+            "address": "13.66.220.135"
+          },
+          {
+            "address": "13.66.221.19"
+          },
+          {
+            "address": "13.66.225.219"
+          },
+          {
+            "address": "52.183.78.157"
+          },
+          {
+            "address": "52.250.112.27"
+          },
+          {
+            "address": "52.246.252.106"
+          },
+          {
+            "address": "10.50.101.32/27"
+          },
+          {
+            "address": "10.50.101.64/27"
+          }
+        ]
+      }
+    }
+  },
+  "id": "/subscriptions/XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXX/resourceGroups/RG-Sample/providers/Microsoft.Logic/workflows/LA-ISE-Sample",
+  "name": "LA-ISE-Sample",
+  "type": "Microsoft.Logic/workflows",
+  "location": "westus2",
+  "tags": {
+    "Environment": "Dev",
+    "managedBy": "eai@xyz.com"
+  }
+}
