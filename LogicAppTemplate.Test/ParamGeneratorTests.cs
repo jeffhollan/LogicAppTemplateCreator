@@ -79,10 +79,10 @@ namespace LogicAppTemplate.Test
             Assert.AreEqual("dummydatabase", defintion["parameters"]["sql-1_database"]["value"]);
             Assert.IsNull(defintion["parameters"]["sql-1_username"]["value"]);
             Assert.AreEqual("/subscriptions/{subscriptionid}/resourceGroups/{resourcegroupname}/providers/Microsoft.KeyVault/vaults/{vault-name}", defintion["parameters"]["sql-1_username"]["reference"]["keyVault"]["id"]);
-            Assert.AreEqual("sql-1_username", defintion["parameters"]["sql-1_username"]["reference"]["secretName"]);
+            Assert.AreEqual("sql-1-username", defintion["parameters"]["sql-1_username"]["reference"]["secretName"]);
             Assert.IsNull(defintion["parameters"]["sql-1_password"]["value"]);
             Assert.AreEqual("/subscriptions/{subscriptionid}/resourceGroups/{resourcegroupname}/providers/Microsoft.KeyVault/vaults/{vault-name}", defintion["parameters"]["sql-1_password"]["reference"]["keyVault"]["id"]);
-            Assert.AreEqual("sql-1_password", defintion["parameters"]["sql-1_password"]["reference"]["secretName"]);
+            Assert.AreEqual("sql-1-password", defintion["parameters"]["sql-1_password"]["reference"]["secretName"]);
         }
 
         [TestMethod]

@@ -82,7 +82,7 @@ namespace LogicAppTemplate
                     dynamic k = new ExpandoObject();
                     k.keyVault = new ExpandoObject();
                     k.keyVault.id = "/subscriptions/{subscriptionid}/resourceGroups/{resourcegroupname}/providers/Microsoft.KeyVault/vaults/{vault-name}";
-                    k.secretName = param.Name;
+                    k.secretName = param.Name.Replace("_","-"); //need replace the underscore since it is an eleigal character in keyvault
                     obj["reference"] = JObject.FromObject(k);
                 }
                 else if (ClearParameterValues)
