@@ -1,0 +1,433 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<helpItems schema="maml" xmlns="http://msh">
+  <command:command xmlns:maml="http://schemas.microsoft.com/maml/2004/10" xmlns:command="http://schemas.microsoft.com/maml/dev/command/2004/10" xmlns:dev="http://schemas.microsoft.com/maml/dev/2004/10" xmlns:MSHelp="http://msdn.microsoft.com/mshelp">
+    <command:details>
+      <command:name>Get-LogicAppTemplate</command:name>
+      <command:verb>Get</command:verb>
+      <command:noun>LogicAppTemplate</command:noun>
+      <maml:description>
+        <maml:para>Generate LogicApp ARM template</maml:para>
+      </maml:description>
+    </command:details>
+    <maml:description>
+      <maml:para>Generate a valid ARM template from a LogicApp directly from the Azure Portal</maml:para>
+    </maml:description>
+    <command:syntax>
+      <command:syntaxItem>
+        <maml:name>Get-LogicAppTemplate</maml:name>
+        <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="True (ByValue)" position="named" aliases="none">
+          <maml:name>ClaimsDump</maml:name>
+          <maml:Description>
+            <maml:para>Piped input from armclient</maml:para>
+          </maml:Description>
+          <command:parameterValue required="true" variableLength="false">String</command:parameterValue>
+          <dev:type>
+            <maml:name>String</maml:name>
+            <maml:uri />
+          </dev:type>
+          <dev:defaultValue>None</dev:defaultValue>
+        </command:parameter>
+        <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="named" aliases="none">
+          <maml:name>DebugOutPutFolder</maml:name>
+          <maml:Description>
+            <maml:para>If set, result from rest interface will be saved to this folder</maml:para>
+          </maml:Description>
+          <command:parameterValue required="true" variableLength="false">String</command:parameterValue>
+          <dev:type>
+            <maml:name>String</maml:name>
+            <maml:uri />
+          </dev:type>
+          <dev:defaultValue>None</dev:defaultValue>
+        </command:parameter>
+        <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="named" aliases="none">
+          <maml:name>DiagnosticSettings</maml:name>
+          <maml:Description>
+            <maml:para>Instructs the cmdlet to included diagnostic in the ARM template</maml:para>
+          </maml:Description>
+          <command:parameterValue required="true" variableLength="false">Boolean</command:parameterValue>
+          <dev:type>
+            <maml:name>Boolean</maml:name>
+            <maml:uri />
+          </dev:type>
+          <dev:defaultValue>None</dev:defaultValue>
+        </command:parameter>
+        <command:parameter required="true" variableLength="true" globbing="false" pipelineInput="False" position="named" aliases="none">
+          <maml:name>LogicApp</maml:name>
+          <maml:Description>
+            <maml:para>Name of the Logic App</maml:para>
+          </maml:Description>
+          <command:parameterValue required="true" variableLength="false">String</command:parameterValue>
+          <dev:type>
+            <maml:name>String</maml:name>
+            <maml:uri />
+          </dev:type>
+          <dev:defaultValue>None</dev:defaultValue>
+        </command:parameter>
+        <command:parameter required="true" variableLength="true" globbing="false" pipelineInput="False" position="named" aliases="none">
+          <maml:name>ResourceGroup</maml:name>
+          <maml:Description>
+            <maml:para>Name of the Resource Group where the Logic App is stored</maml:para>
+          </maml:Description>
+          <command:parameterValue required="true" variableLength="false">String</command:parameterValue>
+          <dev:type>
+            <maml:name>String</maml:name>
+            <maml:uri />
+          </dev:type>
+          <dev:defaultValue>None</dev:defaultValue>
+        </command:parameter>
+        <command:parameter required="true" variableLength="true" globbing="false" pipelineInput="False" position="named" aliases="none">
+          <maml:name>SubscriptionId</maml:name>
+          <maml:Description>
+            <maml:para>The SubscriptionId that the resource group is located in</maml:para>
+          </maml:Description>
+          <command:parameterValue required="true" variableLength="false">String</command:parameterValue>
+          <dev:type>
+            <maml:name>String</maml:name>
+            <maml:uri />
+          </dev:type>
+          <dev:defaultValue>None</dev:defaultValue>
+        </command:parameter>
+        <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="named" aliases="none">
+          <maml:name>TenantName</maml:name>
+          <maml:Description>
+            <maml:para>Name of the Tenant that the subscription exists in</maml:para>
+            <maml:para>This parameter is important when you are trying to access a Logic App from another Azure AD (AAD) tenant than your own primary AAD tenant</maml:para>
+            <maml:para>E.g. "contoso.onmicrosoft.com"</maml:para>
+          </maml:Description>
+          <command:parameterValue required="true" variableLength="false">String</command:parameterValue>
+          <dev:type>
+            <maml:name>String</maml:name>
+            <maml:uri />
+          </dev:type>
+          <dev:defaultValue>None</dev:defaultValue>
+        </command:parameter>
+        <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="named" aliases="none">
+          <maml:name>Token</maml:name>
+          <maml:Description>
+            <maml:para>A valied bearer token used to authenticate against the Azure Portal</maml:para>
+            <maml:para>The value must only be the raw token and NOT contain the "Bearer " part of a token</maml:para>
+          </maml:Description>
+          <command:parameterValue required="true" variableLength="false">String</command:parameterValue>
+          <dev:type>
+            <maml:name>String</maml:name>
+            <maml:uri />
+          </dev:type>
+          <dev:defaultValue>None</dev:defaultValue>
+        </command:parameter>
+      </command:syntaxItem>
+    </command:syntax>
+    <command:parameters>
+      <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="True (ByValue)" position="named" aliases="none">
+        <maml:name>ClaimsDump</maml:name>
+        <maml:Description>
+          <maml:para>Piped input from armclient</maml:para>
+        </maml:Description>
+        <command:parameterValue required="true" variableLength="false">String</command:parameterValue>
+        <dev:type>
+          <maml:name>String</maml:name>
+          <maml:uri />
+        </dev:type>
+        <dev:defaultValue>None</dev:defaultValue>
+      </command:parameter>
+      <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="named" aliases="none">
+        <maml:name>DebugOutPutFolder</maml:name>
+        <maml:Description>
+          <maml:para>If set, result from rest interface will be saved to this folder</maml:para>
+        </maml:Description>
+        <command:parameterValue required="true" variableLength="false">String</command:parameterValue>
+        <dev:type>
+          <maml:name>String</maml:name>
+          <maml:uri />
+        </dev:type>
+        <dev:defaultValue>None</dev:defaultValue>
+      </command:parameter>
+      <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="named" aliases="none">
+        <maml:name>DiagnosticSettings</maml:name>
+        <maml:Description>
+          <maml:para>Instructs the cmdlet to included diagnostic in the ARM template</maml:para>
+        </maml:Description>
+        <command:parameterValue required="true" variableLength="false">Boolean</command:parameterValue>
+        <dev:type>
+          <maml:name>Boolean</maml:name>
+          <maml:uri />
+        </dev:type>
+        <dev:defaultValue>None</dev:defaultValue>
+      </command:parameter>
+      <command:parameter required="true" variableLength="true" globbing="false" pipelineInput="False" position="named" aliases="none">
+        <maml:name>LogicApp</maml:name>
+        <maml:Description>
+          <maml:para>Name of the Logic App</maml:para>
+        </maml:Description>
+        <command:parameterValue required="true" variableLength="false">String</command:parameterValue>
+        <dev:type>
+          <maml:name>String</maml:name>
+          <maml:uri />
+        </dev:type>
+        <dev:defaultValue>None</dev:defaultValue>
+      </command:parameter>
+      <command:parameter required="true" variableLength="true" globbing="false" pipelineInput="False" position="named" aliases="none">
+        <maml:name>ResourceGroup</maml:name>
+        <maml:Description>
+          <maml:para>Name of the Resource Group where the Logic App is stored</maml:para>
+        </maml:Description>
+        <command:parameterValue required="true" variableLength="false">String</command:parameterValue>
+        <dev:type>
+          <maml:name>String</maml:name>
+          <maml:uri />
+        </dev:type>
+        <dev:defaultValue>None</dev:defaultValue>
+      </command:parameter>
+      <command:parameter required="true" variableLength="true" globbing="false" pipelineInput="False" position="named" aliases="none">
+        <maml:name>SubscriptionId</maml:name>
+        <maml:Description>
+          <maml:para>The SubscriptionId that the resource group is located in</maml:para>
+        </maml:Description>
+        <command:parameterValue required="true" variableLength="false">String</command:parameterValue>
+        <dev:type>
+          <maml:name>String</maml:name>
+          <maml:uri />
+        </dev:type>
+        <dev:defaultValue>None</dev:defaultValue>
+      </command:parameter>
+      <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="named" aliases="none">
+        <maml:name>TenantName</maml:name>
+        <maml:Description>
+          <maml:para>Name of the Tenant that the subscription exists in</maml:para>
+          <maml:para>This parameter is important when you are trying to access a Logic App from another Azure AD (AAD) tenant than your own primary AAD tenant</maml:para>
+          <maml:para>E.g. "contoso.onmicrosoft.com"</maml:para>
+        </maml:Description>
+        <command:parameterValue required="true" variableLength="false">String</command:parameterValue>
+        <dev:type>
+          <maml:name>String</maml:name>
+          <maml:uri />
+        </dev:type>
+        <dev:defaultValue>None</dev:defaultValue>
+      </command:parameter>
+      <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="named" aliases="none">
+        <maml:name>Token</maml:name>
+        <maml:Description>
+          <maml:para>A valied bearer token used to authenticate against the Azure Portal</maml:para>
+          <maml:para>The value must only be the raw token and NOT contain the "Bearer " part of a token</maml:para>
+        </maml:Description>
+        <command:parameterValue required="true" variableLength="false">String</command:parameterValue>
+        <dev:type>
+          <maml:name>String</maml:name>
+          <maml:uri />
+        </dev:type>
+        <dev:defaultValue>None</dev:defaultValue>
+      </command:parameter>
+    </command:parameters>
+    <command:inputTypes>
+      <command:inputType>
+        <dev:type>
+          <maml:name>System.String</maml:name>
+        </dev:type>
+        <maml:description>
+          <maml:para></maml:para>
+        </maml:description>
+      </command:inputType>
+    </command:inputTypes>
+    <command:returnValues>
+      <command:returnValue>
+        <dev:type>
+          <maml:name>System.Object</maml:name>
+        </dev:type>
+        <maml:description>
+          <maml:para></maml:para>
+        </maml:description>
+      </command:returnValue>
+    </command:returnValues>
+    <maml:alertSet>
+      <maml:alert>
+        <maml:para>If you want to avoid signing into the Azure Portal, you could spend some time on getting familiar with the ARMClient project.
+This will enable you to get a valid token for your personal user account.</maml:para>
+        <maml:para>https://github.com/projectkudu/ARMClient</maml:para>
+      </maml:alert>
+    </maml:alertSet>
+    <command:examples>
+      <command:example>
+        <maml:title>-------------------------- Example 1 --------------------------</maml:title>
+        <dev:code>PS C:\&gt; Get-LogicAppTemplate -LogicApp "AwesomeLogicApp" -ResourceGroup "LogicAppsDEV" -SubscriptionId "5c92054d-fab6-4dd7-9195-15cd935fa0a4"</dev:code>
+        <dev:remarks>
+          <maml:para>This will connect to the Azure Portal, ask for your credentails like you are used to.
+It will switch context to the supplied subscription id ("5c92054d-fab6-4dd7-9195-15cd935fa0a4").
+The subscription must exists in your default / standard AAD.
+It will locate the "LogicAppsDEV" ressource group.
+Inside the ressource group it will locate the "AwesomeLogicApp" logic app.</maml:para>
+          <maml:para>The cmdlet will output the entire json string to the pipeline / console.
+
+</maml:para>
+        </dev:remarks>
+      </command:example>
+      <command:example>
+        <maml:title>-------------------------- Example 2 --------------------------</maml:title>
+        <dev:code>PS C:\&gt; Get-LogicAppTemplate -LogicApp "AwesomeLogicApp" -ResourceGroup "LogicAppsDEV" -SubscriptionId "5c92054d-fab6-4dd7-9195-15cd935fa0a4" | Out-File -FilePath "c:\temp\AwesomeLogicApp.json" -Encoding utf8</dev:code>
+        <dev:remarks>
+          <maml:para>This will connect to the Azure Portal, ask for your credentails like you are used to.
+It will switch context to the supplied subscription id ("5c92054d-fab6-4dd7-9195-15cd935fa0a4").
+The subscription must exists in your default / standard AAD.
+It will locate the "LogicAppsDEV" ressource group.
+Inside the ressource group it will locate the "AwesomeLogicApp" logic app.</maml:para>
+          <maml:para>The output from Get-LogicAppTemplate is piped to Out-File.
+The file will saved to "c:\temp\AwesomeLogicApp.json".
+The file is saved with utf8 encoding.
+</maml:para>
+        </dev:remarks>
+      </command:example>
+      <command:example>
+        <maml:title>-------------------------- Example 3 --------------------------</maml:title>
+        <dev:code>PS C:\&gt; Get-LogicAppTemplate -LogicApp "AwesomeLogicApp" -ResourceGroup "LogicAppsDEV" -SubscriptionId "5c92054d-fab6-4dd7-9195-15cd935fa0a4" -TenantName "contoso.onmicrosoft.com"</dev:code>
+        <dev:remarks>
+          <maml:para>This will connect to the Azure Portal, ask for your credentails like you are used to.
+It will use the "contoso.onmicrosoft.com" as the tenant name while looking for the subscriptionId.
+It will switch context to the supplied subscription id ("5c92054d-fab6-4dd7-9195-15cd935fa0a4").
+The subscription must exists in your default / standard AAD.
+It will locate the "LogicAppsDEV" ressource group.
+Inside the ressource group it will locate the "AwesomeLogicApp" logic app.</maml:para>
+          <maml:para>The cmdlet will output the entire json string to the pipeline / console.
+</maml:para>
+        </dev:remarks>
+      </command:example>
+      <command:example>
+        <maml:title>-------------------------- Example 4 --------------------------</maml:title>
+        <dev:code>PS C:\&gt; Get-LogicAppTemplate -LogicApp "AwesomeLogicApp" -ResourceGroup "LogicAppsDEV" -SubscriptionId "5c92054d-fab6-4dd7-9195-15cd935fa0a4" -Token "eyJ0eXAi......."</dev:code>
+        <dev:remarks>
+          <maml:para>This will connect to the Azure Portal, and use the provided token to authenticate to gain access. It will switch context to the supplied subscription id ("5c92054d-fab6-4dd7-9195-15cd935fa0a4").
+The subscription must exists in your default / standard AAD.
+It will locate the "LogicAppsDEV" ressource group.
+Inside the ressource group it will locate the "AwesomeLogicApp" logic app.</maml:para>
+          <maml:para>The cmdlet will output the entire json string to the pipeline / console.
+</maml:para>
+        </dev:remarks>
+      </command:example>
+    </command:examples>
+    <command:relatedLinks />
+  </command:command>
+  <command:command xmlns:maml="http://schemas.microsoft.com/maml/2004/10" xmlns:command="http://schemas.microsoft.com/maml/dev/command/2004/10" xmlns:dev="http://schemas.microsoft.com/maml/dev/2004/10" xmlns:MSHelp="http://msdn.microsoft.com/mshelp">
+    <command:details>
+      <command:name>Get-ParameterTemplate</command:name>
+      <command:verb>Get</command:verb>
+      <command:noun>ParameterTemplate</command:noun>
+      <maml:description>
+        <maml:para>Extract ARM template parameter file</maml:para>
+      </maml:description>
+    </command:details>
+    <maml:description>
+      <maml:para>Extract a valid ARM template parameter file from a LogicApp template file</maml:para>
+    </maml:description>
+    <command:syntax>
+      <command:syntaxItem>
+        <maml:name>Get-ParameterTemplate</maml:name>
+        <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="named" aliases="none">
+          <maml:name>KeyVault</maml:name>
+          <maml:Description>
+            <maml:para>How to handle KeyVault integration, default is None, available options None or Static, Static will generate parameters for static reference to KeyVault</maml:para>
+          </maml:Description>
+          <command:parameterValueGroup>
+            <command:parameterValue required="false" command:variableLength="false">None</command:parameterValue>
+            <command:parameterValue required="false" command:variableLength="false">Static</command:parameterValue>
+          </command:parameterValueGroup>
+          <command:parameterValue required="true" variableLength="false">KeyVaultUsage</command:parameterValue>
+          <dev:type>
+            <maml:name>KeyVaultUsage</maml:name>
+            <maml:uri />
+          </dev:type>
+          <dev:defaultValue>None</dev:defaultValue>
+        </command:parameter>
+        <command:parameter required="true" variableLength="true" globbing="false" pipelineInput="False" position="named" aliases="none">
+          <maml:name>TemplateFile</maml:name>
+          <maml:Description>
+            <maml:para>The path to the LogicApp ARM template file that you want to extract the parameter file from</maml:para>
+          </maml:Description>
+          <command:parameterValue required="true" variableLength="false">String</command:parameterValue>
+          <dev:type>
+            <maml:name>String</maml:name>
+            <maml:uri />
+          </dev:type>
+          <dev:defaultValue>None</dev:defaultValue>
+        </command:parameter>
+      </command:syntaxItem>
+    </command:syntax>
+    <command:parameters>
+      <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="named" aliases="none">
+        <maml:name>KeyVault</maml:name>
+        <maml:Description>
+          <maml:para>How to handle KeyVault integration, default is None, available options None or Static, Static will generate parameters for static reference to KeyVault</maml:para>
+        </maml:Description>
+        <command:parameterValue required="true" variableLength="false">KeyVaultUsage</command:parameterValue>
+        <dev:type>
+          <maml:name>KeyVaultUsage</maml:name>
+          <maml:uri />
+        </dev:type>
+        <dev:defaultValue>None</dev:defaultValue>
+      </command:parameter>
+      <command:parameter required="true" variableLength="true" globbing="false" pipelineInput="False" position="named" aliases="none">
+        <maml:name>TemplateFile</maml:name>
+        <maml:Description>
+          <maml:para>The path to the LogicApp ARM template file that you want to extract the parameter file from</maml:para>
+        </maml:Description>
+        <command:parameterValue required="true" variableLength="false">String</command:parameterValue>
+        <dev:type>
+          <maml:name>String</maml:name>
+          <maml:uri />
+        </dev:type>
+        <dev:defaultValue>None</dev:defaultValue>
+      </command:parameter>
+    </command:parameters>
+    <command:inputTypes>
+      <command:inputType>
+        <dev:type>
+          <maml:name>None</maml:name>
+        </dev:type>
+        <maml:description>
+          <maml:para></maml:para>
+        </maml:description>
+      </command:inputType>
+    </command:inputTypes>
+    <command:returnValues>
+      <command:returnValue>
+        <dev:type>
+          <maml:name>System.Object</maml:name>
+        </dev:type>
+        <maml:description>
+          <maml:para></maml:para>
+        </maml:description>
+      </command:returnValue>
+    </command:returnValues>
+    <maml:alertSet>
+      <maml:alert>
+        <maml:para></maml:para>
+      </maml:alert>
+    </maml:alertSet>
+    <command:examples>
+      <command:example>
+        <maml:title>-------------------------- Example 1 --------------------------</maml:title>
+        <dev:code>PS C:\&gt; Get-ParameterTemplate -TemplateFile "c:\temp\AwesomeLogicApp.json"</dev:code>
+        <dev:remarks>
+          <maml:para>This will parse the LogicApp ARM template and extract the parameter file.
+It will read the "c:\temp\AwesomeLogicApp.json" file.
+The cmdlet will output the entire json string to the pipeline / console.
+</maml:para>
+        </dev:remarks>
+      </command:example>
+      <command:example>
+        <maml:title>-------------------------- Example 2 --------------------------</maml:title>
+        <dev:code>PS C:\&gt; Get-ParameterTemplate -TemplateFile "c:\temp\AwesomeLogicApp.json" | Out-File -FilePath "c:\temp\AwesomeLogicApp_parameters.json" -Encoding utf8</dev:code>
+        <dev:remarks>
+          <maml:para>This will parse the LogicApp ARM template and extract the parameter file.
+It will read the "c:\temp\AwesomeLogicApp.json" file.
+The output from Get-ParameterTemplate is piped to Out-File.
+The file will saved to "c:\temp\AwesomeLogicApp.json".
+The file is saved with utf8 encoding.
+</maml:para>
+        </dev:remarks>
+      </command:example>
+    </command:examples>
+    <command:relatedLinks>
+      <maml:navigationLink>
+        <maml:linkText>Get-LogicAppTemplate</maml:linkText>
+        <maml:uri></maml:uri>
+      </maml:navigationLink>
+    </command:relatedLinks>
+  </command:command>
+</helpItems>
