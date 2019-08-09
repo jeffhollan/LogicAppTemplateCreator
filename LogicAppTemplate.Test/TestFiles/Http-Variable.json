@@ -1,0 +1,354 @@
+﻿{
+  "properties": {
+    "provisioningState": "Succeeded",
+    "createdTime": "2016-03-29T11:46:20.905923Z",
+    "changedTime": "2017-06-11T10:47:39.040243Z",
+    "state": "Disabled",
+    "version": "08587044288264688388",
+    "accessEndpoint": "https://prod-05.northeurope.logic.azure.com:443/workflows/05b414ebdcc1445ab66c964899d5c488",
+    "sku": {
+      "name": "Free",
+      "plan": {
+        "name": "Default1",
+        "id": "/subscriptions/FAKE9af-ec2b-4d0f-8cf8-105fa828600a/resourceGroups/Default-Web-NorthEurope/providers/Microsoft.Web/serverFarms/Default1",
+        "type": "Microsoft.Web/ServerFarms"
+      }
+    },
+    "definition": {
+        "$schema": "https://schema.management.azure.com/providers/Microsoft.Logic/schemas/2016-06-01/workflowdefinition.json#",
+        "actions": {
+            "HTTP": {
+                "inputs": {
+                    "method": "GET",
+                    "uri": "@{variables('URL')}_vti_bin/DN/DataService.svc/CurrencyRatesXML?lang=da"
+                },
+                "runAfter": {
+                    "Initialize_variable": [
+                        "Succeeded"
+                    ]
+                },
+                "type": "Http"
+            },
+            "Initialize-Array-NoValue": {
+                "inputs": {
+                    "variables": [
+                        {
+                            "name": "TestArrayNoValue",
+                            "type": "Array"
+                        }
+                    ]
+                },
+                "runAfter": {
+                    "Initialize-Object-Value": [
+                        "Succeeded"
+                    ]
+                },
+                "type": "InitializeVariable"
+            },
+            "Initialize-Array-Value": {
+                "inputs": {
+                    "variables": [
+                        {
+                            "name": "TestArrayValue",
+                            "type": "Array",
+                            "value": [
+                                "red",
+                                "orange",
+                                "yellow"
+                            ]
+                        }
+                    ]
+                },
+                "runAfter": {
+                    "Initialize-Array-NoValue": [
+                        "Succeeded"
+                    ]
+                },
+                "type": "InitializeVariable"
+            },
+            "Initialize-Boolean-False": {
+                "inputs": {
+                    "variables": [
+                        {
+                            "name": "TestBoolFalseNormal",
+                            "type": "Boolean",
+                            "value": false
+                        }
+                    ]
+                },
+                "runAfter": {
+                    "Initialize-Boolean-True-Expression": [
+                        "Succeeded"
+                    ]
+                },
+                "type": "InitializeVariable"
+            },
+            "Initialize-Boolean-False-Expression": {
+                "inputs": {
+                    "variables": [
+                        {
+                            "name": "TestBoolFalseExpression",
+                            "type": "Boolean",
+                            "value": "@false"
+                        }
+                    ]
+                },
+                "runAfter": {
+                    "Initialize-Boolean-False": [
+                        "Succeeded"
+                    ]
+                },
+                "type": "InitializeVariable"
+            },
+            "Initialize-Boolean-True": {
+                "inputs": {
+                    "variables": [
+                        {
+                            "name": "TestBoolTrueNormal",
+                            "type": "Boolean",
+                            "value": true
+                        }
+                    ]
+                },
+                "runAfter": {},
+                "type": "InitializeVariable"
+            },
+            "Initialize-Boolean-True-Expression": {
+                "inputs": {
+                    "variables": [
+                        {
+                            "name": "TestBoolTrueExpression",
+                            "type": "Boolean",
+                            "value": "@true"
+                        }
+                    ]
+                },
+                "runAfter": {
+                    "Initialize-Boolean-True": [
+                        "Succeeded"
+                    ]
+                },
+                "type": "InitializeVariable"
+            },
+            "Initialize-Float-0.01": {
+                "inputs": {
+                    "variables": [
+                        {
+                            "name": "TestFloatValue",
+                            "type": "Float",
+                            "value": 0.01
+                        }
+                    ]
+                },
+                "runAfter": {
+                    "Initialize-Float-NoValue": [
+                        "Succeeded"
+                    ]
+                },
+                "type": "InitializeVariable"
+            },
+            "Initialize-Float-NoValue": {
+                "inputs": {
+                    "variables": [
+                        {
+                            "name": "TestFloatNoValue",
+                            "type": "Float"
+                        }
+                    ]
+                },
+                "runAfter": {
+                    "Initialize-Integer-0": [
+                        "Succeeded"
+                    ]
+                },
+                "type": "InitializeVariable"
+            },
+            "Initialize-Integer-0": {
+                "inputs": {
+                    "variables": [
+                        {
+                            "name": "TestIntegerValue",
+                            "type": "Integer",
+                            "value": 0
+                        }
+                    ]
+                },
+                "runAfter": {
+                    "Initialize-Integer-NoValue": [
+                        "Succeeded"
+                    ]
+                },
+                "type": "InitializeVariable"
+            },
+            "Initialize-Integer-NoValue": {
+                "inputs": {
+                    "variables": [
+                        {
+                            "name": "TestIntegerNoValue",
+                            "type": "Integer"
+                        }
+                    ]
+                },
+                "runAfter": {
+                    "Initialize-String-Null-Expression": [
+                        "Succeeded"
+                    ]
+                },
+                "type": "InitializeVariable"
+            },
+            "Initialize-Object-NoValue": {
+                "inputs": {
+                    "variables": [
+                        {
+                            "name": "TestObjectNoValue",
+                            "type": "Object"
+                        }
+                    ]
+                },
+                "runAfter": {
+                    "Initialize-Float-0.01": [
+                        "Succeeded"
+                    ]
+                },
+                "type": "InitializeVariable"
+            },
+            "Initialize-Object-Value": {
+                "inputs": {
+                    "variables": [
+                        {
+                            "name": "TestObjectValue",
+                            "type": "Object",
+                            "value": {
+                                "Test": "Test"
+                            }
+                        }
+                    ]
+                },
+                "runAfter": {
+                    "Initialize-Object-NoValue": [
+                        "Succeeded"
+                    ]
+                },
+                "type": "InitializeVariable"
+            },
+            "Initialize-String-NoValue": {
+                "inputs": {
+                    "variables": [
+                        {
+                            "name": "TestStringNoValue",
+                            "type": "String"
+                        }
+                    ]
+                },
+                "runAfter": {
+                    "Initialize-Boolean-False-Expression": [
+                        "Succeeded"
+                    ]
+                },
+                "type": "InitializeVariable"
+            },
+            "Initialize-String-Null-Code": {
+                "inputs": {
+                    "variables": [
+                        {
+                            "name": "TestStringNullFromCode",
+                            "type": "String",
+                            "value": "@null"
+                        }
+                    ]
+                },
+                "runAfter": {
+                    "Initialize-String-NoValue": [
+                        "Succeeded"
+                    ]
+                },
+                "type": "InitializeVariable"
+            },
+            "Initialize-String-Null-Expression": {
+                "inputs": {
+                    "variables": [
+                        {
+                            "name": "TestStringNullExpression",
+                            "type": "String",
+                            "value": "@{null}"
+                        }
+                    ]
+                },
+                "runAfter": {
+                    "Initialize-String-Null-Code": [
+                        "Succeeded"
+                    ]
+                },
+                "type": "InitializeVariable"
+            },
+            "Initialize_variable": {
+                "inputs": {
+                    "variables": [
+                        {
+                            "name": "URL",
+                            "type": "String",
+                            "value": "https://www.nationalbanken.dk/"
+                        }
+                    ]
+                },
+                "runAfter": {
+                    "Initialize-Array-Value": [
+                        "Succeeded"
+                    ]
+                },
+                "type": "InitializeVariable"
+            }
+        },
+        "contentVersion": "1.0.0.0",
+        "outputs": {},
+        "parameters": {},
+        "triggers": {
+          "manual": {
+            "inputs": {
+              "schema": {}
+            },
+            "kind": "Http",
+            "type": "Request"
+          }
+        }
+    },
+    "parameters": {},
+    "endpointsConfiguration": {
+      "workflow": {
+        "outgoingIpAddresses": [
+          {
+            "address": "40.113.12.95"
+          },
+          {
+            "address": "52.178.165.215"
+          },
+          {
+            "address": "52.178.166.21"
+          }
+        ],
+        "accessEndpointIpAddresses": [
+          {
+            "address": "13.79.173.49"
+          },
+          {
+            "address": "52.169.218.253"
+          },
+          {
+            "address": "52.169.220.174"
+          }
+        ]
+      },
+      "connector": {
+        "outgoingIpAddresses": [
+          {
+            "address": "104.45.93.9"
+          }
+        ]
+      }
+    }
+  },
+  "id": "/subscriptions/FAKE9af-ec2b-4d0f-8cf8-105fa828600a/resourceGroups/Default-Web-NorthEurope/providers/Microsoft.Logic/workflows/test",
+  "name": "test",
+  "type": "Microsoft.Logic/workflows",
+  "location": "northeurope"
+}
