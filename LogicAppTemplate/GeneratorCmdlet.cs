@@ -74,12 +74,12 @@ namespace LogicAppTemplate
                 return;
             }
 
-            TemplateGenerator generator = new TemplateGenerator(LogicApp, SubscriptionId, ResourceGroup, resourceCollector,StripPassword, DisableState);
+            TemplateGenerator generator = new TemplateGenerator(LogicApp, SubscriptionId, ResourceGroup, resourceCollector,StripPassword, DisableState)
             {
-                DiagnosticSettings = DiagnosticSettings,
-                GenerateHttpTriggerUrlOutput = GenerateHttpTriggerUrlOutput
+                DiagnosticSettings = this.DiagnosticSettings,
+                GenerateHttpTriggerUrlOutput = this.GenerateHttpTriggerUrlOutput
             };
-
+            
             try
             {
 
