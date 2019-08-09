@@ -50,6 +50,20 @@
         "description": "The resource group name that the Integration Account are in"
       },
       "defaultValue": "[resourceGroup().name]"
+    },
+    "integrationServiceEnvironmentName": {
+      "type": "string",
+      "metadata": {
+        "description": "Name of the Integration Service Environemnt that should be connected to this Logic App."
+      },
+      "defaultValue": ""
+    },
+    "integrationServiceEnvironmentResourceGroupName": {
+      "type": "string",
+      "metadata": {
+        "description": "The resource group name that the Integration Service Envrionment is in"
+      },
+      "defaultValue": "[resourceGroup().name]"
     }
   },
   "variables": {
@@ -62,10 +76,15 @@
       "location": "[parameters('logicAppLocation')]",
       "dependsOn": [],
       "properties": {
-        "definition": {},
-        "parameters": {},
+        "definition": { },
+        "parameters": { },
         "integrationAccount": {
           "id": "[concat('/subscriptions/',subscription().subscriptionId,'/resourcegroups/',parameters('IntegrationAccountResourceGroupName'),'/providers/Microsoft.Logic/integrationAccounts/',parameters('IntegrationAccountName'))]"
+        },
+        "integrationServiceEnvironment": {
+          "name": "[parameters('integrationServiceEnvironmentName')]",
+          "id": "[concat('/subscriptions/',subscription().subscriptionId,'/resourcegroups/',parameters('integrationServiceEnvironmentResourceGroupName'),'/providers/Microsoft.Logic/integrationServiceEnvironments/',parameters('integrationServiceEnvironmentName'))]",
+          "type": "Microsoft.Logic/integrationServiceEnvironments"
         }
       },
       "resources": []

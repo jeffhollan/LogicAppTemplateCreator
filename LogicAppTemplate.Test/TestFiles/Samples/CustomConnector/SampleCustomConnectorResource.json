@@ -1,0 +1,27 @@
+{
+  "properties": {
+    "runtimeUrls": [
+      "https://flow-vp45yy5lcy54c-mwh-apim-runtime.westus2.environments.microsoftazurelogicapps.net/apim/7590515e6faf4937928967565606c41d",
+      "http://flow-vp45yy5lcy54c-mwh-apim-runtime.westus2.environments.microsoftazurelogicapps.net/apim/7590515e6faf4937928967565606c41d"
+    ],
+    "capabilities": [],
+    "description": "",
+    "displayName": "CC-HR-RSU-Denodo--Dev",
+    ".": "/Content/retail/assets/default-connection-icon.d269a5b2275fe149967a9c567c002697.2.svg",
+    "apiDefinitions": {
+      "originalSwaggerUrl": "https://wawsprodmwh2031882chub8.blob.core.windows.net/api-swagger-files/flow-vp45yy5lcy54c-mwh-apim/XXXXXXXXXXXXXX1d.json_original?sv=2017-04-17&sr=b&sig=7NA4sry5wEkTViifm4i3rPeuGtQYAt4CaPdOu6BNdLQ%3D&se=2019-03-11T05%3A14%3A15Z&sp=r",
+      "modifiedSwaggerUrl": "https://wawsprodmwh2031882chub8.blob.core.windows.net/api-swagger-files/flow-vp45yy5lcy54c-mwh-apim/XXXXXXXXXXXXXX1d.json?sv=2017-04-17&sr=b&sig=X6zKrutQhkQKII5%2F0HWnf7yBnt4%2FVAMJ5frLCn%2BV%2BP8%3D&se=2019-03-11T05%3A14%3A15Z&sp=r"
+    },
+    "apiType": "Rest",
+    "wsdlDefinition": {},
+    "integrationServiceEnvironment": {
+      "name": "ISE-IT-CoreServices-EAI",
+      "id": "/subscriptions/XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX/resourceGroups/RG-IT-CoreServices-EAI-Prod/providers/Microsoft.Logic/integrationServiceEnvironments/ISE-IT-CoreServices-EAI",
+      "type": "Microsoft.Logic/integrationServiceEnvironments"
+    }
+  },
+  "id": "/subscriptions/XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX/resourceGroups/RG-IT-CoreServices-EAI-Dev/providers/Microsoft.Web/customApis/CC-HR-RSU-Denodo--Dev",
+  "name": "CC-HR-RSU-Denodo--Dev",
+  "type": "Microsoft.Web/customApis",
+  "location": "westus2"
+}
