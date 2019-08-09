@@ -49,6 +49,7 @@ namespace LogicAppTemplate
         }
 
         public bool DiagnosticSettings { get; set; }
+        public bool GenerateHttpTriggerUrlOutput { get; set; }
 
         public async Task<JObject> GenerateTemplate()
         {
@@ -259,8 +260,6 @@ namespace LogicAppTemplate
             }
             return rid;
         }
-
-
 
         private JToken handleActions(JObject definition, JObject parameters)
         {
@@ -510,6 +509,21 @@ namespace LogicAppTemplate
                             definition["triggers"][trigger.Name]["recurrence"]["schedule"] = "[parameters('" + this.AddTemplateParameter(trigger.Name + "Schedule", "Object", new JProperty("defaultValue", recurrence["schedule"])) + "')]";
                         }
                     }
+
+                    // http trigger
+                    if (trigger.Value.Value<string>("type") == "Request" && trigger.Value.Value<string>("kind") == "Http")
+                    {
+                        if (this.GenerateHttpTriggerUrlOutput)
+                        {
+                            JObject outputValue = JObject.FromObject(new
+                            {
+                                type = "string",
+                                value = "[listCallbackURL(concat(resourceId('Microsoft.Logic/workflows/', parameters('logicAppName')), '/triggers/manual'), '2016-06-01').value]"
+                            });
+
+                            this.template.outputs.Add("httpTriggerUrl", outputValue);
+                        }
+                    }
                 }
             }
 
@@ -637,8 +651,6 @@ namespace LogicAppTemplate
             }
             return realParameterName;
         }
-
-
 
         public JObject generateConnectionTemplate(JObject connectionResource, JObject connectionInstance, string connectionName, string concatedId, string connectionNameParam)
         {

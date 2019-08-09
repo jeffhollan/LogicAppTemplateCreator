@@ -36,11 +36,15 @@ namespace LogicAppTemplate
         [Parameter(Mandatory = false, HelpMessage = "If true, diagnostic settings will be included in the ARM template")]
         public bool DiagnosticSettings = false;
 
+        [Parameter(Mandatory = false, HelpMessage = "If true, generate an output variable with the trigger url.")]
+        public bool GenerateHttpTriggerUrlOutput = false;
+
         [Parameter(Mandatory = false, HelpMessage = "If true, the passwords will be stripped out of the output")]
         public bool StripPassword = false;
 
         [Parameter(Mandatory = false, HelpMessage = "If true, the LA ARM Template will be set to Disabled and won't be automatically run when deployed")]
         public bool DisableState = false;
+
 
         protected override void ProcessRecord()
         {
@@ -69,8 +73,12 @@ namespace LogicAppTemplate
             {
                 return;
             }
+
             TemplateGenerator generator = new TemplateGenerator(LogicApp, SubscriptionId, ResourceGroup, resourceCollector,StripPassword, DisableState);
-            generator.DiagnosticSettings = DiagnosticSettings;
+            {
+                DiagnosticSettings = DiagnosticSettings,
+                GenerateHttpTriggerUrlOutput = GenerateHttpTriggerUrlOutput
+            };
 
             try
             {
