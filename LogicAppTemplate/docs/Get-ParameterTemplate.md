@@ -13,7 +13,7 @@ Extract ARM template parameter file
 ## SYNTAX
 
 ```
-Get-ParameterTemplate -TemplateFile <String> [-KeyVault <KeyVaultUsage>] [<CommonParameters>]
+Get-ParameterTemplate -TemplateFile <String> [-KeyVault <KeyVaultUsage>] [-GenerateExpression] [<CommonParameters>]
 ```
 
 ## DESCRIPTION
@@ -75,6 +75,22 @@ Default value: None
 Accept pipeline input: False
 Accept wildcard characters: False
 ```
+
+### -GenerateExpression
+Whether to generate parameters whose default value is an ARM expression.  If not specified then will not generate parameters per original code.
+
+```yaml
+Type: SwitchParameter
+Parameter Sets: (All)
+Aliases:
+
+Required: False
+Position: Named
+Default value: None
+Accept pipeline input: False
+Accept wildcard characters: False
+```
+
 
 ### CommonParameters
 This cmdlet supports the common parameters: -Debug, -ErrorAction, -ErrorVariable, -InformationAction, -InformationVariable, -OutVariable, -OutBuffer, -PipelineVariable, -Verbose, -WarningAction, and -WarningVariable. For more information, see [about_CommonParameters](http://go.microsoft.com/fwlink/?LinkID=113216).

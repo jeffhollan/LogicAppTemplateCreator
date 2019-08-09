@@ -14,12 +14,22 @@ Generate LogicApp ARM template
 
 ```
 Get-LogicAppTemplate -LogicApp <String> -ResourceGroup <String> -SubscriptionId <String> [-TenantName <String>]
- [-Token <String>] [-ClaimsDump <String>] [-DebugOutPutFolder <String>] [-DiagnosticSettings <Boolean>]
- [-IncludeInitializeVariable] [<CommonParameters>]
+ [-Token <String>] [-ClaimsDump <String>] [-DebugOutPutFolder <String>] [-DiagnosticSettings]
+ [-IncludeInitializeVariable] [-FixedFunctionAppName] [-GenerateHttpTriggerUrlOutput] [-StripPassword] [-DisabledState] [<CommonParameters>]
 ```
 
 ## DESCRIPTION
-Generate a valid ARM template from a LogicApp directly from the Azure Portal
+Generate a valid ARM template from a LogicApp directly from the Azure Portal.
+
+There has been a change from previous version on parameters that where Boolean are now SwitchParameter there will be an error when you run it the first time.
+Error is easy fixed, in your script just remove the $true part in your command se example bellow:
+```powershell
+ -DiagnosticSettings $true 
+ ```
+ To:
+ ```powershell
+ -DiagnosticSettings
+ ```
 
 ## EXAMPLES
 
@@ -79,51 +89,6 @@ Inside the ressource group it will locate the "AwesomeLogicApp" logic app.
 The cmdlet will output the entire json string to the pipeline / console.
   
 ## PARAMETERS
-
-### -ClaimsDump
-Piped input from armclient
-
-```yaml
-Type: String
-Parameter Sets: (All)
-Aliases:
-
-Required: False
-Position: Named
-Default value: None
-Accept pipeline input: True (ByValue)
-Accept wildcard characters: False
-```
-
-### -DebugOutPutFolder
-If set, result from rest interface will be saved to this folder
-
-```yaml
-Type: String
-Parameter Sets: (All)
-Aliases:
-
-Required: False
-Position: Named
-Default value: None
-Accept pipeline input: False
-Accept wildcard characters: False
-```
-
-### -DiagnosticSettings
-Instructs the cmdlet to included diagnostic in the ARM template
-
-```yaml
-Type: Boolean
-Parameter Sets: (All)
-Aliases:
-
-Required: False
-Position: Named
-Default value: None
-Accept pipeline input: False
-Accept wildcard characters: False
-```
 
 ### -LogicApp
 Name of the Logic App
@@ -205,6 +170,127 @@ Default value: None
 Accept pipeline input: False
 Accept wildcard characters: False
 ```
+
+### -ClaimsDump
+Piped input from armclient
+
+```yaml
+Type: String
+Parameter Sets: (All)
+Aliases:
+
+Required: False
+Position: Named
+Default value: None
+Accept pipeline input: True (ByValue)
+Accept wildcard characters: False
+```
+
+### -DiagnosticSettings
+Instructs the cmdlet to included diagnostic in the ARM template
+
+```yaml
+Type: SwitchParameter
+Parameter Sets: (All)
+Aliases:
+
+Required: False
+Position: Named
+Default value: None
+Accept pipeline input: False
+Accept wildcard characters: False
+```
+
+### -IncludeInitializeVariable
+Initialize Variable actions will be included in the ARM template
+
+```yaml
+Type: SwitchParameter
+Parameter Sets: (All)
+Aliases:
+
+Required: False
+Position: Named
+Default value: None
+Accept pipeline input: False
+Accept wildcard characters: False
+```
+
+### -FixedFunctionAppName
+Function App gets a static name
+
+```yaml
+Type: SwitchParameter
+Parameter Sets: (All)
+Aliases:
+
+Required: False
+Position: Named
+Default value: None
+Accept pipeline input: False
+Accept wildcard characters: False
+```
+
+### -GenerateHttpTriggerUrlOutput
+Generate an output variable with the http trigger url, usuable in linked templates when url is needed in nested templates.
+
+```yaml
+Type: SwitchParameter
+Parameter Sets: (All)
+Aliases:
+
+Required: False
+Position: Named
+Default value: None
+Accept pipeline input: False
+Accept wildcard characters: False
+```
+
+### -StripPassword
+Passwords will be stripped out of the output
+
+```yaml
+Type: SwitchParameter
+Parameter Sets: (All)
+Aliases:
+
+Required: False
+Position: Named
+Default value: None
+Accept pipeline input: False
+Accept wildcard characters: False
+```
+
+### -DisabledState
+The Logic App will be set to Disabled in the ARM Template and won't be automatically run when deployed
+
+```yaml
+Type: SwitchParameter
+Parameter Sets: (All)
+Aliases:
+
+Required: False
+Position: Named
+Default value: None
+Accept pipeline input: False
+Accept wildcard characters: False
+```
+
+### -DebugOutPutFolder
+If set, result from rest interface will be saved to this folder
+
+```yaml
+Type: String
+Parameter Sets: (All)
+Aliases:
+
+Required: False
+Position: Named
+Default value: None
+Accept pipeline input: False
+Accept wildcard characters: False
+```
+
 
 ### CommonParameters
 This cmdlet supports the common parameters: -Debug, -ErrorAction, -ErrorVariable, -InformationAction, -InformationVariable, -OutVariable, -OutBuffer, -PipelineVariable, -Verbose, -WarningAction, and -WarningVariable. For more information, see [about_CommonParameters](http://go.microsoft.com/fwlink/?LinkID=113216).

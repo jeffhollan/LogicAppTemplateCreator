@@ -21,7 +21,6 @@ Example with diagnostic settings:
 | Parameter | Description | Required |
 | --------- | ---------- | -------|
 | LogicApp | The name of the Logic App | true |
-| FixedFunctionAppName | set to true to make the name of the LogicApp static | false |
 | ResourceGroup | The name of the Resource Group | true |
 | SubscriptionId | The subscription Id for the resource | true |
 | TenantName | Name of the Tenant i.e. contoso.onmicrosoft.com | false |
