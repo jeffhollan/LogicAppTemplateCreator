@@ -36,6 +36,9 @@ namespace LogicAppTemplate
         [Parameter(Mandatory = false, HelpMessage = "If true, diagnostic settings will be included in the ARM template")]
         public bool DiagnosticSettings = false;
 
+        [Parameter(Mandatory = false, HelpMessage = "If true, Initialize Variable actions will be included in the ARM template")]
+        public SwitchParameter IncludeInitializeVariable;
+
         [Parameter(Mandatory = false, HelpMessage = "If true, the functionApp gets a static name")]
         public bool FixedFunctionAppName = false;
 
@@ -75,11 +78,12 @@ namespace LogicAppTemplate
             {
                 return;
             }
-
+            
             TemplateGenerator generator = new TemplateGenerator(LogicApp, SubscriptionId, ResourceGroup, resourceCollector,StripPassword, DisableState)
             {
                 DiagnosticSettings = this.DiagnosticSettings,
-                GenerateHttpTriggerUrlOutput = this.GenerateHttpTriggerUrlOutput
+                GenerateHttpTriggerUrlOutput = this.GenerateHttpTriggerUrlOutput,
+                IncludeInitializeVariable = IncludeInitializeVariable
             };
             
             try

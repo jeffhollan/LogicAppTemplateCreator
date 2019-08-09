@@ -49,6 +49,7 @@ namespace LogicAppTemplate
         }
 
         public bool DiagnosticSettings { get; set; }
+        public bool IncludeInitializeVariable { get; set; }
         public bool FixedFunctionAppName { get; set; }
         public bool GenerateHttpTriggerUrlOutput { get; set; }
 
@@ -281,6 +282,54 @@ namespace LogicAppTemplate
                     string workflowid = $"[concat('/subscriptions/',subscription().subscriptionId,'/resourceGroups/',parameters('{resourcegroupParameterName}'),'/providers/Microsoft.Logic/workflows/',parameters('{wokflowParameterName}'))]";
                     definition["actions"][action.Name]["inputs"]["host"]["workflow"]["id"] = workflowid;
 
+                }
+                else if(type == "initializevariable" && IncludeInitializeVariable && definition["actions"][action.Name]["inputs"]["variables"][0]["value"] != null)
+                {
+                    var variableType = definition["actions"][action.Name]["inputs"]["variables"][0]["type"];                                        
+                    string paramType = string.Empty;
+
+                    //missing securestring & secureObject
+                    switch (variableType.Value<string>())
+                    {
+                        case "Array":
+                        case "Object":
+                        case "String":
+                            paramType = variableType.Value<string>().ToLower();
+                            break;
+                        case "Boolean":
+                            paramType = "bool";
+                            break;
+                        case "Float":
+                            paramType = "string";
+                            break;
+                        case "Integer":
+                            paramType = "int";
+                            break;
+                        default:
+                            paramType = "string";
+                            break;
+                    }
+                    
+                    //Arrays and Objects can't be expressions 
+                    if (definition["actions"][action.Name]["inputs"]["variables"][0]["value"].Type != JTokenType.Array
+                        && definition["actions"][action.Name]["inputs"]["variables"][0]["value"].Type != JTokenType.Object)
+                    {
+                        //If variable is an expression OR float, we need to change the type of the parameter to string
+                        if (definition["actions"][action.Name]["inputs"]["variables"][0].Value<string>("value").StartsWith("@")
+                            || variableType.Value<string>() == "Float")
+                        {
+                            definition["actions"][action.Name]["inputs"]["variables"][0]["value"] = "[parameters('" + AddTemplateParameter(action.Name + "-Value", "string", ((JObject)definition["actions"][action.Name]["inputs"]["variables"][0]).Value<string>("value")) + "')]";
+                        }
+                        else
+                        {
+                            //Same as the one from in the outer if sentence
+                            definition["actions"][action.Name]["inputs"]["variables"][0]["value"] = "[parameters('" + AddTemplateParameter(action.Name + "-Value", paramType, definition["actions"][action.Name]["inputs"]["variables"][0]["value"]) + "')]";
+                        }                        
+                    }
+                    else
+                    {
+                        definition["actions"][action.Name]["inputs"]["variables"][0]["value"] = "[parameters('" + AddTemplateParameter(action.Name + "-Value", paramType, definition["actions"][action.Name]["inputs"]["variables"][0]["value"]) + "')]";
+                    }                    
                 }
                 else if (type == "apimanagement")
                 {

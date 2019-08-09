@@ -308,6 +308,99 @@ namespace LogicAppTemplate.Tests
         }
 
         [TestMethod()]
+        public void TestExtractVariablesNotSet()
+        {
+            var content = GetEmbededFileContent("LogicAppTemplate.Test.TestFiles.Http-Variable.json");
+
+            var generator = new TemplateGenerator("", "", "", null);
+            var defintion = generator.generateDefinition(JObject.Parse(content)).GetAwaiter().GetResult();
+
+            Assert.IsNull(defintion["parameters"]["Initialize_variable-Value"]);
+
+            Assert.IsNull(defintion["parameters"]["Initialize-Array-Value-Value"]);
+
+            Assert.IsNull(defintion["parameters"]["Initialize-Boolean-False-Value"]);
+            Assert.IsNull(defintion["parameters"]["Initialize-Boolean-False-Value"]);
+
+            Assert.IsNull(defintion["parameters"]["Initialize-Boolean-False-Expression-Value"]);
+            Assert.IsNull(defintion["parameters"]["Initialize-Boolean-False-Expression-Value"]);
+
+            Assert.IsNull(defintion["parameters"]["Initialize-Boolean-True-Value"]);
+            Assert.IsNull(defintion["parameters"]["Initialize-Boolean-True-Value"]);
+
+            Assert.IsNull(defintion["parameters"]["Initialize-Boolean-True-Expression-Value"]);
+            Assert.IsNull(defintion["parameters"]["Initialize-Boolean-True-Expression-Value"]);
+
+            Assert.IsNull(defintion["parameters"]["Initialize-Float-0.01-Value"]);
+            Assert.IsNull(defintion["parameters"]["Initialize-Float-0.01-Value"]);
+
+            Assert.IsNull(defintion["parameters"]["Initialize-Integer-0-Value"]);
+            Assert.IsNull(defintion["parameters"]["Initialize-Integer-0-Value"]);
+
+            Assert.IsNull(defintion["parameters"]["Initialize-Object-Value-Value"]);
+
+            Assert.IsNull(defintion["parameters"]["Initialize-String-Null-Code-Value"]);
+            Assert.IsNull(defintion["parameters"]["Initialize-String-Null-Code-Value"]);
+
+            Assert.IsNull(defintion["parameters"]["Initialize-String-Null-Expression-Value"]);
+            Assert.IsNull(defintion["parameters"]["Initialize-String-Null-Expression-Value"]);
+
+            Assert.IsNull(defintion["parameters"]["Initialize-Array-NoValue"]);
+            Assert.IsNull(defintion["parameters"]["Initialize-Float-NoValue"]);
+            Assert.IsNull(defintion["parameters"]["Initialize-Integer-NoValue"]);
+            Assert.IsNull(defintion["parameters"]["Initialize-Object-NoValue"]);
+            Assert.IsNull(defintion["parameters"]["Initialize-String-NoValue"]);
+        }
+
+        [TestMethod()]
+        public void TestExtractVariablesSet()
+        {
+            var content = GetEmbededFileContent("LogicAppTemplate.Test.TestFiles.Http-Variable.json");
+
+            var generator = new TemplateGenerator("", "", "", null);
+            generator.IncludeInitializeVariable = true;
+
+            var defintion = generator.generateDefinition(JObject.Parse(content)).GetAwaiter().GetResult();
+
+            //check parameters
+            Assert.AreEqual(defintion["parameters"]["Initialize_variable-Value"]["defaultValue"], "https://www.nationalbanken.dk/");
+
+            Assert.AreEqual(defintion["parameters"]["Initialize-Array-Value-Value"]["type"], "array");
+
+            Assert.AreEqual(defintion["parameters"]["Initialize-Boolean-False-Value"]["type"], "bool");
+            Assert.AreEqual(defintion["parameters"]["Initialize-Boolean-False-Value"]["defaultValue"], false);
+
+            Assert.AreEqual(defintion["parameters"]["Initialize-Boolean-False-Expression-Value"]["type"], "string");
+            Assert.AreEqual(defintion["parameters"]["Initialize-Boolean-False-Expression-Value"]["defaultValue"], "@false");
+
+            Assert.AreEqual(defintion["parameters"]["Initialize-Boolean-True-Value"]["type"], "bool");
+            Assert.AreEqual(defintion["parameters"]["Initialize-Boolean-True-Value"]["defaultValue"], true);
+
+            Assert.AreEqual(defintion["parameters"]["Initialize-Boolean-True-Expression-Value"]["type"], "string");
+            Assert.AreEqual(defintion["parameters"]["Initialize-Boolean-True-Expression-Value"]["defaultValue"], "@true");
+
+            Assert.AreEqual(defintion["parameters"]["Initialize-Float-0.01-Value"]["type"], "string");
+            Assert.AreEqual(defintion["parameters"]["Initialize-Float-0.01-Value"]["defaultValue"], "0.01");
+
+            Assert.AreEqual(defintion["parameters"]["Initialize-Integer-0-Value"]["type"], "int");
+            Assert.AreEqual(defintion["parameters"]["Initialize-Integer-0-Value"]["defaultValue"], 0);
+
+            Assert.AreEqual(defintion["parameters"]["Initialize-Object-Value-Value"]["type"], "object");
+
+            Assert.AreEqual(defintion["parameters"]["Initialize-String-Null-Code-Value"]["type"], "string");
+            Assert.AreEqual(defintion["parameters"]["Initialize-String-Null-Code-Value"]["defaultValue"], "@null");
+
+            Assert.AreEqual(defintion["parameters"]["Initialize-String-Null-Expression-Value"]["type"], "string");
+            Assert.AreEqual(defintion["parameters"]["Initialize-String-Null-Expression-Value"]["defaultValue"], "@{null}");
+
+            Assert.IsNull(defintion["parameters"]["Initialize-Array-NoValue"]);
+            Assert.IsNull(defintion["parameters"]["Initialize-Float-NoValue"]);
+            Assert.IsNull(defintion["parameters"]["Initialize-Integer-NoValue"]);
+            Assert.IsNull(defintion["parameters"]["Initialize-Object-NoValue"]);
+            Assert.IsNull(defintion["parameters"]["Initialize-String-NoValue"]);
+        }
+
+        [TestMethod()]
         public void TestHTTPAuthentication()
         {
             var content = GetEmbededFileContent("LogicAppTemplate.Test.TestFiles.HTTP-Authentication.json");
