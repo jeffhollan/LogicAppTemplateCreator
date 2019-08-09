@@ -1,0 +1,20 @@
+{
+  "properties": {
+    "schemaType": "Xml",
+    "targetNamespace": "http://IntegrationAccount1.Schema2",
+    "documentName": "Employees",
+    "contentLink": {
+      "uri": "https://prod-01-ise-it-coreserv-vp45yy5lcy54c.westus2.environments.microsoftazurelogicapps.net:443/integrationAccounts/XXXXXXXXXXXXXXXX64f9d9632a64c2/schemas/SunlifeEnrollment/contents/Value?api-version=2015-08-01-preview&se=2019-03-16T01%3A07%3A03.3146892Z&sp=%2Fschemas%2FSunlifeEnrollment%2Fread&sv=1.0&sig=XXXXXX",
+      "contentSize": 22475
+    },
+    "createdTime": "2019-03-14T17:24:58.1836704Z",
+    "changedTime": "2019-03-14T17:34:58.5563412Z",
+    "metadata": {
+      "fileName": null
+    }
+  },
+  "id": "/subscriptions/XXXX4f3a-XXXX-XXXX-XXXX-4866XXXXXbbc/resourceGroups/RG-IT-XXXX-EAI-XXXX/providers/Microsoft.Logic/integrationAccounts/IA-IT-XXX-XXX/schemas/SunlifeEnrollment",
+  "name": "SunlifeEnrollment",
+  "type": "Microsoft.Logic/integrationAccounts/schemas"
+}
+   

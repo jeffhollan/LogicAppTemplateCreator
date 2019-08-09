@@ -1,19 +1,20 @@
 ﻿using Newtonsoft.Json.Linq;
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Management.Automation;
 using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 
 namespace LogicAppTemplate
 {
-    [Cmdlet(VerbsCommon.Get, "LogicAppTemplate", ConfirmImpact = ConfirmImpact.None)]
-    public class GeneratorCmdlet : PSCmdlet
+    [Cmdlet(VerbsCommon.Get, "IntegrationAccountSchemaTemplate", ConfirmImpact = ConfirmImpact.None)]
+    public class GeneratorIASchemaCmdlet : PSCmdlet
     {
-        [Parameter(Mandatory = true, HelpMessage = "Name of the Logic App")]
-        public string LogicApp;
+        [Parameter(Mandatory = true, HelpMessage = "Name of the Artifact")]
+        public string ArtifactName;
+
+        [Parameter(Mandatory = true, HelpMessage = "Name of the IntegrationAccount")]
+        public string IntegrationAccount;
 
         [Parameter(Mandatory = true, HelpMessage = "Name of the Resource Group")]
         public string ResourceGroup;
@@ -32,19 +33,6 @@ namespace LogicAppTemplate
 
         [Parameter(Mandatory = false, HelpMessage = "If set, result from rest interface will be saved to this folder")]
         public string DebugOutPutFolder = "";
-
-        [Parameter(Mandatory = false, HelpMessage = "If true, diagnostic settings will be included in the ARM template")]
-        public bool DiagnosticSettings = false;
-
-        [Parameter(Mandatory = false, HelpMessage = "If true, generate an output variable with the trigger url.")]
-        public bool GenerateHttpTriggerUrlOutput = false;
-
-        [Parameter(Mandatory = false, HelpMessage = "If true, the passwords will be stripped out of the output")]
-        public bool StripPassword = false;
-
-        [Parameter(Mandatory = false, HelpMessage = "If true, the LA ARM Template will be set to Disabled and won't be automatically run when deployed")]
-        public bool DisableState = false;
-
 
         protected override void ProcessRecord()
         {
@@ -73,12 +61,7 @@ namespace LogicAppTemplate
             {
                 return;
             }
-
-            TemplateGenerator generator = new TemplateGenerator(LogicApp, SubscriptionId, ResourceGroup, resourceCollector,StripPassword, DisableState);
-            {
-                DiagnosticSettings = DiagnosticSettings,
-                GenerateHttpTriggerUrlOutput = GenerateHttpTriggerUrlOutput
-            };
+            IntegrationAccountGenerator generator = new IntegrationAccountGenerator(ArtifactName, IntegrationAccountGenerator.ARtifactType.Schemas, IntegrationAccount, SubscriptionId, ResourceGroup, resourceCollector);
 
             try
             {
