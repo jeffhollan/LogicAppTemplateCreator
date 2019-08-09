@@ -36,6 +36,9 @@ namespace LogicAppTemplate
         [Parameter(Mandatory = false, HelpMessage = "If true, diagnostic settings will be included in the ARM template")]
         public bool DiagnosticSettings = false;
 
+        [Parameter(Mandatory = false, HelpMessage = "If true, the functionApp gets a static name")]
+        public bool FixedFunctionAppName = false;
+
         [Parameter(Mandatory = false, HelpMessage = "If true, generate an output variable with the trigger url.")]
         public bool GenerateHttpTriggerUrlOutput = false;
 
@@ -44,7 +47,6 @@ namespace LogicAppTemplate
 
         [Parameter(Mandatory = false, HelpMessage = "If true, the LA ARM Template will be set to Disabled and won't be automatically run when deployed")]
         public bool DisableState = false;
-
 
         protected override void ProcessRecord()
         {
