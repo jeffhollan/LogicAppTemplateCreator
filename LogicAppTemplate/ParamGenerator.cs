@@ -27,6 +27,9 @@ namespace LogicAppTemplate
             )]
         public KeyVaultUsage KeyVault = KeyVaultUsage.None;
 
+        [Parameter(Mandatory = false, HelpMessage = "If true, the default value for the parameters will be cleared")]
+        public SwitchParameter ClearParameterValues;
+
         public enum KeyVaultUsage
         {
             None,
@@ -79,11 +82,14 @@ namespace LogicAppTemplate
                     dynamic k = new ExpandoObject();
                     k.keyVault = new ExpandoObject();
                     k.keyVault.id = "/subscriptions/{subscriptionid}/resourceGroups/{resourcegroupname}/providers/Microsoft.KeyVault/vaults/{vault-name}";
-                    k.secretName = param.Name;
+                    k.secretName = param.Name.Replace("_","-"); //need replace the underscore since it is an eleigal character in keyvault
                     obj["reference"] = JObject.FromObject(k);
                 }
-                else
+                else if (ClearParameterValues)
                 {
+                    obj["value"] = JValue.Parse("[]");
+                }
+                else {
                     obj["value"] = logicAppTemplate["parameters"][param.Name]["defaultValue"];
                 }
 
