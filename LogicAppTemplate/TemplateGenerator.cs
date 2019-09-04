@@ -25,6 +25,7 @@ namespace LogicAppTemplate
         private string LogicApp;
         private string IntegrationAccountId;
         private bool extractIntegrationAccountArtifacts = false;
+        internal bool ExtractServiceBusConnectionString = false;
 
         public TemplateGenerator(string LogicApp, string SubscriptionId, string ResourceGroup, IResourceCollector resourceCollector)
         {
@@ -250,19 +251,19 @@ namespace LogicAppTemplate
                 {
                     var apiId = ((JObject)definition["actions"][action.Name]["inputs"]["api"]).Value<string>("id");
                     var aaid = new AzureResourceId(apiId);
-
+                    
 
                     aaid.SubscriptionId = "',subscription().subscriptionId,'";
                     aaid.ResourceGroupName = "', parameters('" + AddTemplateParameter("apimResourceGroup", "string", aaid.ResourceGroupName) + "'),'";
                     aaid.ReplaceValueAfter("service", "', parameters('" + AddTemplateParameter("apimInstanceName", "string", aaid.ValueAfter("service")) + "'),'");
-                    aaid.ReplaceValueAfter("apis", "', parameters('" + AddTemplateParameter("apimApiId", "string", aaid.ValueAfter("apis")) + "'),'");
+                    aaid.ReplaceValueAfter("apis", "', parameters('" + AddTemplateParameter($"api_{aaid.ValueAfter("apis")}_name", "string", aaid.ValueAfter("apis")) + "'),'");
                     apiId = "[concat('" + aaid.ToString() + "')]";
 
                     definition["actions"][action.Name]["inputs"]["api"]["id"] = apiId;
 
                     //handle subscriptionkey if not parematrized
                     var subkey = ((JObject)definition["actions"][action.Name]["inputs"]).Value<string>("subscriptionKey");
-                    if (!Regex.Match(subkey, @"parameters\('(.*)'\)").Success)
+                    if (subkey != null && !Regex.Match(subkey, @"parameters\('(.*)'\)").Success)
                     {
                         definition["actions"][action.Name]["inputs"]["subscriptionKey"] = "[parameters('" + AddTemplateParameter("apimSubscriptionKey", "string", subkey) + "')]";
                     }
@@ -657,6 +658,14 @@ namespace LogicAppTemplate
                             }
 
 
+                        }
+                        else if (concatedId.EndsWith("/managedApis/servicebus')]") && ExtractServiceBusConnectionString)
+                        {
+                            var namespace_param = AddTemplateParameter($"servicebus_namespace_name", "string", "REPLACE__servicebus_namespace");                
+                            var sb_resource_group_param = AddTemplateParameter($"servicebus_rg", "string", "REPLACE__servicebus_rg");
+                            var servicebus_auth_name_param = AddTemplateParameter($"servicebus_auth_name", "string", "RootManageSharedAccessKey");
+
+                            connectionParameters.Add(parameter.Name, $"[listkeys(resourceId(parameters('servicebus_rg'),'Microsoft.ServiceBus/namespaces/authorizationRules', parameters('servicebus_namespace_name'), parameters('servicebus_auth_name')), '2017-04-01').primaryConnectionString]");
                         }
                         else
                         {

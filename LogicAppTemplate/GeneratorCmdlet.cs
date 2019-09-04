@@ -38,6 +38,9 @@ namespace LogicAppTemplate
 
         [Parameter(Mandatory = false, HelpMessage = "If true, the functionApp gets a static name")]
         public bool FixedFunctionAppName = false;
+
+        [Parameter(Mandatory = false, HelpMessage = "If set, connections to a ServiceBus will be set by a name and resourcegroupname")]
+        public SwitchParameter ExtractServiceBusConnectionString = false;
         protected override void ProcessRecord()
         {
             AzureResourceCollector resourceCollector = new AzureResourceCollector();
@@ -68,6 +71,7 @@ namespace LogicAppTemplate
             TemplateGenerator generator = new TemplateGenerator(LogicApp, SubscriptionId, ResourceGroup, resourceCollector);
             generator.DiagnosticSettings = DiagnosticSettings;
             generator.FixedFunctionAppName = FixedFunctionAppName;
+            generator.ExtractServiceBusConnectionString = ExtractServiceBusConnectionString;
 
             try
             {
