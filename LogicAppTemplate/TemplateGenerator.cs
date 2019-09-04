@@ -18,21 +18,24 @@ namespace LogicAppTemplate
         private JObject workflowTemplateReference;
 
         private string LogicAppResourceGroup;
-
+        private bool stripPassword = false;
         IResourceCollector resourceCollector;
         private string SubscriptionId;
         private string ResourceGroup;
         private string LogicApp;
         private string IntegrationAccountId;
         private bool extractIntegrationAccountArtifacts = false;
+        private bool disableState = false;
         internal bool ExtractServiceBusConnectionString = false;
 
-        public TemplateGenerator(string LogicApp, string SubscriptionId, string ResourceGroup, IResourceCollector resourceCollector)
+        public TemplateGenerator(string LogicApp, string SubscriptionId, string ResourceGroup, IResourceCollector resourceCollector, bool stripPassword = false, bool disableState = false)
         {
             this.SubscriptionId = SubscriptionId;
             this.ResourceGroup = ResourceGroup;
             this.LogicApp = LogicApp;
             this.resourceCollector = resourceCollector;
+            this.stripPassword = stripPassword;
+            this.disableState = disableState;
             template = JsonConvert.DeserializeObject<DeploymentTemplate>(GetResourceContent("LogicAppTemplate.Templates.starterTemplate.json"));
         }
 
@@ -48,6 +51,7 @@ namespace LogicAppTemplate
 
         public bool DiagnosticSettings { get; set; }
         public bool FixedFunctionAppName { get; set; }
+        public bool GenerateHttpTriggerUrlOutput { get; set; }
 
         public async Task<JObject> GenerateTemplate()
         {
@@ -57,6 +61,7 @@ namespace LogicAppTemplate
 
         public async Task<JObject> generateDefinition(JObject definition, bool generateConnection = true)
         {
+          
             var rid = new AzureResourceId(definition.Value<string>("id"));
             LogicAppResourceGroup = rid.ResourceGroupName;
             //Manage Integration account
@@ -72,7 +77,25 @@ namespace LogicAppTemplate
                 IntegrationAccountId = definition["properties"]["integrationAccount"].Value<string>("id");
             }
 
+            //ISE
+            if (definition["properties"]["integrationServiceEnvironment"] == null)
+            {
+                ((JObject)template.resources[0]["properties"]).Remove("integrationServiceEnvironment");
+                template.parameters.Remove("integrationServiceEnvironmentName");
+                template.parameters.Remove("integrationServiceEnvironmentResourceGroupName");
+            }
+            else
+            {
+                template.parameters["integrationServiceEnvironmentName"]["defaultValue"] = definition["properties"]["integrationServiceEnvironment"]["name"];
+                AzureResourceId iseId = new AzureResourceId(definition["properties"]["integrationServiceEnvironment"].Value<string>("id"));
+                template.parameters["integrationServiceEnvironmentResourceGroupName"]["defaultValue"] = iseId.ResourceGroupName;
+            }
 
+            if (disableState)
+            {
+                ((JObject)template.resources[0]["properties"]).Add("state", "Disabled");
+            }          
+            
             template.parameters["logicAppName"]["defaultValue"] = definition.Value<string>("name");
 
             workflowTemplateReference = template.resources.Where(t => ((string)t["type"]) == "Microsoft.Logic/workflows").FirstOrDefault();
@@ -101,6 +124,15 @@ namespace LogicAppTemplate
             }
 
             workflowTemplateReference["properties"]["definition"] = handleActions(def, (JObject)definition["properties"]["parameters"]);
+
+            if (definition.ContainsKey("tags"))
+            {
+                JToken tags = await HandleTags(definition);
+                if (tags.HasValues)
+                {
+                    workflowTemplateReference.Add("tags", tags);
+                }
+            }
 
             // Diagnostic Settings
             if (DiagnosticSettings)
@@ -143,11 +175,15 @@ namespace LogicAppTemplate
                 string id = connectionProperty.First.Value<string>("id");
                 string connectionName = connectionProperty.First["connectionName"] != null ? connectionProperty.First.Value<string>("connectionName") : connectionId.Split('/').Last();
 
-                var cid = apiIdTemplate(id);
-                string concatedId = $"[concat('{cid.ToString()}')]";
+                
                 //fixes old templates where name sometimes is missing
 
                 var connectionNameParam = AddTemplateParameter($"{connectionName}_name", "string", connectionName);
+
+                var cid = apiIdTemplate(id,connectionNameParam);
+                string concatedId = $"[concat('{cid.ToString()}')]";
+
+
                 workflowTemplateReference["properties"]["parameters"]["$connections"]["value"][name] = JObject.FromObject(new
                 {
                     id = concatedId,
@@ -170,8 +206,7 @@ namespace LogicAppTemplate
                     template.resources.Insert(1, connectionTemplate);
                 }
             }
-
-
+                     
             // WriteVerbose("Finalizing Template...");
             return JObject.FromObject(template);
         }
@@ -208,25 +243,26 @@ namespace LogicAppTemplate
             return result;
         }
 
-        private AzureResourceId apiIdTemplate(string apiId)
+        private AzureResourceId apiIdTemplate(string apiId, string connectionNameParameter)
         {
             var rid = new AzureResourceId(apiId);
             rid.SubscriptionId = "',subscription().subscriptionId,'";
             if (apiId.Contains("/managedApis/"))
             {
                 rid.ReplaceValueAfter("locations", "',parameters('logicAppLocation'),'");
-            }
+            } 
             else
             {
-
+                if (apiId.Contains("customApis"))
+                {
+                    rid.ReplaceValueAfter("customApis", "',parameters('" + connectionNameParameter + "'),'");
+                }
                 string resourcegroupValue = LogicAppResourceGroup == rid.ResourceGroupName ? "[resourceGroup().name]" : rid.ResourceGroupName;
                 string resourcegroupParameterName = AddTemplateParameter(apiId.Split('/').Last() + "-ResourceGroup", "string", resourcegroupValue);
                 rid.ResourceGroupName = $"',parameters('{resourcegroupParameterName}'),'";
             }
             return rid;
         }
-
-
 
         private JToken handleActions(JObject definition, JObject parameters)
         {
@@ -477,6 +513,21 @@ namespace LogicAppTemplate
                             definition["triggers"][trigger.Name]["recurrence"]["schedule"] = "[parameters('" + this.AddTemplateParameter(trigger.Name + "Schedule", "Object", new JProperty("defaultValue", recurrence["schedule"])) + "')]";
                         }
                     }
+
+                    // http trigger
+                    if (trigger.Value.Value<string>("type") == "Request" && trigger.Value.Value<string>("kind") == "Http")
+                    {
+                        if (this.GenerateHttpTriggerUrlOutput)
+                        {
+                            JObject outputValue = JObject.FromObject(new
+                            {
+                                type = "string",
+                                value = "[listCallbackURL(concat(resourceId('Microsoft.Logic/workflows/', parameters('logicAppName')), '/triggers/manual'), '2016-06-01').value]"
+                            });
+
+                            this.template.outputs.Add("httpTriggerUrl", outputValue);
+                        }
+                    }
                 }
             }
 
@@ -567,11 +618,16 @@ namespace LogicAppTemplate
 
         private string AddTemplateParameter(string paramname, string type, JProperty defaultvalue)
         {
+
+            if (this.stripPassword && (paramname.EndsWith("Username", StringComparison.InvariantCultureIgnoreCase) || paramname.EndsWith("Password", StringComparison.InvariantCultureIgnoreCase)))
+            {
+                defaultvalue.Value = "*Stripped*";
+            }
             string realParameterName = paramname;
             JObject param = new JObject();
             param.Add("type", JToken.FromObject(type));
             param.Add(defaultvalue);
-
+            
             if (template.parameters[paramname] == null)
             {
                 template.parameters.Add(paramname, param);
@@ -579,7 +635,7 @@ namespace LogicAppTemplate
             else
             {
                 if (!template.parameters[paramname].Value<string>("defaultValue").Equals(defaultvalue.Value.ToString()))
-                {
+                {                    
                     foreach (var p in template.parameters)
                     {
                         if (p.Key.StartsWith(paramname))
@@ -599,8 +655,6 @@ namespace LogicAppTemplate
             }
             return realParameterName;
         }
-
-
 
         public JObject generateConnectionTemplate(JObject connectionResource, JObject connectionInstance, string connectionName, string concatedId, string connectionNameParam)
         {
@@ -716,6 +770,18 @@ namespace LogicAppTemplate
                 connectionTemplate.properties.parameterValues = connectionParameters;
 
             return JObject.FromObject(connectionTemplate);
+        }
+        private async Task<JObject> HandleTags(JObject definition)
+        {
+            JObject result = new JObject();
+
+            foreach (var property in definition["tags"].ToObject<JObject>().Properties())
+            {
+                var parm= AddTemplateParameter(property.Name + "_Tag", "string", property.Value.ToString());
+                result.Add(property.Name, $"[parameters('{parm}')]" );
+            }
+
+            return result;
         }
 
         public DeploymentTemplate GetTemplate()

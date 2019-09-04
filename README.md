@@ -28,6 +28,7 @@ Example with diagnostic settings:
 | Token | An AAD Token to access the resources - should not include `Bearer`, only the token | false |
 | ClaimsDump | A dump of claims piped in from `armclient` - should not be manually set | false |
 | DiagnosticSettings | If true, diagnostic settings are included in the ARM template | false |
+| GenerateHttpTriggerUrlOutput | If true, generate an output variable with the http trigger url. | false |
 
 After extraction a parameters file can be created off the LogicAppTemplate. (works on any ARM template file):
 
@@ -43,3 +44,9 @@ For extraction with KeyVault reference liks created use: (only static reference)
 | --------- | ---------- | -------|
 | TemplateFile | File path to the template file | true |
 | KeyVault | Enum describing how to handle KeyVault possible values Static Noce, default None | false |
+
+### Other supported commands:
+
+* Get-IntegrationAccountSchemaTemplate: extract a schema from an integration account
+* Get-IntegrationAccountMapTemplate: extract a map from an integration account
+* Get-CustomConnectorTemplate: extract a custom connector
