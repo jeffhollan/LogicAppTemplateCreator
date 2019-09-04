@@ -25,7 +25,7 @@ namespace LogicAppTemplate
         private string LogicApp;
         private string IntegrationAccountId;
         private bool extractIntegrationAccountArtifacts = false;
-        private bool disableState = false;
+        private bool disabledState = false;
         internal bool ExtractServiceBusConnectionString = false;
 
         public TemplateGenerator(string LogicApp, string SubscriptionId, string ResourceGroup, IResourceCollector resourceCollector, bool stripPassword = false, bool disabledState = false)

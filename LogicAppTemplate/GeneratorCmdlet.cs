@@ -85,7 +85,7 @@ namespace LogicAppTemplate
             {
                 DiagnosticSettings = this.DiagnosticSettings,
                 GenerateHttpTriggerUrlOutput = this.GenerateHttpTriggerUrlOutput,
-                IncludeInitializeVariable = this.IncludeInitializeVariable
+                IncludeInitializeVariable = this.IncludeInitializeVariable,
                 FixedFunctionAppName = FixedFunctionAppName,
                 ExtractServiceBusConnectionString = ExtractServiceBusConnectionString
         };
