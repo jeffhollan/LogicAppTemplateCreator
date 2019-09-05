@@ -750,14 +750,15 @@ namespace LogicAppTemplate
                             var site = url.Substring(0, url.LastIndexOf("." + location));
 
                             var param = AddTemplateParameter($"{connectionInstance.Value<string>("name")}_instancename", "string", site);
+                            var eventgrid_resource_group_param = AddTemplateParameter($"{connectionInstance.Value<string>("name")}_rg", "string", "[resourceGroup().location]");
 
                             if (parameter.Name == "endpoint")
                             {
-                                connectionParameters.Add(parameter.Name, $"[reference(concat('Microsoft.EventGrid/topics/',parameters('{param}')),'2018-01-01').endpoint]");
+                                connectionParameters.Add(parameter.Name, $"[reference(resourceId(parameters('{eventgrid_resource_group_param}'),'Microsoft.EventGrid/topics',parameters('{param}')),'2018-01-01').endpoint]");
                             }
                             else if (parameter.Name == "api_key")
                             {
-                                connectionParameters.Add(parameter.Name, $"[listKeys(resourceId('Microsoft.EventGrid/topics',parameters('{param}')),'2018-01-01').key1]");
+                                connectionParameters.Add(parameter.Name, $"[listKeys(resourceId(parameters('{eventgrid_resource_group_param}'),'Microsoft.EventGrid/topics',parameters('{param}')),'2018-01-01').key1]");
                             }
 
 
