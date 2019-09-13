@@ -765,11 +765,15 @@ namespace LogicAppTemplate
                         }
                         else if (concatedId.EndsWith("/managedApis/servicebus')]") && ExtractServiceBusConnectionString)
                         {
-                            var namespace_param = AddTemplateParameter($"servicebus_namespace_name", "string", "REPLACE__servicebus_namespace");                
+                            var namespace_param = AddTemplateParameter($"servicebus_namespace_name", "string", "REPLACE__servicebus_namespace");
                             var sb_resource_group_param = AddTemplateParameter($"servicebus_rg", "string", "REPLACE__servicebus_rg");
                             var servicebus_auth_name_param = AddTemplateParameter($"servicebus_auth_name", "string", "RootManageSharedAccessKey");
 
                             connectionParameters.Add(parameter.Name, $"[listkeys(resourceId(parameters('servicebus_rg'),'Microsoft.ServiceBus/namespaces/authorizationRules', parameters('servicebus_namespace_name'), parameters('servicebus_auth_name')), '2017-04-01').primaryConnectionString]");
+                        }
+                        else if (concatedId.EndsWith("/managedApis/sharepointonline')]"))
+                        {
+                             //skip because otherwise authenticated connection has to be authenticated again.
                         }
                         else
                         {
