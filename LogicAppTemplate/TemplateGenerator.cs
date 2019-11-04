@@ -532,6 +532,14 @@ namespace LogicAppTemplate
 
                                     break;
                                 }
+                            case "azureeventgrid":
+                                {
+                                    var ri = new AzureResourceId(trigger.Value["inputs"]["body"]["properties"].Value<string>("topic"));
+                                    ri.SubscriptionId = "',subscription().subscriptionId,'";
+                                    ri.ResourceGroupName = "',parameters('" + AddTemplateParameter( ri.ResourceName + "ResourceGroup", "string", ri.ResourceGroupName) + "'),'";
+                                    trigger.Value["inputs"]["body"]["properties"]["topic"] = "[concat('" + ri.ToString() + ")]";
+                                    break;
+                                }
                         }
                     }
 
@@ -739,6 +747,10 @@ namespace LogicAppTemplate
                         else if (parameter.Name == "sharedkey" && concatedId.EndsWith("/azurequeues')]"))
                         {
                             connectionParameters.Add(parameter.Name, $"[listKeys(resourceId('Microsoft.Storage/storageAccounts', parameters('{connectionName}_storageaccount')), '2018-02-01').keys[0].value]");
+                        }
+                        else if (concatedId.EndsWith("/servicebus')]"))
+                        {
+
                         }
                         else if (concatedId.EndsWith("/azureeventgridpublish')]"))
                         {
