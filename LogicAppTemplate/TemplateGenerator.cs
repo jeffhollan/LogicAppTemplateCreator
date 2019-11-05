@@ -529,14 +529,14 @@ namespace LogicAppTemplate
                                          var param = AddTemplateParameter(trigger.Name + "-folderPath","string",path);
                                          meta[((JProperty)meta.First).Name] = $"[parameters('{param}')]";*/
                                     }
-
                                     break;
                                 }
                             case "azureeventgrid":
                                 {
                                     var ri = new AzureResourceId(trigger.Value["inputs"]["body"]["properties"].Value<string>("topic"));
                                     ri.SubscriptionId = "',subscription().subscriptionId,'";
-                                    ri.ResourceGroupName = "',parameters('" + AddTemplateParameter( ri.ResourceName + "ResourceGroup", "string", ri.ResourceGroupName) + "'),'";
+                                    ri.ResourceGroupName = "',parameters('" + AddTemplateParameter( ri.ResourceName + "_ResourceGroup", "string", ri.ResourceGroupName) + "'),'";
+                                    ri.ResourceName = "',parameters('" + AddTemplateParameter(ri.ResourceName + "_Name", "string", ri.ResourceName) + "')";
                                     trigger.Value["inputs"]["body"]["properties"]["topic"] = "[concat('" + ri.ToString() + ")]";
                                     break;
                                 }
