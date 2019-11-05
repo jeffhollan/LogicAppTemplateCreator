@@ -53,7 +53,7 @@ namespace LogicAppTemplate.Test
 
             Assert.AreEqual("[parameters('azuretables_displayName')]", connection["properties"].Value<string>("displayName"));
             Assert.AreEqual("[parameters('azuretables_storageaccount')]", connection["properties"]["parameterValues"].Value<string>("storageaccount"));
-            Assert.AreEqual("[listKeys(resourceId('Microsoft.Storage/storageAccounts', parameters('azuretables_accountName')), '2018-02-01').keys[0].value]", connection["properties"]["parameterValues"].Value<string>("sharedkey"));
+            Assert.AreEqual("[listKeys(resourceId(parameters('azuretables_resourceGroupName'),'Microsoft.Storage/storageAccounts', parameters('azuretables_accountName')), '2018-02-01').keys[0].value]", connection["properties"]["parameterValues"].Value<string>("sharedkey"));
 
         }
 

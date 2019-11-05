@@ -535,7 +535,7 @@ namespace LogicAppTemplate.Tests
             Assert.AreEqual("[parameters('azureblob_displayName')]", defintion["properties"]["displayName"]);
 
             Assert.AreEqual("[parameters('azureblob_accountName')]", defintion["properties"]["parameterValues"]["accountName"]);
-            Assert.AreEqual("[listKeys(resourceId('Microsoft.Storage/storageAccounts', parameters('azureblob_accountName')), '2018-02-01').keys[0].value]", defintion["properties"]["parameterValues"]["accessKey"]);
+            Assert.AreEqual("[listKeys(resourceId(parameters('azureblob_resourceGroupName'),'Microsoft.Storage/storageAccounts', parameters('azureblob_accountName')), '2018-02-01').keys[0].value]", defintion["properties"]["parameterValues"]["accessKey"]);
             Assert.AreEqual("[concat('/subscriptions/', subscription().subscriptionId, '/providers/Microsoft.Web/locations/', parameters('logicAppLocation'), '/managedApis/azureblob')]", defintion["properties"]["api"]["id"]);
         }
 

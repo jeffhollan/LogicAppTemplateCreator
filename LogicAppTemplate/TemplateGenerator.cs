@@ -721,6 +721,7 @@ namespace LogicAppTemplate
 
             bool useGateway = connectionInstance["properties"]["nonSecretParameterValues"]["gateway"] != null;
 
+            var instanceResourceId = new AzureResourceId(connectionInstance.Value<string>("id"));
 
             //add all parameters
             if (connectionResource["properties"]["connectionParameters"] != null)
@@ -738,15 +739,17 @@ namespace LogicAppTemplate
                             if (match == null)
                                 continue;
                         }
-
+                        
 
                         if ((parameter.Name == "accessKey" && concatedId.EndsWith("/azureblob')]")) || parameter.Name == "sharedkey" && concatedId.EndsWith("/azuretables')]"))
                         {
-                            connectionParameters.Add(parameter.Name, $"[listKeys(resourceId('Microsoft.Storage/storageAccounts', parameters('{connectionName}_accountName')), '2018-02-01').keys[0].value]");
+                            //handle different resourceGroups
+
+                            connectionParameters.Add(parameter.Name, $"[listKeys(resourceId(parameters('{AddTemplateParameter(connectionName+"_resourceGroupName","string", instanceResourceId.ResourceGroupName)}'),'Microsoft.Storage/storageAccounts', parameters('{connectionName}_accountName')), '2018-02-01').keys[0].value]");
                         }
                         else if (parameter.Name == "sharedkey" && concatedId.EndsWith("/azurequeues')]"))
                         {
-                            connectionParameters.Add(parameter.Name, $"[listKeys(resourceId('Microsoft.Storage/storageAccounts', parameters('{connectionName}_storageaccount')), '2018-02-01').keys[0].value]");
+                            connectionParameters.Add(parameter.Name, $"[listKeys(resourceId(parameters('{AddTemplateParameter(connectionName + "_resourceGroupName", "string", instanceResourceId.ResourceGroupName)}'),'Microsoft.Storage/storageAccounts', parameters('{connectionName}_storageaccount')), '2018-02-01').keys[0].value]");
                         }
                         else if (concatedId.EndsWith("/servicebus')]"))
                         {
@@ -763,11 +766,11 @@ namespace LogicAppTemplate
 
                             if (parameter.Name == "endpoint")
                             {
-                                connectionParameters.Add(parameter.Name, $"[reference(concat('Microsoft.EventGrid/topics/',parameters('{param}')),'2018-01-01').endpoint]");
+                                connectionParameters.Add(parameter.Name, $"[reference(resourceId(parameters('{AddTemplateParameter(connectionName + "_resourceGroupName", "string", instanceResourceId.ResourceGroupName)}'),'Microsoft.EventGrid/topics',parameters('{param}')),'2018-01-01').endpoint]");
                             }
                             else if (parameter.Name == "api_key")
                             {
-                                connectionParameters.Add(parameter.Name, $"[listKeys(resourceId('Microsoft.EventGrid/topics',parameters('{param}')),'2018-01-01').key1]");
+                                connectionParameters.Add(parameter.Name, $"[listKeys(resourceId(parameters('{AddTemplateParameter(connectionName + "_resourceGroupName", "string", instanceResourceId.ResourceGroupName)}'),'Microsoft.EventGrid/topics',parameters('{param}')),'2018-01-01').key1]");
                             }
 
 
