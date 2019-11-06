@@ -534,9 +534,17 @@ namespace LogicAppTemplate
                             case "azureeventgrid":
                                 {
                                     var ri = new AzureResourceId(trigger.Value["inputs"]["body"]["properties"].Value<string>("topic"));
+                                    AddTemplateParameter("__apostrophe", "string", "'");
+                                    var path = trigger.Value["inputs"].Value<string>("path");
+                                    path = path.Replace("'", "', parameters('__apostrophe'),'");
+
+                                    //replace for gui
+                                    trigger.Value["inputs"]["path"] = "[concat('" + path.Replace($"'{ri.SubscriptionId}'", $"subscription().subscriptionId") + "')]";                                    
+                                    
                                     ri.SubscriptionId = "',subscription().subscriptionId,'";
                                     ri.ResourceGroupName = "',parameters('" + AddTemplateParameter( ri.ResourceName + "_ResourceGroup", "string", ri.ResourceGroupName) + "'),'";
                                     ri.ResourceName = "',parameters('" + AddTemplateParameter(ri.ResourceName + "_Name", "string", ri.ResourceName) + "')";
+                                    //replace for topic
                                     trigger.Value["inputs"]["body"]["properties"]["topic"] = "[concat('" + ri.ToString() + ")]";
                                     break;
                                 }
