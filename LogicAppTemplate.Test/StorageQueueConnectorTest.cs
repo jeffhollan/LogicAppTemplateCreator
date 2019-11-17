@@ -35,12 +35,12 @@ namespace LogicAppTemplate.Test
                 {
                     Assert.AreEqual("[parameters('azurequeues-1_displayName')]", connection["properties"].Value<string>("displayName"));
                     Assert.AreEqual("[parameters('azurequeues-1_storageaccount')]", connection["properties"]["parameterValues"].Value<string>("storageaccount"));
-                    Assert.AreEqual("[listKeys(resourceId('Microsoft.Storage/storageAccounts', parameters('azurequeues-1_storageaccount')), '2018-02-01').keys[0].value]", connection["properties"]["parameterValues"].Value<string>("sharedkey"));
+                    Assert.AreEqual("[listKeys(resourceId(parameters('azurequeues-1_resourceGroupName'),'Microsoft.Storage/storageAccounts', parameters('azurequeues-1_storageaccount')), '2018-02-01').keys[0].value]", connection["properties"]["parameterValues"].Value<string>("sharedkey"));
                 }else
                 {
                     Assert.AreEqual("[parameters('azurequeues_displayName')]", connection["properties"].Value<string>("displayName"));
                     Assert.AreEqual("[parameters('azurequeues_storageaccount')]", connection["properties"]["parameterValues"].Value<string>("storageaccount"));
-                    Assert.AreEqual("[listKeys(resourceId('Microsoft.Storage/storageAccounts', parameters('azurequeues_storageaccount')), '2018-02-01').keys[0].value]", connection["properties"]["parameterValues"].Value<string>("sharedkey"));
+                    Assert.AreEqual("[listKeys(resourceId(parameters('azurequeues_resourceGroupName'),'Microsoft.Storage/storageAccounts', parameters('azurequeues_storageaccount')), '2018-02-01').keys[0].value]", connection["properties"]["parameterValues"].Value<string>("sharedkey"));
                 }
                 i++;
             }
