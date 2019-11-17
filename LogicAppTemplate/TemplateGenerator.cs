@@ -126,8 +126,13 @@ namespace LogicAppTemplate
                 }
             }
 
+            var managedIdentity = (JObject)definition["identity"];
 
-
+            if(managedIdentity != null && managedIdentity.Value<string>("type") == "SystemAssigned")
+            {
+                template.resources[0].Add("identity", JObject.Parse("{'type': 'SystemAssigned'}"));
+            }
+            
             // WriteVerbose("Checking connections...");
             if (connections == null)
                 return JObject.FromObject(template);
