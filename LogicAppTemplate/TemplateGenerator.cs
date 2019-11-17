@@ -51,6 +51,7 @@ namespace LogicAppTemplate
         public bool IncludeInitializeVariable { get; set; }
         public bool FixedFunctionAppName { get; set; }
         public bool GenerateHttpTriggerUrlOutput { get; set; }
+        public bool ForceManagedIdentity { get; set; }
 
         public async Task<JObject> GenerateTemplate()
         {
@@ -162,7 +163,7 @@ namespace LogicAppTemplate
 
             var managedIdentity = (JObject)definition["identity"];
 
-            if(managedIdentity != null && managedIdentity.Value<string>("type") == "SystemAssigned")
+            if(ForceManagedIdentity || (managedIdentity != null && managedIdentity.Value<string>("type") == "SystemAssigned"))
             {
                 template.resources[0].Add("identity", JObject.Parse("{'type': 'SystemAssigned'}"));
             }
