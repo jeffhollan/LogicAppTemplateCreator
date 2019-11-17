@@ -51,6 +51,9 @@ namespace LogicAppTemplate
         [Parameter(Mandatory = false, HelpMessage = "If supplied, the LA ARM Template will be set to Disabled and won't be automatically run when deployed")]
         public SwitchParameter DisabledState;
 
+        [Parameter(Mandatory = false, HelpMessage = "If supplied, Managed Identity for the Logic App will be set in the ARM template")]
+        public SwitchParameter ForceManagedIdentity;
+
         protected override void ProcessRecord()
         {
             AzureResourceCollector resourceCollector = new AzureResourceCollector();
@@ -83,7 +86,8 @@ namespace LogicAppTemplate
             {
                 DiagnosticSettings = this.DiagnosticSettings,
                 GenerateHttpTriggerUrlOutput = this.GenerateHttpTriggerUrlOutput,
-                IncludeInitializeVariable = this.IncludeInitializeVariable
+                IncludeInitializeVariable = this.IncludeInitializeVariable,
+                ForceManagedIdentity = this.ForceManagedIdentity
             };
             
             try

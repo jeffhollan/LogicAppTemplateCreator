@@ -352,6 +352,45 @@ namespace LogicAppTemplate.Tests
             Assert.IsNull(defintion["parameters"]["Initialize-String-NoValue"]);
         }
 
+
+
+        [TestMethod()]
+        public void TestManagedIdentityNotSet()
+        {
+            var content = GetEmbededFileContent("LogicAppTemplate.Test.TestFiles.HTTP-basic.json");
+
+            var generator = new TemplateGenerator("", "", "", null);
+
+            var defintion = generator.generateDefinition(JObject.Parse(content)).GetAwaiter().GetResult();
+
+            Assert.IsNull(defintion["resources"][0]["identity"]);
+        }
+        [TestMethod()]
+        public void TestManagedIdentityForced()
+        {
+            var content = GetEmbededFileContent("LogicAppTemplate.Test.TestFiles.HTTP-basic.json");
+
+            var generator = new TemplateGenerator("", "", "", null);
+            generator.ForceManagedIdentity = true;
+
+            var defintion = generator.generateDefinition(JObject.Parse(content)).GetAwaiter().GetResult();
+
+            Assert.IsNotNull(defintion["resources"][0]["identity"]);
+        }
+
+
+        [TestMethod()]
+        public void TestManagedIdentityFromResource()
+        {
+            var content = GetEmbededFileContent("LogicAppTemplate.Test.TestFiles.ManagedIdentity.json");
+
+            var generator = new TemplateGenerator("", "", "", null);
+
+            var defintion = generator.generateDefinition(JObject.Parse(content)).GetAwaiter().GetResult();
+
+            Assert.IsNotNull(defintion["resources"][0]["identity"]);
+        }
+
         [TestMethod()]
         public void TestExtractVariablesSet()
         {
