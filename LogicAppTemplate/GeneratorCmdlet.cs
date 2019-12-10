@@ -90,7 +90,7 @@ namespace LogicAppTemplate
                 DiagnosticSettings = this.DiagnosticSettings,
                 GenerateHttpTriggerUrlOutput = this.GenerateHttpTriggerUrlOutput,
                 IncludeInitializeVariable = this.IncludeInitializeVariable,
-                ForceManagedIdentity = this.ForceManagedIdentity
+                ForceManagedIdentity = this.ForceManagedIdentity,
                 FixedFunctionAppName = FixedFunctionAppName,
                 ExtractServiceBusConnectionString = ExtractServiceBusConnectionString
         };
