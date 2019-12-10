@@ -58,8 +58,8 @@ namespace LogicAppTemplate.Test
             Assert.AreEqual("[concat('/subscriptions/',subscription().subscriptionId,'/providers/Microsoft.Web/locations/',parameters('logicAppLocation'),'/managedApis/azureeventgridpublish')]", connection["properties"]["api"].Value<string>("id"));
 
             Assert.AreEqual("[parameters('azureeventgridpublish_displayName')]", connection["properties"].Value<string>("displayName"));
-            Assert.AreEqual("[listKeys(resourceId('Microsoft.EventGrid/topics',parameters('azureeventgridpublish_instancename')),'2018-01-01').key1]", connection["properties"]["parameterValues"].Value<string>("api_key"));
-            Assert.AreEqual("[reference(concat('Microsoft.EventGrid/topics/',parameters('azureeventgridpublish_instancename')),'2018-01-01').endpoint]", connection["properties"]["parameterValues"].Value<string>("endpoint"));
+            Assert.AreEqual("[listKeys(resourceId(parameters('azureeventgridpublish_resourceGroupName'),'Microsoft.EventGrid/topics',parameters('azureeventgridpublish_instancename')),'2018-01-01').key1]", connection["properties"]["parameterValues"].Value<string>("api_key"));
+            Assert.AreEqual("[reference(resourceId(parameters('azureeventgridpublish_resourceGroupName'),'Microsoft.EventGrid/topics',parameters('azureeventgridpublish_instancename')),'2018-01-01').endpoint]", connection["properties"]["parameterValues"].Value<string>("endpoint"));
 
         }
         [TestMethod]

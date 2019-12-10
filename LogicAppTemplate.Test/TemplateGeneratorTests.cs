@@ -352,6 +352,45 @@ namespace LogicAppTemplate.Tests
             Assert.IsNull(defintion["parameters"]["Initialize-String-NoValue"]);
         }
 
+
+
+        [TestMethod()]
+        public void TestManagedIdentityNotSet()
+        {
+            var content = GetEmbededFileContent("LogicAppTemplate.Test.TestFiles.HTTP-basic.json");
+
+            var generator = new TemplateGenerator("", "", "", null);
+
+            var defintion = generator.generateDefinition(JObject.Parse(content)).GetAwaiter().GetResult();
+
+            Assert.IsNull(defintion["resources"][0]["identity"]);
+        }
+        [TestMethod()]
+        public void TestManagedIdentityForced()
+        {
+            var content = GetEmbededFileContent("LogicAppTemplate.Test.TestFiles.HTTP-basic.json");
+
+            var generator = new TemplateGenerator("", "", "", null);
+            generator.ForceManagedIdentity = true;
+
+            var defintion = generator.generateDefinition(JObject.Parse(content)).GetAwaiter().GetResult();
+
+            Assert.IsNotNull(defintion["resources"][0]["identity"]);
+        }
+
+
+        [TestMethod()]
+        public void TestManagedIdentityFromResource()
+        {
+            var content = GetEmbededFileContent("LogicAppTemplate.Test.TestFiles.ManagedIdentity.json");
+
+            var generator = new TemplateGenerator("", "", "", null);
+
+            var defintion = generator.generateDefinition(JObject.Parse(content)).GetAwaiter().GetResult();
+
+            Assert.IsNotNull(defintion["resources"][0]["identity"]);
+        }
+
         [TestMethod()]
         public void TestExtractVariablesSet()
         {
@@ -535,7 +574,7 @@ namespace LogicAppTemplate.Tests
             Assert.AreEqual("[parameters('azureblob_displayName')]", defintion["properties"]["displayName"]);
 
             Assert.AreEqual("[parameters('azureblob_accountName')]", defintion["properties"]["parameterValues"]["accountName"]);
-            Assert.AreEqual("[listKeys(resourceId('Microsoft.Storage/storageAccounts', parameters('azureblob_accountName')), '2018-02-01').keys[0].value]", defintion["properties"]["parameterValues"]["accessKey"]);
+            Assert.AreEqual("[listKeys(resourceId(parameters('azureblob_resourceGroupName'),'Microsoft.Storage/storageAccounts', parameters('azureblob_accountName')), '2018-02-01').keys[0].value]", defintion["properties"]["parameterValues"]["accessKey"]);
             Assert.AreEqual("[concat('/subscriptions/', subscription().subscriptionId, '/providers/Microsoft.Web/locations/', parameters('logicAppLocation'), '/managedApis/azureblob')]", defintion["properties"]["api"]["id"]);
         }
 
