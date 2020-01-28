@@ -733,7 +733,7 @@ namespace LogicAppTemplate
             connectionTemplate.properties.displayName = $"[parameters('{AddTemplateParameter(connectionName + "_displayName", "string", (string)connectionInstance["properties"]["displayName"])}')]";
             JObject connectionParameters = new JObject();
 
-            bool useGateway = connectionInstance["properties"]["nonSecretParameterValues"]["gateway"] != null;
+            bool useGateway = connectionInstance["properties"]?["parameterValueSet"]?["values"]?["gateway"] != null;
 
             var instanceResourceId = new AzureResourceId(connectionInstance.Value<string>("id"));
 
@@ -792,7 +792,16 @@ namespace LogicAppTemplate
                         else
                         {
                             //todo check this!
-                            var addedparam = AddTemplateParameter($"{connectionName}_{parameter.Name}", (string)(parameter.Value)["type"], connectionInstance["properties"]["nonSecretParameterValues"][parameter.Name]);
+                            object parameterValue = null;
+                            if(connectionInstance["properties"]["nonSecretParameterValues"] != null)
+                            {
+                                parameterValue = connectionInstance["properties"]["nonSecretParameterValues"][parameter.Name];
+                            }else
+                            {
+                                parameterValue = connectionInstance["properties"]["parameterValueSet"]?["values"]?[parameter.Name]?["value"];
+                            }
+
+                            var addedparam = AddTemplateParameter($"{connectionName}_{parameter.Name}", (string)(parameter.Value)["type"], parameterValue);
                             connectionParameters.Add(parameter.Name, $"[parameters('{addedparam}')]");
 
                             //If has an enum
@@ -823,10 +832,19 @@ namespace LogicAppTemplate
 
             if (useGateway)
             {
-                var currentvalue = (string)connectionInstance["properties"]["nonSecretParameterValues"]["gateway"]["id"];
+                string currentvalue = "";
+                if ( connectionInstance["properties"]["nonSecretParameterValues"] != null )
+                {
+                    currentvalue = (string)connectionInstance["properties"]["nonSecretParameterValues"]["gateway"]["id"];
+                                      
+                }
+                else
+                {
+                    currentvalue = (string)connectionInstance["properties"]["parameterValueSet"]["values"]["gateway"]["value"]["id"];
+                }
                 var rid = new AzureResourceId(currentvalue);
-                var gatewayname = AddTemplateParameter($"{connectionName}_gatewayname", "string", rid.ResourceName);
-                var resourcegroup = AddTemplateParameter($"{connectionName}_gatewayresourcegroup", "string", rid.ResourceGroupName);
+                var  gatewayname = AddTemplateParameter($"{connectionName}_gatewayname", "string", rid.ResourceName);
+                var  resourcegroup = AddTemplateParameter($"{connectionName}_gatewayresourcegroup", "string", rid.ResourceGroupName);
 
                 var gatewayobject = new JObject();
                 gatewayobject["id"] = $"[concat('/subscriptions/',subscription().subscriptionId,'/resourceGroups/',parameters('{resourcegroup}'),'/providers/Microsoft.Web/connectionGateways/',parameters('{gatewayname}'))]";
