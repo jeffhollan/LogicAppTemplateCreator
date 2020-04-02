@@ -31,7 +31,7 @@ namespace LogicAppTemplate
 
         public async Task<JObject> GenerateTemplate()
         {
-            JObject _definition = await resourceCollector.GetResource($"https://management.azure.com/subscriptions/{subscriptionId}/resourceGroups/{resourceGroup}/providers/Microsoft.Logic/integrationAccounts/{integrationAccount}/{type.ToString().ToLower()}/{artifactName}", "2018-07-01-preview");
+            JObject _definition = await resourceCollector.GetResource($"https://management.azure.com/subscriptions/{subscriptionId}/resourceGroups/{resourceGroup}/providers/Microsoft.Logic/integrationAccounts/{integrationAccount}/{type.ToString().ToLower()}/{artifactName}", "2019-05-01");
 
             if (type == ARtifactType.Maps)
             {
