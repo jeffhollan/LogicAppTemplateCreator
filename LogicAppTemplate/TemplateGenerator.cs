@@ -783,7 +783,7 @@ namespace LogicAppTemplate
                             var url = connectionInstance["properties"]["nonSecretParameterValues"].Value<string>("endpoint");
                             var location = connectionInstance.Value<string>("location");
                             url = url.Replace("https://", "");
-                            var site = url.Substring(0, url.LastIndexOf("." + location));
+                            var site = url.Substring(0, url.IndexOf("."));
 
                             var param = AddTemplateParameter($"{connectionInstance.Value<string>("name")}_instancename", "string", site);
 
