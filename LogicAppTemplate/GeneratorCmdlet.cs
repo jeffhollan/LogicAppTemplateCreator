@@ -54,6 +54,10 @@ namespace LogicAppTemplate
         [Parameter(Mandatory = false, HelpMessage = "If supplied, Managed Identity for the Logic App will be set in the ARM template")]
         public SwitchParameter ForceManagedIdentity;
 
+        [Parameter(Mandatory = false, HelpMessage = "If supplied, Connections for the Logic App will not be output in the ARM template")]
+        public SwitchParameter DisableConnectionGeneration;
+
+
         protected override void ProcessRecord()
         {
             AzureResourceCollector resourceCollector = new AzureResourceCollector();
@@ -81,13 +85,14 @@ namespace LogicAppTemplate
             {
                 return;
             }
-            
-            TemplateGenerator generator = new TemplateGenerator(LogicApp, SubscriptionId, ResourceGroup, resourceCollector,StripPassword, DisabledState)
+
+            TemplateGenerator generator = new TemplateGenerator(LogicApp, SubscriptionId, ResourceGroup, resourceCollector, StripPassword, DisabledState)
             {
                 DiagnosticSettings = this.DiagnosticSettings,
                 GenerateHttpTriggerUrlOutput = this.GenerateHttpTriggerUrlOutput,
                 IncludeInitializeVariable = this.IncludeInitializeVariable,
-                ForceManagedIdentity = this.ForceManagedIdentity
+                ForceManagedIdentity = this.ForceManagedIdentity,
+                DisableConnectionsOutput = this.DisableConnectionGeneration
             };
             
             try

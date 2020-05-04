@@ -52,11 +52,12 @@ namespace LogicAppTemplate
         public bool FixedFunctionAppName { get; set; }
         public bool GenerateHttpTriggerUrlOutput { get; set; }
         public bool ForceManagedIdentity { get; set; }
+        public bool DisableConnectionsOutput { get; set; }
 
         public async Task<JObject> GenerateTemplate()
         {
             JObject _definition = await resourceCollector.GetResource($"https://management.azure.com/subscriptions/{SubscriptionId}/resourceGroups/{ResourceGroup}/providers/Microsoft.Logic/workflows/{LogicApp}", "2016-06-01");
-            return await generateDefinition(_definition);
+            return await generateDefinition(_definition, !DisableConnectionsOutput);
         }
 
         public async Task<JObject> generateDefinition(JObject definition, bool generateConnection = true)
