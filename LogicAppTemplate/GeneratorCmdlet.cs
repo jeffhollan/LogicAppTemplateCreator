@@ -45,6 +45,9 @@ namespace LogicAppTemplate
         [Parameter(Mandatory = false, HelpMessage = "If supplied, generate an output variable with the trigger url.")]
         public SwitchParameter GenerateHttpTriggerUrlOutput;
 
+        [Parameter(Mandatory = false, HelpMessage = "If supplied, connections to a ServiceBus will be set by a name and resourcegroupname")]
+        public SwitchParameter ExtractServiceBusConnectionString = false;
+
         [Parameter(Mandatory = false, HelpMessage = "If supplied, the passwords will be stripped out of the output")]
         public SwitchParameter StripPassword;
 
@@ -74,22 +77,24 @@ namespace LogicAppTemplate
             }
             else if (ClaimsDump.Contains("Token copied"))
             {
-                Token = Clipboard.GetText().Replace("Bearer ", "");
+                Token = GetClipboardText().Replace("Bearer ", "");
                 resourceCollector.token = Token;
             }
             else
             {
                 return;
             }
-            
-            TemplateGenerator generator = new TemplateGenerator(LogicApp, SubscriptionId, ResourceGroup, resourceCollector,StripPassword, DisabledState)
+
+            TemplateGenerator generator = new TemplateGenerator(LogicApp, SubscriptionId, ResourceGroup, resourceCollector, StripPassword, DisabledState)
             {
                 DiagnosticSettings = this.DiagnosticSettings,
                 GenerateHttpTriggerUrlOutput = this.GenerateHttpTriggerUrlOutput,
                 IncludeInitializeVariable = this.IncludeInitializeVariable,
-                ForceManagedIdentity = this.ForceManagedIdentity
+                ForceManagedIdentity = this.ForceManagedIdentity,
+                FixedFunctionAppName = FixedFunctionAppName,
+                ExtractServiceBusConnectionString = ExtractServiceBusConnectionString
             };
-            
+
             try
             {
 
@@ -116,6 +121,34 @@ namespace LogicAppTemplate
                     throw ex;
                 }
             }
+        }
+        private string GetClipboardText()
+        {
+            string strClipboard = string.Empty;
+
+            for (int i = 0; i < 10; i++)
+            {
+                try
+                {
+                    strClipboard = Clipboard.GetText();
+                    if (strClipboard != string.Empty)
+                        return strClipboard;
+
+                    System.Threading.Thread.Sleep(10);
+                }
+                catch (System.Runtime.InteropServices.COMException ex)
+                {
+                    //fix for OpenClipboard Failed (Exception from HRESULT: 0x800401D0 (CLIPBRD_E_CANT_OPEN))
+                    //https://stackoverflow.com/questions/12769264/openclipboard-failed-when-copy-pasting-data-from-wpf-datagrid
+                    //https://stackoverflow.com/questions/68666/clipbrd-e-cant-open-error-when-setting-the-clipboard-from-net
+                    if (ex.ErrorCode == -2147221040)
+                        System.Threading.Thread.Sleep(10);
+                    else
+                        throw new Exception("Unable to get Clipboard text.");
+                }
+            }
+
+            return strClipboard;
         }
     }
 }
