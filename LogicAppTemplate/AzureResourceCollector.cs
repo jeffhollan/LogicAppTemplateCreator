@@ -19,6 +19,7 @@ namespace LogicAppTemplate
 
         public AzureResourceCollector()
         {
+            ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12;
 
         }
         public string Login(string tenantName)
