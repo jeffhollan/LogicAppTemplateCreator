@@ -42,7 +42,6 @@ Error is easy fixed, in your script just remove the $true part in your command s
 | FixedFunctionAppName | If supplied, the functionApp gets a static name | false |
 | GenerateHttpTriggerUrlOutput | If supplied, generate an output variable with the http trigger url. | false |
 | StripPassword | If supplied, the passwords will be stripped out of the output | false |
-| ExtractServiceBusConnectionString | If supplied, connections to a ServiceBus will be set by a name and resourcegroupname | false |
 | DisabledState | If supplied, the LA ARM Template will be set to Disabled and won't be automatically run when deployed | false |
 
 After extraction a parameters file can be created off the LogicAppTemplate. (works on any ARM template file):

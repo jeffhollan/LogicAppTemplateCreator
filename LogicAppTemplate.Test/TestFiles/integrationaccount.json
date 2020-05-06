@@ -8,7 +8,7 @@
     "accessEndpoint": "https://prod-00.westeurope.logic.azure.com:443/workflows/x",
     "integrationAccount": {
       "name": "ia-tst",
-      "id": "/subscriptions/FAKEa1e9-15f5-4c85-bb3e-1e108dc79b01/resourcegroups/resourcegroupname/providers/Microsoft.Logic/integrationAccounts/ia-tst",
+      "id": "/subscriptions/FAKEa1e9-15f5-4c85-bb3e-1e108dc79b01/resourcegroups/resourcegroupname2/providers/Microsoft.Logic/integrationAccounts/ia-tst",
       "type": "Microsoft.Logic/integrationAccounts"
     },
     "definition": {

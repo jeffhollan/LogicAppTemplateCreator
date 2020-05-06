@@ -26,7 +26,6 @@ namespace LogicAppTemplate
         private string IntegrationAccountId;
         private bool extractIntegrationAccountArtifacts = false;
         private bool disabledState = false;
-        internal bool ExtractServiceBusConnectionString = false;
 
         public TemplateGenerator(string LogicApp, string SubscriptionId, string ResourceGroup, IResourceCollector resourceCollector, bool stripPassword = false, bool disabledState = false)
         {
@@ -774,14 +773,12 @@ namespace LogicAppTemplate
                         }
                         else if (concatedId.EndsWith("/servicebus')]"))
                         {
-                            if (ExtractServiceBusConnectionString)
-                            {
-                                var namespace_param = AddTemplateParameter($"servicebus_namespace_name", "string", "REPLACE__servicebus_namespace");
-                                var sb_resource_group_param = AddTemplateParameter($"servicebus_rg", "string", "REPLACE__servicebus_rg");
-                                var servicebus_auth_name_param = AddTemplateParameter($"servicebus_auth_name", "string", "RootManageSharedAccessKey");
+                            var namespace_param = AddTemplateParameter($"servicebus_namespace_name", "string", "REPLACE__servicebus_namespace");
+                            var sb_resource_group_param = AddTemplateParameter($"servicebus_resourceGroupName", "string", "REPLACE__servicebus_rg");
+                            var servicebus_auth_name_param = AddTemplateParameter($"servicebus_accessKey_name", "string", "RootManageSharedAccessKey");
 
-                                connectionParameters.Add(parameter.Name, $"[listkeys(resourceId(parameters('servicebus_rg'),'Microsoft.ServiceBus/namespaces/authorizationRules', parameters('servicebus_namespace_name'), parameters('servicebus_auth_name')), '2017-04-01').primaryConnectionString]");
-                            }
+                            connectionParameters.Add(parameter.Name, $"[listkeys(resourceId(parameters('servicebus_rg'),'Microsoft.ServiceBus/namespaces/authorizationRules', parameters('servicebus_namespace_name'), parameters('servicebus_auth_name')), '2017-04-01').primaryConnectionString]");
+
                         }
                         else if (concatedId.EndsWith("/azureeventgridpublish')]"))
                         {
@@ -811,10 +808,11 @@ namespace LogicAppTemplate
                         {
                             //todo check this!
                             object parameterValue = null;
-                            if(connectionInstance["properties"]["nonSecretParameterValues"] != null)
+                            if (connectionInstance["properties"]["nonSecretParameterValues"] != null)
                             {
                                 parameterValue = connectionInstance["properties"]["nonSecretParameterValues"][parameter.Name];
-                            }else
+                            }
+                            else
                             {
                                 parameterValue = connectionInstance["properties"]["parameterValueSet"]?["values"]?[parameter.Name]?["value"];
                             }
@@ -851,18 +849,18 @@ namespace LogicAppTemplate
             if (useGateway)
             {
                 string currentvalue = "";
-                if ( connectionInstance["properties"]["nonSecretParameterValues"] != null )
+                if (connectionInstance["properties"]["nonSecretParameterValues"] != null)
                 {
                     currentvalue = (string)connectionInstance["properties"]["nonSecretParameterValues"]["gateway"]["id"];
-                                      
+
                 }
                 else
                 {
                     currentvalue = (string)connectionInstance["properties"]["parameterValueSet"]["values"]["gateway"]["value"]["id"];
                 }
                 var rid = new AzureResourceId(currentvalue);
-                var  gatewayname = AddTemplateParameter($"{connectionName}_gatewayname", "string", rid.ResourceName);
-                var  resourcegroup = AddTemplateParameter($"{connectionName}_gatewayresourcegroup", "string", rid.ResourceGroupName);
+                var gatewayname = AddTemplateParameter($"{connectionName}_gatewayname", "string", rid.ResourceName);
+                var resourcegroup = AddTemplateParameter($"{connectionName}_gatewayresourcegroup", "string", rid.ResourceGroupName);
 
                 var gatewayobject = new JObject();
                 gatewayobject["id"] = $"[concat('/subscriptions/',subscription().subscriptionId,'/resourceGroups/',parameters('{resourcegroup}'),'/providers/Microsoft.Web/connectionGateways/',parameters('{gatewayname}'))]";

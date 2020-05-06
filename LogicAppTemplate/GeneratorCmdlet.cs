@@ -45,9 +45,6 @@ namespace LogicAppTemplate
         [Parameter(Mandatory = false, HelpMessage = "If supplied, generate an output variable with the trigger url.")]
         public SwitchParameter GenerateHttpTriggerUrlOutput;
 
-        [Parameter(Mandatory = false, HelpMessage = "If supplied, connections to a ServiceBus will be set by a name and resourcegroupname")]
-        public SwitchParameter ExtractServiceBusConnectionString = false;
-
         [Parameter(Mandatory = false, HelpMessage = "If supplied, the passwords will be stripped out of the output")]
         public SwitchParameter StripPassword;
 
@@ -91,8 +88,7 @@ namespace LogicAppTemplate
                 GenerateHttpTriggerUrlOutput = this.GenerateHttpTriggerUrlOutput,
                 IncludeInitializeVariable = this.IncludeInitializeVariable,
                 ForceManagedIdentity = this.ForceManagedIdentity,
-                FixedFunctionAppName = FixedFunctionAppName,
-                ExtractServiceBusConnectionString = ExtractServiceBusConnectionString
+                FixedFunctionAppName = FixedFunctionAppName
             };
 
             try
