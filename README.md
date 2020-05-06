@@ -26,6 +26,9 @@ Error is easy fixed, in your script just remove the $true part in your command s
  ```powershell
  -DiagnosticSettings
  ```
+### Updates Change 2020-05-06
+There has been alot of small changes and contribution around extraction of connectors, Integration Account and nested templates.
+New is that service bus connector now comes out with inputs needed for Azure Resource Manager to create the connection string rather than providing it manually.
 
 ### Specifications
 
