@@ -75,6 +75,11 @@ namespace LogicAppTemplate
             {
                 template.parameters["IntegrationAccountName"]["defaultValue"] = definition["properties"]["integrationAccount"]["name"];
                 IntegrationAccountId = definition["properties"]["integrationAccount"].Value<string>("id");
+                var IntegrationAccountAzureResourceId = new AzureResourceId(IntegrationAccountId);
+                if (IntegrationAccountAzureResourceId.ResourceGroupName.ToLower() != rid.ResourceGroupName.ToLower())
+                {
+                    template.parameters["IntegrationAccountResourceGroupName"]["defaultValue"] = IntegrationAccountAzureResourceId.ResourceGroupName;
+                }
             }
 
             //ISE
@@ -591,7 +596,7 @@ namespace LogicAppTemplate
                             JObject outputValue = JObject.FromObject(new
                             {
                                 type = "string",
-                                value = "[listCallbackURL(concat(resourceId('Microsoft.Logic/workflows/', parameters('logicAppName')), '/triggers/manual'), '2016-06-01').value]"
+                                value = "[listCallbackURL(concat(resourceId(resourceGroup().name,'Microsoft.Logic/workflows/', parameters('logicAppName')), '/triggers/manual'), '2016-06-01').value]"
                             });
 
                             this.template.outputs.Add("httpTriggerUrl", outputValue);
