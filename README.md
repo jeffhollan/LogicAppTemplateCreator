@@ -43,6 +43,8 @@ Error is easy fixed, in your script just remove the $true part in your command s
 | GenerateHttpTriggerUrlOutput | If supplied, generate an output variable with the http trigger url. | false |
 | StripPassword | If supplied, the passwords will be stripped out of the output | false |
 | DisabledState | If supplied, the LA ARM Template will be set to Disabled and won't be automatically run when deployed | false |
+| ForceManagedIdentity | If supplied, Managed Identity for the Logic App will be set in the ARM template | false |
+| DisableConnectionGeneration | If supplied, Connections for the Logic App will not be output in the ARM template | false |
 
 After extraction a parameters file can be created off the LogicAppTemplate. (works on any ARM template file):
 
