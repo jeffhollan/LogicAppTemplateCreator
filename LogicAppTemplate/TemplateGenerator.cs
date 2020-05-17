@@ -186,7 +186,21 @@ namespace LogicAppTemplate
 
                 var connectionNameParam = AddTemplateParameter($"{connectionName}_name", "string", connectionName);
 
-                var cid = apiIdTemplate(id,connectionNameParam);
+                AzureResourceId cid ;
+
+                // Check if id contains different parameter than connectionname
+                var idarray = id.Split('/');
+                string candidate = idarray.Last();
+                string type = idarray[idarray.Count()-2];
+                if (type.Equals("customApis"))
+                {
+                    var idparam = AddTemplateParameter($"{connectionName}_api", "string", candidate);
+                    cid = apiIdTemplate(id, idparam);
+                }
+                else
+                {
+                    cid = apiIdTemplate(id, connectionNameParam);
+                }
                 string concatedId = $"[concat('{cid.ToString()}')]";
 
 
