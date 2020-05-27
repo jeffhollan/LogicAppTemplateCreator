@@ -1,7 +1,7 @@
 ﻿{
   "name": "",
   "type": "Microsoft.Resources/deployments",
-  "apiVersion": "2016-09-01",
+  "apiVersion": "2019-10-01",
   "dependsOn": [],
   "properties": {
     "mode": "Incremental",

@@ -108,11 +108,11 @@ namespace LogicAppTemplate
 
                             if (nestedtemplate.parameters.ContainsKey(parameter.Name))
                             {
-                                dynamic v1 = nestedtemplate.parameters[parameter.Name]; //.Value["defaultValue"]?.Value<string>();\
+                                var v1 = (JObject)nestedtemplate.parameters[parameter.Name]; //.Value["defaultValue"]?.Value<string>();\
                                                                                         //v1.Properties[""];
 
 
-                                if (parameter.Contains("defaultValue") && !JToken.DeepEquals(v1.defaultValue, parameter.Value["defaultValue"]))
+                                if (parameter.Value["defaultValue"] != null && !JToken.DeepEquals(v1["defaultValue"], parameter.Value["defaultValue"]))
                                 {
                                     var paramName = GetUniqueParamName(parameter.Name);
 
