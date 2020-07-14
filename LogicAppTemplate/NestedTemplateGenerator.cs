@@ -34,6 +34,9 @@ namespace LogicAppTemplate
         [Parameter(Mandatory = false, HelpMessage = "Add Parameterlink")]
         public bool AddParameterlink = true;
 
+        [Parameter(Mandatory = false, HelpMessage = "Optional dependsOn")]
+        public string DependsOn = "";
+
         private static string NestedTemplateResourceUri = "[concat(parameters('repoBaseUrl'), '/{0}/{0}.json', parameters('_artifactsLocationSasToken'))]";
         private static string NestedTemplateParameterUri = "[concat(parameters('repoBaseUrl'), '/{0}/{0}.parameters.json', parameters('_artifactsLocationSasToken'))]";
         private DeploymentTemplate nestedtemplate;
@@ -74,6 +77,7 @@ namespace LogicAppTemplate
             nestedtemplate = JsonConvert.DeserializeObject<DeploymentTemplate>(Template);
         }
 
+        public string _previousResourceName = null;
         protected override void ProcessRecord()
         {
             var nestedresource = new Models.NestedResourceTemplate() { name = ResourceName };
@@ -88,6 +92,8 @@ namespace LogicAppTemplate
                 nestedresource.properties.parametersLink = null;
                 nestedresource.properties.parameters = new JObject();
 
+                if (!string.IsNullOrEmpty(DependsOn))
+                    nestedresource.dependsOn.Add(DependsOn);
 
                 var fileName = Path.Combine(ResourcePath, Path.GetFileName(ResourcePath) + ".json");
 
@@ -109,7 +115,7 @@ namespace LogicAppTemplate
                             if (nestedtemplate.parameters.ContainsKey(parameter.Name))
                             {
                                 var v1 = (JObject)nestedtemplate.parameters[parameter.Name]; //.Value["defaultValue"]?.Value<string>();\
-                                                                                        //v1.Properties[""];
+                                                                                             //v1.Properties[""];
 
 
                                 if (parameter.Value["defaultValue"] != null && !JToken.DeepEquals(v1["defaultValue"], parameter.Value["defaultValue"]))
