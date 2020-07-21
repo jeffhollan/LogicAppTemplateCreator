@@ -174,6 +174,26 @@ namespace LogicAppTemplate
             {
                 template.resources[0].Add("identity", JObject.Parse("{'type': 'SystemAssigned'}"));
             }
+            else if (managedIdentity != null && managedIdentity.Value<string>("type") == "UserAssigned")
+            {
+                //Extract user assigned managed identity info
+                var identities = ((JObject)managedIdentity["userAssignedIdentities"]).Properties().ToList();
+                var identity = new AzureResourceId(identities[0].Name);
+                
+                //Add ARM parameter to configure the user assigned identity
+                template.parameters.Add(Constants.UserAssignedIdentityParameterName, JObject.FromObject(new { type = "string", defaultValue = identity.ResourceName }));
+
+                //Create identity object for ARM template
+                var userAssignedIdentities = new JObject();
+                userAssignedIdentities.Add($"[resourceId('Microsoft.ManagedIdentity/userAssignedIdentities/', parameters('{Constants.UserAssignedIdentityParameterName}'))]", JObject.FromObject(new { }));
+
+                var userAssignedIdentity = new JObject();
+                userAssignedIdentity.Add("type", "UserAssigned");
+                userAssignedIdentity.Add("userAssignedIdentities", userAssignedIdentities);
+
+                //Add identity object to Logic App resource
+                template.resources[0].Add("identity", userAssignedIdentity);
+            }
 
             // WriteVerbose("Checking connections...");
             if (connections == null)
@@ -441,6 +461,17 @@ namespace LogicAppTemplate
                         {
                             definition["actions"][action.Name]["inputs"]["authentication"]["value"] = "[parameters('" + AddTemplateParameter(action.Name + "-Raw", "string", ((JObject)definition["actions"][action.Name]["inputs"]["authentication"]).Value<string>("value")) + "')]";
                         }
+                        else if ("ManagedServiceIdentity".Equals(authType, StringComparison.CurrentCultureIgnoreCase))
+                        {
+                            definition["actions"][action.Name]["inputs"]["authentication"]["audience"] = "[parameters('" + AddTemplateParameter(action.Name + "-Audience", "string", ((JObject)definition["actions"][action.Name]["inputs"]["authentication"]).Value<string>("audience")) + "')]";
+
+                            if (definition["actions"][action.Name]["inputs"]["authentication"]["identity"] != null)
+                            { 
+                                //User Assigned Identity
+                                definition["actions"][action.Name]["inputs"]["authentication"]["identity"] = $"[resourceId('Microsoft.ManagedIdentity/userAssignedIdentities/', parameters('{Constants.UserAssignedIdentityParameterName}'))]";
+                            }
+                        }
+
                     }
                 }
                 else if (type == "function")
