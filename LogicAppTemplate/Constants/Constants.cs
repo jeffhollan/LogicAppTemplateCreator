@@ -21,5 +21,8 @@
         public static string DsMetricsEnabled = DsPrefix + "metricsEnabled";
         public static string DsMetricsRetentionPolicyEnabled = DsPrefix + "metricsRetentionPolicyEnabled";
         public static string DsMetricsRetentionPolicyDays = DsPrefix + "metricsRetentionPolicyDays";
+
+        // Managed Identity
+        public static string UserAssignedIdentityParameterName = "UserAssignedIdentityName";
     }
 }
