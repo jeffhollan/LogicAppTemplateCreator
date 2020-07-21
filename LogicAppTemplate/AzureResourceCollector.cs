@@ -54,7 +54,7 @@ namespace LogicAppTemplate
 
             if (response.StatusCode == HttpStatusCode.NotFound)
             {
-                return null;
+                throw new Exception("Reesource Not found, resource: " + resourceId);
             }
             else if (response.StatusCode == HttpStatusCode.Forbidden)
             {
