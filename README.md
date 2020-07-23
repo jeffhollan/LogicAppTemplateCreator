@@ -53,7 +53,7 @@ After extraction a parameters file can be created off the LogicAppTemplate. (wor
 
 `Get-ParameterTemplate -TemplateFile $filenname | Out-File 'paramfile.json'`
 
-For extraction with KeyVault reference liks created use: (only static reference)
+For extraction with KeyVault reference mockup links created use: (only static reference)
 
 `Get-ParameterTemplate -TemplateFile $filenname -KeyVault Static | Out-File $filennameparam`
 
