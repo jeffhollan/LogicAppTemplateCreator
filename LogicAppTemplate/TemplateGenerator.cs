@@ -735,7 +735,8 @@ namespace LogicAppTemplate
             connectionTemplate.properties.displayName = $"[parameters('{AddTemplateParameter(connectionName + "_displayName", "string", (string)connectionInstance["properties"]["displayName"])}')]";
             JObject connectionParameters = new JObject();
 
-            bool useGateway = connectionInstance["properties"]?["parameterValueSet"]?["values"]?["gateway"] != null;
+            bool useGateway = connectionInstance["properties"]?["parameterValueSet"]?["values"]?["gateway"] != null ||
+                connectionInstance["properties"]?["nonSecretParameterValues"]?["gateway"] != null;
 
             var instanceResourceId = new AzureResourceId(connectionInstance.Value<string>("id"));
 
