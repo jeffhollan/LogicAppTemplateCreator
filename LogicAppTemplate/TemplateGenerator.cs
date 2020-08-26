@@ -903,7 +903,7 @@ namespace LogicAppTemplate
                 }
             }
 
-            if (useGateway) //&& !concatedId.EndsWith("/managedApis/sharepointonline')]")
+            if (useGateway)
             {
                 string currentvalue = "";
                 if (connectionInstance["properties"]["nonSecretParameterValues"] != null)
