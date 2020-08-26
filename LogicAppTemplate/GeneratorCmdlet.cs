@@ -45,9 +45,6 @@ namespace LogicAppTemplate
         [Parameter(Mandatory = false, HelpMessage = "If supplied, generate an output variable with the trigger url.")]
         public SwitchParameter GenerateHttpTriggerUrlOutput;
 
-        [Parameter(Mandatory = false, HelpMessage = "If supplied, connections to a ServiceBus will be set by a name and resourcegroupname")]
-        public SwitchParameter ExtractServiceBusConnectionString = false;
-
         [Parameter(Mandatory = false, HelpMessage = "If supplied, the passwords will be stripped out of the output")]
         public SwitchParameter StripPassword;
 
@@ -56,6 +53,10 @@ namespace LogicAppTemplate
 
         [Parameter(Mandatory = false, HelpMessage = "If supplied, Managed Identity for the Logic App will be set in the ARM template")]
         public SwitchParameter ForceManagedIdentity;
+
+        [Parameter(Mandatory = false, HelpMessage = "If supplied, Connections for the Logic App will not be output in the ARM template")]
+        public SwitchParameter DisableConnectionGeneration;
+
 
         protected override void ProcessRecord()
         {
@@ -92,7 +93,7 @@ namespace LogicAppTemplate
                 IncludeInitializeVariable = this.IncludeInitializeVariable,
                 ForceManagedIdentity = this.ForceManagedIdentity,
                 FixedFunctionAppName = FixedFunctionAppName,
-                ExtractServiceBusConnectionString = ExtractServiceBusConnectionString
+                DisableConnectionsOutput = this.DisableConnectionGeneration
             };
 
             try

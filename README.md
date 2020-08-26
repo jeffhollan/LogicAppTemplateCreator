@@ -26,6 +26,9 @@ Error is easy fixed, in your script just remove the $true part in your command s
  ```powershell
  -DiagnosticSettings
  ```
+### Updates Change 2020-05-06
+There has been alot of small changes and contribution around extraction of connectors, Integration Account and nested templates.
+New is that service bus connector now comes out with inputs needed for Azure Resource Manager to create the connection string rather than providing it manually.
 
 ### Specifications
 
@@ -42,14 +45,15 @@ Error is easy fixed, in your script just remove the $true part in your command s
 | FixedFunctionAppName | If supplied, the functionApp gets a static name | false |
 | GenerateHttpTriggerUrlOutput | If supplied, generate an output variable with the http trigger url. | false |
 | StripPassword | If supplied, the passwords will be stripped out of the output | false |
-| ExtractServiceBusConnectionString | If supplied, connections to a ServiceBus will be set by a name and resourcegroupname | false |
 | DisabledState | If supplied, the LA ARM Template will be set to Disabled and won't be automatically run when deployed | false |
+| ForceManagedIdentity | If supplied, Managed Identity for the Logic App will be set in the ARM template | false |
+| DisableConnectionGeneration | If supplied, Connections for the Logic App will not be output in the ARM template | false |
 
 After extraction a parameters file can be created off the LogicAppTemplate. (works on any ARM template file):
 
 `Get-ParameterTemplate -TemplateFile $filenname | Out-File 'paramfile.json'`
 
-For extraction with KeyVault reference liks created use: (only static reference)
+For extraction with KeyVault reference mockup links created use: (only static reference)
 
 `Get-ParameterTemplate -TemplateFile $filenname -KeyVault Static | Out-File $filennameparam`
 
