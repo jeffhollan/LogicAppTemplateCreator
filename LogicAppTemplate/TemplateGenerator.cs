@@ -799,12 +799,19 @@ namespace LogicAppTemplate
 
 
                         }
-                        else if (concatedId.EndsWith("/managedApis/sharepointonline')]"))
-                        {
+                        //else if (concatedId.EndsWith("/managedApis/sharepointonline')]"))
+                        //{
                             //skip because otherwise authenticated connection has to be authenticated again.
-                        }
+                        //}
                         else
                         {
+                            //check for hidden constraint
+                            if ((parameter.Value["uiDefinition"]["constraints"]["hidden"]?.Value<bool>() ?? false))
+                            {
+                                continue;
+                            }
+
+
                             //todo check this!
                             object parameterValue = null;
                             if(connectionInstance["properties"]["nonSecretParameterValues"] != null)
@@ -844,7 +851,7 @@ namespace LogicAppTemplate
                 }
             }
 
-            if (useGateway)
+            if (useGateway) //&& !concatedId.EndsWith("/managedApis/sharepointonline')]")
             {
                 string currentvalue = "";
                 if ( connectionInstance["properties"]["nonSecretParameterValues"] != null )
