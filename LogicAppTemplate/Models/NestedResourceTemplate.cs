@@ -48,7 +48,7 @@ namespace LogicAppTemplate.Models
         {
             get
             {
-                return "2016-09-01";
+                return "2019-10-01";
             }
         }
         public List<object> dependsOn { get; set; }
