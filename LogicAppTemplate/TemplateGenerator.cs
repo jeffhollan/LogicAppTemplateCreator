@@ -179,13 +179,22 @@ namespace LogicAppTemplate
                 //Extract user assigned managed identity info
                 var identities = ((JObject)managedIdentity["userAssignedIdentities"]).Properties().ToList();
                 var identity = new AzureResourceId(identities[0].Name);
-                
+
                 //Add ARM parameter to configure the user assigned identity
                 template.parameters.Add(Constants.UserAssignedIdentityParameterName, JObject.FromObject(new { type = "string", defaultValue = identity.ResourceName }));
 
+                //When the identity exists in a different resourcegroup add this as parameter and in the resourceId() function
+                var identityResourceGroupAddtion = "";
+                if (LogicAppResourceGroup != identity.ResourceGroupName)
+                {
+                    identityResourceGroupAddtion = $"parameters('{Constants.UserAssignedIdentityParameterName}_resourceGroup'),";
+                    template.parameters.Add($"{Constants.UserAssignedIdentityParameterName}_resourceGroup", JObject.FromObject(new { type = "string", defaultValue = identity.ResourceGroupName }));
+                }
+               
+
                 //Create identity object for ARM template
                 var userAssignedIdentities = new JObject();
-                userAssignedIdentities.Add($"[resourceId('Microsoft.ManagedIdentity/userAssignedIdentities/', parameters('{Constants.UserAssignedIdentityParameterName}'))]", JObject.FromObject(new { }));
+                userAssignedIdentities.Add($"[resourceId({identityResourceGroupAddtion}'Microsoft.ManagedIdentity/userAssignedIdentities/', parameters('{Constants.UserAssignedIdentityParameterName}'))]", JObject.FromObject(new { }));
 
                 var userAssignedIdentity = new JObject();
                 userAssignedIdentity.Add("type", "UserAssigned");
@@ -466,9 +475,20 @@ namespace LogicAppTemplate
                             definition["actions"][action.Name]["inputs"]["authentication"]["audience"] = "[parameters('" + AddTemplateParameter(action.Name + "-Audience", "string", ((JObject)definition["actions"][action.Name]["inputs"]["authentication"]).Value<string>("audience")) + "')]";
 
                             if (definition["actions"][action.Name]["inputs"]["authentication"]["identity"] != null)
-                            { 
+                            {
+
+                                //When the identity exists in a different resourcegroup add this as parameter and in the resourceId() function
+                                var identityResource = new AzureResourceId(definition["actions"][action.Name]["inputs"]["authentication"]["identity"].Value<string>());
+                                var identityResourceGroupAddtion = "";
+                                if (LogicAppResourceGroup != identityResource.ResourceGroupName)
+                                {
+                                    identityResourceGroupAddtion = $"parameters('{Constants.UserAssignedIdentityParameterName}_resourceGroup'),";
+                                    //template.parameters.Add($"{Constants.UserAssignedIdentityParameterName}_resourceGroup", JObject.FromObject(new { type = "string", defaultValue = identityResource.ResourceGroupName }));
+                                }
+
+
                                 //User Assigned Identity
-                                definition["actions"][action.Name]["inputs"]["authentication"]["identity"] = $"[resourceId('Microsoft.ManagedIdentity/userAssignedIdentities/', parameters('{Constants.UserAssignedIdentityParameterName}'))]";
+                                definition["actions"][action.Name]["inputs"]["authentication"]["identity"] = $"[resourceId({identityResourceGroupAddtion}'Microsoft.ManagedIdentity/userAssignedIdentities/', parameters('{Constants.UserAssignedIdentityParameterName}'))]";
                             }
                         }
 
@@ -784,7 +804,8 @@ namespace LogicAppTemplate
             connectionTemplate.properties.displayName = $"[parameters('{AddTemplateParameter(connectionName + "_displayName", "string", (string)connectionInstance["properties"]["displayName"])}')]";
             JObject connectionParameters = new JObject();
 
-            bool useGateway = connectionInstance["properties"]?["parameterValueSet"]?["values"]?["gateway"] != null;
+            bool useGateway = connectionInstance["properties"]?["parameterValueSet"]?["values"]?["gateway"] != null ||
+                connectionInstance["properties"]?["nonSecretParameterValues"]?["gateway"] != null;
 
             if(useGateway == false)
             {
@@ -849,12 +870,19 @@ namespace LogicAppTemplate
 
 
                         }
-                        else if (concatedId.EndsWith("/managedApis/sharepointonline')]"))
-                        {
+                        //else if (concatedId.EndsWith("/managedApis/sharepointonline')]"))
+                        //{
                             //skip because otherwise authenticated connection has to be authenticated again.
-                        }
+                        //}
                         else
                         {
+                            //check for hidden constraint
+                            if ((parameter.Value["uiDefinition"]["constraints"]["hidden"]?.Value<bool>() ?? false))
+                            {
+                                continue;
+                            }
+
+
                             //todo check this!
                             object parameterValue = null;
                             if (connectionInstance["properties"]["nonSecretParameterValues"] != null)
