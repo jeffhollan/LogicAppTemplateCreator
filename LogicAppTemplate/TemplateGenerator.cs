@@ -179,13 +179,22 @@ namespace LogicAppTemplate
                 //Extract user assigned managed identity info
                 var identities = ((JObject)managedIdentity["userAssignedIdentities"]).Properties().ToList();
                 var identity = new AzureResourceId(identities[0].Name);
-                
+
                 //Add ARM parameter to configure the user assigned identity
                 template.parameters.Add(Constants.UserAssignedIdentityParameterName, JObject.FromObject(new { type = "string", defaultValue = identity.ResourceName }));
 
+                //When the identity exists in a different resourcegroup add this as parameter and in the resourceId() function
+                var identityResourceGroupAddtion = "";
+                if (LogicAppResourceGroup != identity.ResourceGroupName)
+                {
+                    identityResourceGroupAddtion = $"parameters('{Constants.UserAssignedIdentityParameterName}_resourceGroup'),";
+                    template.parameters.Add($"{Constants.UserAssignedIdentityParameterName}_resourceGroup", JObject.FromObject(new { type = "string", defaultValue = identity.ResourceGroupName }));
+                }
+               
+
                 //Create identity object for ARM template
                 var userAssignedIdentities = new JObject();
-                userAssignedIdentities.Add($"[resourceId('Microsoft.ManagedIdentity/userAssignedIdentities/', parameters('{Constants.UserAssignedIdentityParameterName}'))]", JObject.FromObject(new { }));
+                userAssignedIdentities.Add($"[resourceId({identityResourceGroupAddtion}'Microsoft.ManagedIdentity/userAssignedIdentities/', parameters('{Constants.UserAssignedIdentityParameterName}'))]", JObject.FromObject(new { }));
 
                 var userAssignedIdentity = new JObject();
                 userAssignedIdentity.Add("type", "UserAssigned");
