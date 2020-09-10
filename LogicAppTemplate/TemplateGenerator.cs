@@ -475,9 +475,20 @@ namespace LogicAppTemplate
                             definition["actions"][action.Name]["inputs"]["authentication"]["audience"] = "[parameters('" + AddTemplateParameter(action.Name + "-Audience", "string", ((JObject)definition["actions"][action.Name]["inputs"]["authentication"]).Value<string>("audience")) + "')]";
 
                             if (definition["actions"][action.Name]["inputs"]["authentication"]["identity"] != null)
-                            { 
+                            {
+
+                                //When the identity exists in a different resourcegroup add this as parameter and in the resourceId() function
+                                var identityResource = new AzureResourceId(definition["actions"][action.Name]["inputs"]["authentication"]["identity"].Value<string>());
+                                var identityResourceGroupAddtion = "";
+                                if (LogicAppResourceGroup != identityResource.ResourceGroupName)
+                                {
+                                    identityResourceGroupAddtion = $"parameters('{Constants.UserAssignedIdentityParameterName}_resourceGroup'),";
+                                    //template.parameters.Add($"{Constants.UserAssignedIdentityParameterName}_resourceGroup", JObject.FromObject(new { type = "string", defaultValue = identityResource.ResourceGroupName }));
+                                }
+
+
                                 //User Assigned Identity
-                                definition["actions"][action.Name]["inputs"]["authentication"]["identity"] = $"[resourceId('Microsoft.ManagedIdentity/userAssignedIdentities/', parameters('{Constants.UserAssignedIdentityParameterName}'))]";
+                                definition["actions"][action.Name]["inputs"]["authentication"]["identity"] = $"[resourceId({identityResourceGroupAddtion}'Microsoft.ManagedIdentity/userAssignedIdentities/', parameters('{Constants.UserAssignedIdentityParameterName}'))]";
                             }
                         }
 
