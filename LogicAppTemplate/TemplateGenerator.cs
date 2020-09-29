@@ -876,8 +876,8 @@ namespace LogicAppTemplate
                         //}
                         else
                         {
-                            //check for hidden constraint
-                            if ((parameter.Value["uiDefinition"]["constraints"]["hidden"]?.Value<bool>() ?? false))
+                            //check for hidden constraint do not skip token parameters for client credential services like eventgrid
+                            if (!parameter.Name.StartsWith("token:") && (parameter.Value["uiDefinition"]["constraints"]["hidden"]?.Value<bool>() ?? false))
                             {
                                 continue;
                             }
