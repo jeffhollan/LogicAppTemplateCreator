@@ -1,0 +1,48 @@
+{
+  "kind": "V1",
+  "properties": {
+    "displayName": "my sql",
+    "authenticatedUser": {
+    },
+    "statuses": [
+      {
+        "status": "Connected"
+      }
+    ],
+    "parameterValueSet": {
+      "name": "sqlAuthentication",
+      "values": {
+        "server": {
+          "value": "customdbname.database.windows.net"
+        },
+        "database": {
+          "value": "db-name"
+        }
+      }
+    },
+    "customParameterValues": {
+    },
+    "createdTime": "2019-11-28T14:45:17.4095563Z",
+    "changedTime": "2019-12-04T09:04:52.4088169Z",
+    "api": {
+      "name": "sql",
+      "displayName": "SQL Server",
+      "description": "Microsoft SQL Server is a relational database management system developed by Microsoft. Connect to SQL Server to manage data. You can perform various actions such as create, update, get, and delete on rows in a table.",
+      "iconUri": "https://connectoricons-prod.azureedge.net/releases/v1.0.1411/1.0.1411.2206/sql/icon.png",
+      "brandColor": "#ba141a",
+      "category": "Standard",
+      "id": "/subscriptions/aabbccdd-9cb5-4652-b245-f1782aa43b25/providers/Microsoft.Web/locations/northeurope/managedApis/sql",
+      "type": "Microsoft.Web/locations/managedApis"
+    },
+    "testLinks": [
+      {
+        "requestUri": "https://management.azure.com:443/subscriptions/aabbccdd-9cb5-4652-b245-f1782aa43b25/resourceGroups/INT117-funding-RG/providers/Microsoft.Web/connections/sql/extensions/proxy/testconnection?api-version=2016-06-01",
+        "method": "get"
+      }
+    ]
+  },
+  "id": "/subscriptions/aabbccdd-9cb5-4652-b245-f1782aa43b25/resourceGroups/INT117-funding-RG/providers/Microsoft.Web/connections/sql",
+  "name": "sql",
+  "type": "Microsoft.Web/connections",
+  "location": "northeurope"
+}

@@ -548,6 +548,24 @@ namespace LogicAppTemplate
 
                                     break;
                                 }
+                            case "dynamicsax":
+                                {
+                                    var inputs = action.Value.Value<JObject>("inputs");
+                                    var path = inputs.Value<string>("path").Replace("'","''");
+                                    var pathsubsets = path.Split('/');
+                                    var dataset = pathsubsets[2];
+
+                                    var m = Regex.Match(dataset, @"\(''(.*)''\)");
+                                    if (m.Groups.Count > 1)
+                                    {
+                                        var datasetName = m.Groups[1].Value;
+                                        var param = AddTemplateParameter(action.Name + "-instance", "string", datasetName);
+                                        inputs["path"] = "[concat('" + path.Replace($"''{datasetName}''", $"', parameters('__apostrophe'), parameters('{param}'), parameters('__apostrophe'), '") + "')]";
+                                        AddTemplateParameter("__apostrophe", "string", "'");
+                                    }
+
+                                    break;
+                                }
                             case "azureblob":
                                 {
                                     var newValue = AddParameterForMetadataBase64((JObject)action.Value, action.Name + "-path", action.Value["inputs"].Value<string>("path"));
@@ -727,7 +745,7 @@ namespace LogicAppTemplate
             var name = ConnectionToken.Value<string>("name");
             if (name != null && name.StartsWith("@parameters('$connections')"))
             {
-                var match = Regex.Match(name, @"@parameters\('\$connections'\)\['(?<connectionname>\w*)");
+                var match = Regex.Match(name, @"@parameters\('\$connections'\)\['(?<connectionname>\w*)'");
                 if (match.Success)
                 {
                     var path = "$connections.value." + match.Groups["connectionname"].Value;
