@@ -1,0 +1,260 @@
+{
+  "properties": {
+    "provisioningState": "Succeeded",
+    "createdTime": "2020-11-10T08:54:31.573372Z",
+    "changedTime": "2020-11-10T12:48:05.1842412Z",
+    "state": "Enabled",
+    "version": "08585965944003590111",
+    "accessEndpoint": "https://prod-29.eastus.logic.azure.com:443/workflows/6b480a1410204a26885eb877ff805cd1",
+    "definition": {
+      "$schema": "https://schema.management.azure.com/providers/Microsoft.Logic/schemas/2016-06-01/workflowdefinition.json#",
+      "contentVersion": "1.0.0.0",
+      "parameters": {
+        "$connections": {
+          "defaultValue": {
+          },
+          "type": "Object"
+        }
+      },
+      "triggers": {
+        "When_a_Business_Event_occurs": {
+          "type": "ApiConnectionWebhook",
+          "inputs": {
+            "body": {
+              "NotificationUrl": "@{listCallbackUrl()}"
+            },
+            "host": {
+              "connection": {
+                "name": "@parameters('$connections')['dynamicsax']['connectionId']"
+              }
+            },
+            "path": "/datasets/@{encodeURIComponent(encodeURIComponent('myd365-instance.cloudax.dynamics.com'))}/subscribebusinessevent/@{encodeURIComponent(encodeURIComponent('PER_ProdOrderStatusChangedPartsProgBusinessEvent'))}",
+            "queries": {
+              "businesseventcategory": "Production orders"
+            }
+          }
+        }
+      },
+      "actions": {
+        "Compose": {
+          "runAfter": {
+            "Parse_Data_Object": [
+              "Succeeded"
+            ]
+          },
+          "type": "Compose",
+          "inputs": {
+            "ProductionOrder": {
+              "Customer_Code": "@body('Parse_Data_Object')?['AccountNum']",
+              "Date_Entered": "@{utcNow()}",
+              "EAN_Code": "@body('Parse_Data_Object')?['GlobalTradeItemNumber']",
+              "Is_Rnet": "@if(equals('no',toLower(body('Parse_Data_Object')?['NoYesId'])),false,true)",
+              "Order_Number": "@body('Parse_Data_Object')?['ProdId']",
+              "Part_Desc_1": "@body('Parse_Data_Object')?['ItemName']",
+              "Part_Desc_2": "@body('Parse_Data_Object')?['Description']",
+              "Part_Number": "@body('Parse_Data_Object')?['ItemId']",
+              "Qty": "@body('Parse_Data_Object')?['ProdQtySched']",
+              "Serial_Number": "@body('Parse_Data_Object')?['InventSerialId']"
+            }
+          }
+        },
+        "Execute_stored_procedure_(V2)": {
+          "runAfter": {
+            "Compose": [
+              "Succeeded"
+            ]
+          },
+          "type": "ApiConnection",
+          "inputs": {
+            "body": {
+              "Order_Number": "@body('Parse_Data_Object')?['ProdId']",
+              "orderData": "@{xml(outputs('Compose'))}"
+            },
+            "host": {
+              "connection": {
+                "name": "@parameters('$connections')['sql']['connectionId']"
+              }
+            },
+            "method": "post",
+            "path": "/v2/datasets/@{encodeURIComponent(encodeURIComponent('USNASDB05'))},@{encodeURIComponent(encodeURIComponent('INT142'))}/procedures/@{encodeURIComponent(encodeURIComponent('[dbo].[sp_INT142_Order_Ins_Upd]'))}"
+          }
+        },
+        "Lists_items_present_in_table": {
+          "runAfter": {
+          },
+          "type": "ApiConnection",
+          "inputs": {
+            "host": {
+              "connection": {
+                "name": "@parameters('$connections')['dynamicsax']['connectionId']"
+              }
+            },
+            "method": "get",
+            "path": "/datasets/@{encodeURIComponent(encodeURIComponent('myd365-instance.cloudax.dynamics.com'))}/tables/@{encodeURIComponent(encodeURIComponent('CustomersV3'))}/items"
+          }
+        },
+        "Parse_Data_Object": {
+          "runAfter": {
+            "Lists_items_present_in_table": [
+              "Succeeded"
+            ]
+          },
+          "trackedProperties": {
+            "DataAreaId": "@action()['outputs']?['DataAreaId']",
+            "ItemNumber": "@action()['inputs']['content']['ItemId']",
+            "ProductionOrderNumber": "@action()['inputs']['content']['ProdId']",
+            "SerialNumber": "@action()['inputs']['content']['InventSerialId']",
+            "Type": "Upsert"
+          },
+          "type": "ParseJson",
+          "inputs": {
+            "content": "@json(triggerBody()?['data'])",
+            "schema": {
+              "properties": {
+                "AccountNum": {
+                  "type": "string"
+                },
+                "BusinessEventId": {
+                  "type": "string"
+                },
+                "ControlNumber": {
+                  "type": "integer"
+                },
+                "DataAreaId": {
+                  "type": "string"
+                },
+                "Description": {
+                  "type": "string"
+                },
+                "EventId": {
+                  "type": "string"
+                },
+                "EventTime": {
+                  "type": "string"
+                },
+                "GlobalTradeItemNumber": {
+                  "type": "string"
+                },
+                "InventSerialId": {
+                  "type": "string"
+                },
+                "ItemId": {
+                  "type": "string"
+                },
+                "ItemName": {
+                  "type": "string"
+                },
+                "LineNum": {
+                  "type": "integer"
+                },
+                "MajorVersion": {
+                  "type": "integer"
+                },
+                "MinorVersion": {
+                  "type": "integer"
+                },
+                "NoYesId": {
+                  "type": "string"
+                },
+                "ProdId": {
+                  "type": "string"
+                },
+                "ProdQtySched": {
+                  "type": "integer"
+                },
+                "ProdStatus": {
+                  "type": "string"
+                }
+              },
+              "type": "object"
+            }
+          }
+        }
+      },
+      "outputs": {
+      }
+    },
+    "parameters": {
+      "$connections": {
+        "value": {
+          "dynamicsax": {
+            "connectionId": "/subscriptions/aabbccdd-9cb5-4652-b245-aabbccddeeff/resourceGroups/INT142-partsProgramming-RG/providers/Microsoft.Web/connections/dynamicsax",
+            "connectionName": "dynamicsax",
+            "id": "/subscriptions/aabbccdd-9cb5-4652-b245-aabbccddeeff/providers/Microsoft.Web/locations/eastus/managedApis/dynamicsax"
+          },
+          "sql": {
+            "connectionId": "/subscriptions/aabbccdd-9cb5-4652-b245-aabbccddeeff/resourceGroups/INT142-partsProgramming-RG/providers/Microsoft.Web/connections/sql-1",
+            "connectionName": "sql-1",
+            "id": "/subscriptions/aabbccdd-9cb5-4652-b245-aabbccddeeff/providers/Microsoft.Web/locations/eastus/managedApis/sql"
+          }
+        }
+      }
+    },
+    "endpointsConfiguration": {
+      "workflow": {
+        "outgoingIpAddresses": [
+          {
+            "address": "13.92.98.111"
+          },
+          {
+            "address": "40.121.91.41"
+          },
+          {
+            "address": "40.114.82.191"
+          },
+          {
+            "address": "23.101.139.153"
+          },
+          {
+            "address": "23.100.29.190"
+          },
+          {
+            "address": "23.101.136.201"
+          },
+          {
+            "address": "104.45.153.81"
+          },
+          {
+            "address": "23.101.132.208"
+          }
+        ],
+        "accessEndpointIpAddresses": [
+          {
+            "address": "137.135.106.54"
+          },
+          {
+            "address": "40.117.99.79"
+          },
+          {
+            "address": "40.117.100.228"
+          },
+          {
+            "address": "137.116.126.165"
+          }
+        ]
+      },
+      "connector": {
+        "outgoingIpAddresses": [
+          {
+            "address": "40.71.11.80/28"
+          },
+          {
+            "address": "40.71.249.205"
+          },
+          {
+            "address": "40.114.40.132"
+          },
+          {
+            "address": "40.71.249.139"
+          }
+        ]
+      }
+    }
+  },
+  "id": "/subscriptions/aabbccdd-9cb5-4652-b245-aabbccddeeff/resourceGroups/INT142-partsProgramming-RG/providers/Microsoft.Logic/workflows/INT142-LA-002-partsProgramming",
+  "name": "INT142-LA-002-partsProgramming",
+  "type": "Microsoft.Logic/workflows",
+  "location": "eastus",
+  "tags": {
+  }
+}

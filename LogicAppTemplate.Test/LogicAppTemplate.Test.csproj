@@ -165,6 +165,12 @@
     <EmbeddedResource Include="TestFiles\Samples\DynamicsAx\providers-Microsoft.Web-connections-sql.json" />
     <EmbeddedResource Include="TestFiles\Samples\DynamicsAx\providers-Microsoft.Web-locations-northeurope-managedApis-dynamicsax.json" />
     <EmbeddedResource Include="TestFiles\Samples\DynamicsAx\providers-Microsoft.Web-locations-northeurope-managedApis-sql.json" />
+    <EmbeddedResource Include="TestFiles\Samples\DynamicAxTrigger\providers-Microsoft.Logic-workflows-INT142-LA-002-partsProgramming-providers-microsoft.insights-diagnosticSettings.json" />
+    <EmbeddedResource Include="TestFiles\Samples\DynamicAxTrigger\providers-Microsoft.Logic-workflows-INT142-LA-002-partsProgramming.json" />
+    <EmbeddedResource Include="TestFiles\Samples\DynamicAxTrigger\providers-Microsoft.Web-connections-dynamicsax.json" />
+    <EmbeddedResource Include="TestFiles\Samples\DynamicAxTrigger\providers-Microsoft.Web-connections-sql-1.json" />
+    <EmbeddedResource Include="TestFiles\Samples\DynamicAxTrigger\providers-Microsoft.Web-locations-eastus-managedApis-dynamicsax.json" />
+    <EmbeddedResource Include="TestFiles\Samples\DynamicAxTrigger\providers-Microsoft.Web-locations-eastus-managedApis-sql.json" />
   </ItemGroup>
   <ItemGroup />
   <Choose>

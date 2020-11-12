@@ -190,7 +190,7 @@ namespace LogicAppTemplate
                     identityResourceGroupAddtion = $"parameters('{Constants.UserAssignedIdentityParameterName}_resourceGroup'),";
                     template.parameters.Add($"{Constants.UserAssignedIdentityParameterName}_resourceGroup", JObject.FromObject(new { type = "string", defaultValue = identity.ResourceGroupName }));
                 }
-               
+
 
                 //Create identity object for ARM template
                 var userAssignedIdentities = new JObject();
@@ -460,7 +460,7 @@ namespace LogicAppTemplate
                         }
                         else if ("ActiveDirectoryOAuth".Equals(authType, StringComparison.CurrentCultureIgnoreCase))
                         {
-                            definition["actions"][action.Name]["inputs"]["authentication"]["audience"] = "[parameters('" + AddTemplateParameter(action.Name + "-Audience", "string", ((JObject)definition["actions"][action.Name]["inputs"]["authentication"]).Value<string>("audience")) + "')]";                            
+                            definition["actions"][action.Name]["inputs"]["authentication"]["audience"] = "[parameters('" + AddTemplateParameter(action.Name + "-Audience", "string", ((JObject)definition["actions"][action.Name]["inputs"]["authentication"]).Value<string>("audience")) + "')]";
                             definition["actions"][action.Name]["inputs"]["authentication"]["authority"] = "[parameters('" + AddTemplateParameter(action.Name + "-Authority", "string", (((JObject)definition["actions"][action.Name]["inputs"]["authentication"]).Value<string>("authority")) ?? "") + "')]";
                             definition["actions"][action.Name]["inputs"]["authentication"]["clientId"] = "[parameters('" + AddTemplateParameter(action.Name + "-ClientId", "string", ((JObject)definition["actions"][action.Name]["inputs"]["authentication"]).Value<string>("clientId")) + "')]";
                             definition["actions"][action.Name]["inputs"]["authentication"]["secret"] = "[parameters('" + AddTemplateParameter(action.Name + "-Secret", "string", ((JObject)definition["actions"][action.Name]["inputs"]["authentication"]).Value<string>("secret")) + "')]";
@@ -551,7 +551,7 @@ namespace LogicAppTemplate
                             case "dynamicsax":
                                 {
                                     var inputs = action.Value.Value<JObject>("inputs");
-                                    var path = inputs.Value<string>("path").Replace("'","''");
+                                    var path = inputs.Value<string>("path").Replace("'", "''");
                                     var pathsubsets = path.Split('/');
                                     var dataset = pathsubsets[2];
 
@@ -624,6 +624,25 @@ namespace LogicAppTemplate
                                          var param = AddTemplateParameter(trigger.Name + "-folderPath","string",path);
                                          meta[((JProperty)meta.First).Name] = $"[parameters('{param}')]";*/
                                     }
+                                    break;
+                                }
+                            case "dynamicsax":
+                                {
+
+                                    var inputs = trigger.Value.Value<JObject>("inputs");
+                                    var path = inputs.Value<string>("path").Replace("'", "''");
+                                    var pathsubsets = path.Split('/');
+                                    var dataset = pathsubsets[2];
+
+                                    var m = Regex.Match(dataset, @"\(''(.*)''\)");
+                                    if (m.Groups.Count > 1)
+                                    {
+                                        var datasetName = m.Groups[1].Value;
+                                        var param = AddTemplateParameter(trigger.Name + "-instance", "string", datasetName);
+                                        inputs["path"] = "[concat('" + path.Replace($"''{datasetName}''", $"', parameters('__apostrophe'), parameters('{param}'), parameters('__apostrophe'), '") + "')]";
+                                        AddTemplateParameter("__apostrophe", "string", "'");
+                                    }
+
                                     break;
                                 }
                             case "azureeventgrid":
@@ -825,7 +844,7 @@ namespace LogicAppTemplate
             bool useGateway = connectionInstance["properties"]?["parameterValueSet"]?["values"]?["gateway"] != null ||
                 connectionInstance["properties"]?["nonSecretParameterValues"]?["gateway"] != null;
 
-            if(useGateway == false)
+            if (useGateway == false)
             {
                 useGateway = connectionInstance["properties"]?["nonSecretParameterValues"]?["gateway"] != null;
             }
@@ -890,7 +909,7 @@ namespace LogicAppTemplate
                         }
                         //else if (concatedId.EndsWith("/managedApis/sharepointonline')]"))
                         //{
-                            //skip because otherwise authenticated connection has to be authenticated again.
+                        //skip because otherwise authenticated connection has to be authenticated again.
                         //}
                         else
                         {
