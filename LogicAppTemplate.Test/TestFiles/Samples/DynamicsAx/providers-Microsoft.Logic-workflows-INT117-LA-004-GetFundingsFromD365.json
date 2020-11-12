@@ -1,0 +1,288 @@
+{
+  "properties": {
+    "provisioningState": "Succeeded",
+    "createdTime": "2019-11-28T08:24:15.5839219Z",
+    "changedTime": "2020-11-10T13:51:27.6180838Z",
+    "state": "Enabled",
+    "version": "08585965905978627713",
+    "accessEndpoint": "https://prod-05.northeurope.logic.azure.com:443/workflows/30ac689e5d0043a490a322766371f872",
+    "definition": {
+      "$schema": "https://schema.management.azure.com/providers/Microsoft.Logic/schemas/2016-06-01/workflowdefinition.json#",
+      "contentVersion": "1.0.0.0",
+      "parameters": {
+        "$connections": {
+          "defaultValue": {
+          },
+          "type": "Object"
+        },
+        "audience": {
+          "defaultValue": "https://az-customer-d365.cloudax.dynamics.com",
+          "type": "String"
+        },
+        "clientId": {
+          "defaultValue": "clientid",
+          "type": "SecureString"
+        },
+        "client_secret": {
+          "defaultValue": "clientsecret",
+          "type": "SecureString"
+        },
+        "tenantId": {
+          "defaultValue": "tenant",
+          "type": "String"
+        }
+      },
+      "triggers": {
+        "Recurrence": {
+          "recurrence": {
+            "frequency": "Hour",
+            "interval": 1
+          },
+          "type": "Recurrence"
+        }
+      },
+      "actions": {
+        "Compose_2": {
+          "runAfter": {
+            "For_each": [
+              "Succeeded"
+            ]
+          },
+          "type": "Compose",
+          "inputs": "@json(concat('[', join(outputs('Compose_4'),','), ']'))"
+        },
+        "Execute_stored_procedure_(V2)": {
+          "runAfter": {
+            "Compose_2": [
+              "Succeeded"
+            ]
+          },
+          "type": "ApiConnection",
+          "inputs": {
+            "body": {
+              "json": "@{outputs('Compose_2')}"
+            },
+            "host": {
+              "connection": {
+                "name": "@parameters('$connections')['sql']['connectionId']"
+              }
+            },
+            "method": "post",
+            "path": "/v2/datasets/@{encodeURIComponent(encodeURIComponent('default'))},@{encodeURIComponent(encodeURIComponent('default'))}/procedures/@{encodeURIComponent(encodeURIComponent('[dbo].[INT117MergeFundingD365]'))}"
+          }
+        },
+        "For_each": {
+          "foreach": "@body('Parse_JSON')?['value']",
+          "actions": {
+            "Compose_4": {
+              "runAfter": {
+                "D365_-_Get_CategoryCode": [
+                  "Succeeded"
+                ]
+              },
+              "type": "Compose",
+              "inputs": "@addProperty(addProperty(item(),'FundingCategoryCode', body('D365_-_Get_CategoryCode')['value']?[0]?['CategoryCode']),'dataAreaId', body('D365_-_Get_dataAreaId')['value']?[0]?['dataAreaId'])"
+            },
+            "D365_-_Get_CategoryCode": {
+              "runAfter": {
+                "D365_-_Get_dataAreaId": [
+                  "Succeeded"
+                ]
+              },
+              "type": "ApiConnection",
+              "inputs": {
+                "host": {
+                  "connection": {
+                    "name": "@parameters('$connections')['dynamicsax']['connectionId']"
+                  }
+                },
+                "method": "get",
+                "path": "/datasets/@{encodeURIComponent(encodeURIComponent('az-customer-d365.cloudax.dynamics.com'))}/tables/@{encodeURIComponent(encodeURIComponent('ProductCategories'))}/items",
+                "queries": {
+                  "$filter": "(CategoryName eq '@{items('For_each')?['ProductCategoryName']}')",
+                  "$select": "CategoryCode",
+                  "cross-company": true
+                }
+              }
+            },
+            "D365_-_Get_dataAreaId": {
+              "runAfter": {
+              },
+              "type": "ApiConnection",
+              "inputs": {
+                "host": {
+                  "connection": {
+                    "name": "@parameters('$connections')['dynamicsax']['connectionId']"
+                  }
+                },
+                "method": "get",
+                "path": "/datasets/@{encodeURIComponent(encodeURIComponent('az-customer-d365.cloudax.dynamics.com'))}/tables/@{encodeURIComponent(encodeURIComponent('ReleasedProductsV2'))}/items",
+                "queries": {
+                  "$filter": "(ProductNumber eq '@{replace(items('For_each')?['ProductNumber'],'+','%2B')}')",
+                  "$select": "dataAreaId",
+                  "cross-company": true
+                }
+              }
+            }
+          },
+          "runAfter": {
+            "Parse_JSON": [
+              "Succeeded"
+            ]
+          },
+          "type": "Foreach"
+        },
+        "Lists_items_present_in_table": {
+          "runAfter": {
+          },
+          "type": "ApiConnection",
+          "inputs": {
+            "host": {
+              "connection": {
+                "name": "@parameters('$connections')['dynamicsax']['connectionId']"
+              }
+            },
+            "method": "get",
+            "path": "/datasets/@{encodeURIComponent(encodeURIComponent('az-customer-d365.cloudax.dynamics.com'))}/tables/@{encodeURIComponent(encodeURIComponent('ProductCategoryAssignments'))}/items",
+            "queries": {
+              "$filter": "(ProductCategoryHierarchyName eq 'Funding codes')",
+              "cross-company": true
+            }
+          }
+        },
+        "Parse_JSON": {
+          "runAfter": {
+            "Lists_items_present_in_table": [
+              "Succeeded"
+            ]
+          },
+          "type": "ParseJson",
+          "inputs": {
+            "content": "@body('Lists_items_present_in_table')",
+            "schema": {
+              "properties": {
+                "@@odata.context": {
+                  "type": "string"
+                },
+                "value": {
+                  "items": {
+                    "properties": {
+                      "@@odata.etag": {
+                        "type": "string"
+                      },
+                      "ProductCategoryHierarchyName": {
+                        "type": "string"
+                      },
+                      "ProductCategoryName": {
+                        "type": "string"
+                      },
+                      "ProductNumber": {
+                        "type": "string"
+                      }
+                    },
+                    "required": [
+                      "@@odata.etag",
+                      "ProductNumber",
+                      "ProductCategoryName",
+                      "ProductCategoryHierarchyName"
+                    ],
+                    "type": "object"
+                  },
+                  "type": "array"
+                }
+              },
+              "type": "object"
+            }
+          }
+        }
+      },
+      "outputs": {
+      }
+    },
+    "parameters": {
+      "$connections": {
+        "value": {
+          "dynamicsax": {
+            "connectionId": "/subscriptions/aabbccdd-9cb5-4652-b245-f1782aa43b25/resourceGroups/INT117-funding-RG/providers/Microsoft.Web/connections/dynamicsax",
+            "connectionName": "dynamicsax",
+            "id": "/subscriptions/aabbccdd-9cb5-4652-b245-f1782aa43b25/providers/Microsoft.Web/locations/northeurope/managedApis/dynamicsax"
+          },
+          "sql": {
+            "connectionId": "/subscriptions/aabbccdd-9cb5-4652-b245-f1782aa43b25/resourceGroups/INT117-funding-RG/providers/Microsoft.Web/connections/sql",
+            "connectionName": "sql",
+            "id": "/subscriptions/aabbccdd-9cb5-4652-b245-f1782aa43b25/providers/Microsoft.Web/locations/northeurope/managedApis/sql"
+          }
+        }
+      }
+    },
+    "endpointsConfiguration": {
+      "workflow": {
+        "outgoingIpAddresses": [
+          {
+            "address": "40.113.12.95"
+          },
+          {
+            "address": "52.178.165.215"
+          },
+          {
+            "address": "52.178.166.21"
+          },
+          {
+            "address": "40.112.92.104"
+          },
+          {
+            "address": "40.112.95.216"
+          },
+          {
+            "address": "40.113.4.18"
+          },
+          {
+            "address": "40.113.3.202"
+          },
+          {
+            "address": "40.113.1.181"
+          }
+        ],
+        "accessEndpointIpAddresses": [
+          {
+            "address": "13.79.173.49"
+          },
+          {
+            "address": "52.169.218.253"
+          },
+          {
+            "address": "52.169.220.174"
+          },
+          {
+            "address": "40.112.90.39"
+          }
+        ]
+      },
+      "connector": {
+        "outgoingIpAddresses": [
+          {
+            "address": "13.69.227.208/28"
+          },
+          {
+            "address": "52.178.150.68"
+          },
+          {
+            "address": "104.45.93.9"
+          },
+          {
+            "address": "94.245.91.93"
+          },
+          {
+            "address": "52.169.28.181"
+          }
+        ]
+      }
+    }
+  },
+  "id": "/subscriptions/aabbccdd-9cb5-4652-b245-f1782aa43b25/resourceGroups/INT117-funding-RG/providers/Microsoft.Logic/workflows/INT117-LA-004-GetFundingsFromD365",
+  "name": "INT117-LA-004-GetFundingsFromD365",
+  "type": "Microsoft.Logic/workflows",
+  "location": "northeurope",
+  "tags": {
+  }
+}

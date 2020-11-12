@@ -59,6 +59,7 @@
   </Choose>
   <ItemGroup>
     <Compile Include="AzureResourceIdTests.cs" />
+    <Compile Include="DynamicsAXConnectorTests.cs" />
     <Compile Include="IntegrationAccountTest.cs" />
     <Compile Include="BlobConnector2Test.cs" />
     <Compile Include="StorageQueueConnectorTest.cs" />
@@ -158,7 +159,20 @@
   <ItemGroup>
     <None Include="packages.config" />
     <EmbeddedResource Include="TestFiles\ManagedIdentity.json" />
+    <EmbeddedResource Include="TestFiles\Samples\DynamicsAx\providers-Microsoft.Logic-workflows-INT117-LA-004-GetFundingsFromD365-providers-microsoft.insights-diagnosticSettings.json" />
+    <EmbeddedResource Include="TestFiles\Samples\DynamicsAx\providers-Microsoft.Logic-workflows-INT117-LA-004-GetFundingsFromD365.json" />
+    <EmbeddedResource Include="TestFiles\Samples\DynamicsAx\providers-Microsoft.Web-connections-dynamicsax.json" />
+    <EmbeddedResource Include="TestFiles\Samples\DynamicsAx\providers-Microsoft.Web-connections-sql.json" />
+    <EmbeddedResource Include="TestFiles\Samples\DynamicsAx\providers-Microsoft.Web-locations-northeurope-managedApis-dynamicsax.json" />
+    <EmbeddedResource Include="TestFiles\Samples\DynamicsAx\providers-Microsoft.Web-locations-northeurope-managedApis-sql.json" />
+    <EmbeddedResource Include="TestFiles\Samples\DynamicAxTrigger\providers-Microsoft.Logic-workflows-INT142-LA-002-partsProgramming-providers-microsoft.insights-diagnosticSettings.json" />
+    <EmbeddedResource Include="TestFiles\Samples\DynamicAxTrigger\providers-Microsoft.Logic-workflows-INT142-LA-002-partsProgramming.json" />
+    <EmbeddedResource Include="TestFiles\Samples\DynamicAxTrigger\providers-Microsoft.Web-connections-dynamicsax.json" />
+    <EmbeddedResource Include="TestFiles\Samples\DynamicAxTrigger\providers-Microsoft.Web-connections-sql-1.json" />
+    <EmbeddedResource Include="TestFiles\Samples\DynamicAxTrigger\providers-Microsoft.Web-locations-eastus-managedApis-dynamicsax.json" />
+    <EmbeddedResource Include="TestFiles\Samples\DynamicAxTrigger\providers-Microsoft.Web-locations-eastus-managedApis-sql.json" />
   </ItemGroup>
+  <ItemGroup />
   <Choose>
     <When Condition="'$(VisualStudioVersion)' == '10.0' And '$(IsCodedUITest)' == 'True'">
       <ItemGroup>

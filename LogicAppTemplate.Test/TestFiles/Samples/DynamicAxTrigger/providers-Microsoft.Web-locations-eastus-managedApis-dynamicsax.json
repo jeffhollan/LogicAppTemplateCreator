@@ -1,0 +1,152 @@
+{
+  "properties": {
+    "name": "dynamicsax",
+    "connectionParameters": {
+      "token": {
+        "type": "oauthSetting",
+        "oAuthSettings": {
+          "identityProvider": "dynamicscrmonlinecertificate",
+          "clientId": "7ab7862c-4c57-491e-8a45-d52a7e023983",
+          "scopes": [
+          ],
+          "redirectMode": "Global",
+          "redirectUrl": "https://global.consent.azure-apim.net/redirect",
+          "properties": {
+            "IsFirstParty": "True"
+          },
+          "customParameters": {
+            "resourceUriAAD": {
+              "value": "00000015-0000-0000-c000-000000000000"
+            },
+            "resourceUri": {
+              "value": "00000015-0000-0000-c000-000000000000"
+            },
+            "loginUriAAD": {
+              "value": "https://login.microsoftonline.com"
+            },
+            "loginUri": {
+              "value": "https://login.microsoftonline.com"
+            }
+          }
+        },
+        "uiDefinition": {
+          "displayName": "Login with Microsoft Dynamics 365 for Fin & Ops credentials",
+          "description": "Login with Microsoft Dynamics 365 for Fin & Ops credentials",
+          "tooltip": "Provide Microsoft Dynamics 365 for Fin & Ops Credentials",
+          "constraints": {
+            "required": "true"
+          }
+        }
+      },
+      "environment": {
+        "type": "string",
+        "uiDefinition": {
+          "displayName": "Environment id",
+          "description": "Environment id",
+          "tooltip": "Environment id",
+          "constraints": {
+            "required": " false",
+            "hidden": "true"
+          }
+        }
+      },
+      "token:clientId": {
+        "type": "string",
+        "uiDefinition": {
+          "displayName": "Client ID",
+          "description": "Client (or Application) ID of the Azure Active Directory application.",
+          "constraints": {
+            "required": "false",
+            "hidden": "true"
+          }
+        }
+      },
+      "token:clientSecret": {
+        "type": "securestring",
+        "uiDefinition": {
+          "displayName": "Client Secret",
+          "description": "Client secret of the Azure Active Directory application.",
+          "constraints": {
+            "required": "false",
+            "hidden": "true"
+          }
+        }
+      },
+      "token:TenantId": {
+        "type": "string",
+        "metadata": {
+          "sourceType": "AzureActiveDirectoryTenant"
+        },
+        "uiDefinition": {
+          "displayName": "Tenant",
+          "description": "The tenant ID for the Azure Active Directory application.",
+          "constraints": {
+            "required": "false",
+            "hidden": "true"
+          }
+        }
+      },
+      "token:resourceUri": {
+        "type": "string",
+        "uiDefinition": {
+          "displayName": "ResourceUri",
+          "description": "The resource you are requesting authorization to use.",
+          "constraints": {
+            "required": "false",
+            "hidden": "true"
+          }
+        }
+      },
+      "token:grantType": {
+        "type": "string",
+        "allowedValues": [
+          {
+            "value": "code"
+          },
+          {
+            "value": "client_credentials"
+          }
+        ],
+        "uiDefinition": {
+          "displayName": "Grant Type",
+          "description": "Grant type",
+          "constraints": {
+            "required": "false",
+            "hidden": "true",
+            "allowedValues": [
+              {
+                "text": "Code",
+                "value": "code"
+              },
+              {
+                "text": "Client Credentials",
+                "value": "client_credentials"
+              }
+            ]
+          }
+        }
+      }
+    },
+    "metadata": {
+      "source": "marketplace",
+      "brandColor": "#4A356F"
+    },
+    "runtimeUrls": [
+      "https://logic-apis-eastus.azure-apim.net/apim/dynamicsax"
+    ],
+    "generalInformation": {
+      "iconUrl": "https://connectoricons-prod.azureedge.net/releases/v1.0.1400/1.0.1400.2154/dynamicsax/icon.png",
+      "displayName": "Dynamics 365 for Fin & Ops",
+      "description": "Microsoft Dynamics 365 for Fin & Ops connector provides access to data entities.",
+      "releaseTag": "Production",
+      "tier": "Premium"
+    },
+    "capabilities": [
+      "tabular"
+    ]
+  },
+  "id": "/subscriptions/aabbccdd-9cb5-4652-b245-aabbccddeeff/providers/Microsoft.Web/locations/eastus/managedApis/dynamicsax",
+  "name": "dynamicsax",
+  "type": "Microsoft.Web/locations/managedApis",
+  "location": "eastus"
+}
