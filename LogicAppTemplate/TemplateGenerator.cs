@@ -695,11 +695,11 @@ namespace LogicAppTemplate
                     if (trigger.Value.Value<string>("type") == "Request" && trigger.Value.Value<string>("kind") == "Http")
                     {
                         if (this.GenerateHttpTriggerUrlOutput)
-                        {
+                        {                            
                             JObject outputValue = JObject.FromObject(new
                             {
                                 type = "string",
-                                value = "[listCallbackURL(concat(resourceId(resourceGroup().name,'Microsoft.Logic/workflows/', parameters('logicAppName')), '/triggers/manual'), '2016-06-01').value]"
+                                value = $"[listCallbackURL(concat(resourceId(resourceGroup().name,'Microsoft.Logic/workflows/', parameters('logicAppName')), '/triggers/{trigger.Name}'), '2016-06-01').value]"
                             });
 
                             this.template.outputs.Add("httpTriggerUrl", outputValue);
