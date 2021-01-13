@@ -913,13 +913,17 @@ namespace LogicAppTemplate
                         //}
                         else
                         {
+                            //skip the tenantId property for sharepointonline
+                            if (parameter.Name.Equals("token:TenantId") && concatedId.EndsWith("/managedApis/sharepointonline')]"))
+                            {
+                                continue;
+                            }
+
                             //check for hidden constraint do not skip token parameters for client credential services like eventgrid
                             if (!parameter.Name.StartsWith("token:") && (parameter.Value["uiDefinition"]["constraints"]["hidden"]?.Value<bool>() ?? false))
                             {
                                 continue;
                             }
-
-
                             //todo check this!
                             object parameterValue = null;
                             if (connectionInstance["properties"]["nonSecretParameterValues"] != null)
