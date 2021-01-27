@@ -1,0 +1,88 @@
+{
+  "properties": {
+    "provisioningState": "Succeeded",
+    "createdTime": "2020-04-01T08:13:07.1970154Z",
+    "changedTime": "2021-01-27T15:34:29.7796606Z",
+    "state": "Enabled",
+    "version": "08585898452156961597",
+    "accessEndpoint": "https://prod-31.northeurope.logic.azure.com:443/workflows/a402b38e914a48268cac39ee9bcf908b",
+    "definition": {
+      "$schema": "https://schema.management.azure.com/providers/Microsoft.Logic/schemas/2016-06-01/workflowdefinition.json#",
+      "contentVersion": "1.0.0.0",
+      "parameters": {
+        "$connections": {
+          "defaultValue": {},
+          "type": "Object"
+        }
+      },
+      "triggers": {
+        "When_a_record_is_created": {
+          "type": "ApiConnectionWebhook",
+          "inputs": {
+            "body": { "NotificationUrl": "@{listCallbackUrl()}" },
+            "host": { "connection": { "name": "@parameters('$connections')['commondataservice']['connectionId']" } },
+            "path": "/datasets/@{encodeURIComponent(encodeURIComponent('org7e2c0d10.crm4'))}/tables/@{encodeURIComponent(encodeURIComponent('postfollows'))}/onnewitemswebhook",
+            "queries": { "scope": "Business unit" }
+          }
+        }
+      },
+      "actions": {
+        "List_records": {
+          "runAfter": {},
+          "type": "ApiConnection",
+          "inputs": {
+            "host": { "connection": { "name": "@parameters('$connections')['commondataservice']['connectionId']" } },
+            "method": "get",
+            "path": "/v2/datasets/@{encodeURIComponent(encodeURIComponent('org7e2c0d10.crm4'))}/tables/@{encodeURIComponent(encodeURIComponent('cdmtmp_accounts'))}/items"
+          }
+        }
+      },
+      "outputs": {}
+    },
+    "parameters": {
+      "$connections": {
+        "value": {
+          "commondataservice": {
+            "connectionId": "/subscriptions/abcdefgh-9cb5-4652-b245-f1782aa43b25/resourceGroups/SimonTest-RG/providers/Microsoft.Web/connections/commondataservice",
+            "connectionName": "commondataservice",
+            "id": "/subscriptions/abcdefgh-9cb5-4652-b245-f1782aa43b25/providers/Microsoft.Web/locations/northeurope/managedApis/commondataservice"
+          }
+        }
+      }
+    },
+    "endpointsConfiguration": {
+      "workflow": {
+        "outgoingIpAddresses": [
+          { "address": "40.113.12.95" },
+          { "address": "52.178.165.215" },
+          { "address": "52.178.166.21" },
+          { "address": "40.112.92.104" },
+          { "address": "40.112.95.216" },
+          { "address": "40.113.4.18" },
+          { "address": "40.113.3.202" },
+          { "address": "40.113.1.181" }
+        ],
+        "accessEndpointIpAddresses": [
+          { "address": "13.79.173.49" },
+          { "address": "52.169.218.253" },
+          { "address": "52.169.220.174" },
+          { "address": "40.112.90.39" }
+        ]
+      },
+      "connector": {
+        "outgoingIpAddresses": [
+          { "address": "13.69.227.208/28" },
+          { "address": "52.178.150.68" },
+          { "address": "104.45.93.9" },
+          { "address": "94.245.91.93" },
+          { "address": "52.169.28.181" }
+        ]
+      }
+    }
+  },
+  "id": "/subscriptions/abcdefgh-9cb5-4652-b245-f1782aa43b25/resourceGroups/SimonTest-RG/providers/Microsoft.Logic/workflows/FilePickerTest",
+  "name": "FilePickerTest",
+  "type": "Microsoft.Logic/workflows",
+  "location": "northeurope",
+  "tags": {}
+}

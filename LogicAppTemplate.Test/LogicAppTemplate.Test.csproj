@@ -59,6 +59,7 @@
   </Choose>
   <ItemGroup>
     <Compile Include="AzureResourceIdTests.cs" />
+    <Compile Include="CDSConnectorTests.cs" />
     <Compile Include="DynamicsAXConnectorTests.cs" />
     <Compile Include="IntegrationAccountTest.cs" />
     <Compile Include="BlobConnector2Test.cs" />
@@ -171,6 +172,10 @@
     <EmbeddedResource Include="TestFiles\Samples\DynamicAxTrigger\providers-Microsoft.Web-connections-sql-1.json" />
     <EmbeddedResource Include="TestFiles\Samples\DynamicAxTrigger\providers-Microsoft.Web-locations-eastus-managedApis-dynamicsax.json" />
     <EmbeddedResource Include="TestFiles\Samples\DynamicAxTrigger\providers-Microsoft.Web-locations-eastus-managedApis-sql.json" />
+    <EmbeddedResource Include="TestFiles\Samples\CdsConnector\providers-Microsoft.Logic-workflows-FilePickerTest-providers-microsoft.insights-diagnosticSettings.json" />
+    <EmbeddedResource Include="TestFiles\Samples\CdsConnector\providers-Microsoft.Logic-workflows-FilePickerTest.json" />
+    <EmbeddedResource Include="TestFiles\Samples\CdsConnector\providers-Microsoft.Web-connections-commondataservice.json" />
+    <EmbeddedResource Include="TestFiles\Samples\CdsConnector\providers-Microsoft.Web-locations-northeurope-managedApis-commondataservice.json" />
   </ItemGroup>
   <ItemGroup />
   <Choose>
