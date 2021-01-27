@@ -70,9 +70,7 @@ namespace LogicAppTemplate.Test
             var inputs = action.Value<JObject>("inputs");
 
             var path = inputs.Value<string>("path");
-            //"/datasets/@{encodeURIComponent(encodeURIComponent('az-customer-d365.cloudax.dynamics.com'))}/tables/@{encodeURIComponent(encodeURIComponent('ProductCategoryAssignments'))}/items"
-            //[concat('/datasets/@{encodeURIComponent(encodeURIComponent(', parameters('__apostrophe'), parameters('Lists_items_present_in_table-instance'), parameters('__apostrophe'), '))}/tables/@{encodeURIComponent(encodeURIComponent('ProductCategoryAssignments'))}/items')]
-            Assert.AreEqual("[concat('/v2/datasets/@{encodeURIComponent(encodeURIComponent(', parameters('__apostrophe'), parameters('List_records-environment'), parameters('__apostrophe'), '))}/tables/@{encodeURIComponent(encodeURIComponent(''cdmtmp_accounts''))}/items')]", path);            
+               Assert.AreEqual("[concat('/v2/datasets/@{encodeURIComponent(encodeURIComponent(', parameters('__apostrophe'), parameters('List_records-environment'), parameters('__apostrophe'), '))}/tables/@{encodeURIComponent(encodeURIComponent(''cdmtmp_accounts''))}/items')]", path);            
 
         }
 
