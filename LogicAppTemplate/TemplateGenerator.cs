@@ -520,7 +520,7 @@ namespace LogicAppTemplate
 
                     if (DisableFunctionNameParameters)
                     {
-                        faid.ReplaceValueAfter("functions", action.Name + "'");
+                        faid.ReplaceValueAfter("functions", faid.ValueAfter("functions") + "'");
                     }
                     else
                     {
