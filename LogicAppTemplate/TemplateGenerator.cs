@@ -54,6 +54,8 @@ namespace LogicAppTemplate
         public bool GenerateHttpTriggerUrlOutput { get; set; }
         public bool ForceManagedIdentity { get; set; }
         public bool DisableConnectionsOutput { get; set; }
+        public bool DisableTagParameters { get; set; }
+        public bool DisableFunctionNameParameters { get; set; }
 
         public async Task<JObject> GenerateTemplate()
         {
@@ -442,7 +444,9 @@ namespace LogicAppTemplate
                 }
                 else if (type == "http")
                 {
-                    definition["actions"][action.Name]["inputs"]["uri"] = "[parameters('" + AddTemplateParameter(action.Name + "-URI", "string", ((JObject)definition["actions"][action.Name]["inputs"]).Value<string>("uri")) + "')]";
+                    //only add when not parameterized yet
+                    if (!Regex.IsMatch(((JObject)definition["actions"][action.Name]["inputs"]).Value<string>("uri"), @"parameters\('.*'\)"))
+                        definition["actions"][action.Name]["inputs"]["uri"] = "[parameters('" + AddTemplateParameter(action.Name + "-URI", "string", ((JObject)definition["actions"][action.Name]["inputs"]).Value<string>("uri")) + "')]";
 
                     var authenticationObj = (JObject)definition["actions"][action.Name]["inputs"]["authentication"];
                     if (authenticationObj != null)
@@ -450,8 +454,12 @@ namespace LogicAppTemplate
                         var authType = authenticationObj.Value<string>("type");
                         if ("Basic".Equals(authType, StringComparison.CurrentCultureIgnoreCase))
                         {
-                            definition["actions"][action.Name]["inputs"]["authentication"]["password"] = "[parameters('" + AddTemplateParameter(action.Name + "-Password", "string", ((JObject)definition["actions"][action.Name]["inputs"]["authentication"]).Value<string>("password")) + "')]";
-                            definition["actions"][action.Name]["inputs"]["authentication"]["username"] = "[parameters('" + AddTemplateParameter(action.Name + "-Username", "string", ((JObject)definition["actions"][action.Name]["inputs"]["authentication"]).Value<string>("username")) + "')]";
+                            //only add when not parameterized yet
+                            if (!Regex.IsMatch(((JObject)definition["actions"][action.Name]["inputs"]["authentication"]).Value<string>("password"), @"parameters\('.*'\)"))
+                                definition["actions"][action.Name]["inputs"]["authentication"]["password"] = "[parameters('" + AddTemplateParameter(action.Name + "-Password", "string", ((JObject)definition["actions"][action.Name]["inputs"]["authentication"]).Value<string>("password")) + "')]";
+                            //only add when not parameterized yet
+                            if (!Regex.IsMatch(((JObject)definition["actions"][action.Name]["inputs"]["authentication"]).Value<string>("username"), @"parameters\('.*'\)"))
+                                definition["actions"][action.Name]["inputs"]["authentication"]["username"] = "[parameters('" + AddTemplateParameter(action.Name + "-Username", "string", ((JObject)definition["actions"][action.Name]["inputs"]["authentication"]).Value<string>("username")) + "')]";
                         }
                         else if ("ClientCertificate".Equals(authType, StringComparison.CurrentCultureIgnoreCase))
                         {
@@ -460,7 +468,9 @@ namespace LogicAppTemplate
                         }
                         else if ("ActiveDirectoryOAuth".Equals(authType, StringComparison.CurrentCultureIgnoreCase))
                         {
-                            definition["actions"][action.Name]["inputs"]["authentication"]["audience"] = "[parameters('" + AddTemplateParameter(action.Name + "-Audience", "string", ((JObject)definition["actions"][action.Name]["inputs"]["authentication"]).Value<string>("audience")) + "')]";
+                            //only add when not parameterized yet
+                            if (!Regex.IsMatch(((JObject)definition["actions"][action.Name]["inputs"]["authentication"]).Value<string>("audience"), @"parameters\('.*'\)"))
+                                definition["actions"][action.Name]["inputs"]["authentication"]["audience"] = "[parameters('" + AddTemplateParameter(action.Name + "-Audience", "string", ((JObject)definition["actions"][action.Name]["inputs"]["authentication"]).Value<string>("audience")) + "')]";
                             definition["actions"][action.Name]["inputs"]["authentication"]["authority"] = "[parameters('" + AddTemplateParameter(action.Name + "-Authority", "string", (((JObject)definition["actions"][action.Name]["inputs"]["authentication"]).Value<string>("authority")) ?? "") + "')]";
                             definition["actions"][action.Name]["inputs"]["authentication"]["clientId"] = "[parameters('" + AddTemplateParameter(action.Name + "-ClientId", "string", ((JObject)definition["actions"][action.Name]["inputs"]["authentication"]).Value<string>("clientId")) + "')]";
                             definition["actions"][action.Name]["inputs"]["authentication"]["secret"] = "[parameters('" + AddTemplateParameter(action.Name + "-Secret", "string", ((JObject)definition["actions"][action.Name]["inputs"]["authentication"]).Value<string>("secret")) + "')]";
@@ -472,7 +482,9 @@ namespace LogicAppTemplate
                         }
                         else if ("ManagedServiceIdentity".Equals(authType, StringComparison.CurrentCultureIgnoreCase))
                         {
-                            definition["actions"][action.Name]["inputs"]["authentication"]["audience"] = "[parameters('" + AddTemplateParameter(action.Name + "-Audience", "string", ((JObject)definition["actions"][action.Name]["inputs"]["authentication"]).Value<string>("audience")) + "')]";
+                            //only add when not parameterized yet
+                            if (!Regex.IsMatch(((JObject)definition["actions"][action.Name]["inputs"]["authentication"]).Value<string>("audience"), @"parameters\('.*'\)"))
+                                definition["actions"][action.Name]["inputs"]["authentication"]["audience"] = "[parameters('" + AddTemplateParameter(action.Name + "-Audience", "string", ((JObject)definition["actions"][action.Name]["inputs"]["authentication"]).Value<string>("audience")) + "')]";
 
                             if (definition["actions"][action.Name]["inputs"]["authentication"]["identity"] != null)
                             {
@@ -505,8 +517,15 @@ namespace LogicAppTemplate
                     faid.SubscriptionId = "',subscription().subscriptionId,'";
                     faid.ResourceGroupName = "',parameters('" + AddTemplateParameter((FixedFunctionAppName ? "FunctionApp-" : action.Name + "-") + "ResourceGroup", "string", resourcegroupValue) + "'),'";
                     faid.ReplaceValueAfter("sites", "',parameters('" + AddTemplateParameter((FixedFunctionAppName ? "" : action.Name + "-") + "FunctionApp", "string", faid.ValueAfter("sites")) + "'),'");
-                    faid.ReplaceValueAfter("functions", "',parameters('" + AddTemplateParameter((FixedFunctionAppName ? "" : action.Name + "-") + "FunctionName", "string", faid.ValueAfter("functions")) + "')");
 
+                    if (DisableFunctionNameParameters)
+                    {
+                        faid.ReplaceValueAfter("functions", action.Name + "'");
+                    }
+                    else
+                    {
+                        faid.ReplaceValueAfter("functions", "',parameters('" + AddTemplateParameter((FixedFunctionAppName ? "" : action.Name + "-") + "FunctionName", "string", faid.ValueAfter("functions")) + "')");
+                    }
                     definition["actions"][action.Name]["inputs"]["function"]["id"] = "[concat('" + faid.ToString() + ")]";
                 }
                 else
@@ -695,7 +714,7 @@ namespace LogicAppTemplate
                     if (trigger.Value.Value<string>("type") == "Request" && trigger.Value.Value<string>("kind") == "Http")
                     {
                         if (this.GenerateHttpTriggerUrlOutput)
-                        {                            
+                        {
                             JObject outputValue = JObject.FromObject(new
                             {
                                 type = "string",
@@ -913,20 +932,20 @@ namespace LogicAppTemplate
                         //}
                         else
                         {
+                            //todo check this!
+                            object parameterValue = null;
                             //skip the tenantId property for sharepointonline
-                            if (parameter.Name.Equals("token:TenantId") && concatedId.EndsWith("/managedApis/sharepointonline')]"))
+                            if (parameter.Name.Equals("token:TenantId"))
                             {
-                                continue;
+                                parameterValue = "[subscription().tenantId]";
                             }
 
                             //check for hidden constraint do not skip token parameters for client credential services like eventgrid
-                            if (!parameter.Name.StartsWith("token:") && (parameter.Value["uiDefinition"]["constraints"]["hidden"]?.Value<bool>() ?? false))
+                            else if (!parameter.Name.StartsWith("token:") && (parameter.Value["uiDefinition"]["constraints"]["hidden"]?.Value<bool>() ?? false))
                             {
                                 continue;
                             }
-                            //todo check this!
-                            object parameterValue = null;
-                            if (connectionInstance["properties"]["nonSecretParameterValues"] != null)
+                            else if (connectionInstance["properties"]["nonSecretParameterValues"] != null)
                             {
                                 parameterValue = connectionInstance["properties"]["nonSecretParameterValues"][parameter.Name];
                             }
@@ -997,8 +1016,15 @@ namespace LogicAppTemplate
 
             foreach (var property in definition["tags"].ToObject<JObject>().Properties())
             {
-                var parm = AddTemplateParameter(property.Name + "_Tag", "string", property.Value.ToString());
-                result.Add(property.Name, $"[parameters('{parm}')]");
+                if (DisableTagParameters)
+                {
+                    result.Add(property.Name, property.Value.ToString());
+                }
+                else
+                {
+                    var parm = AddTemplateParameter(property.Name + "_Tag", "string", property.Value.ToString());
+                    result.Add(property.Name, $"[parameters('{parm}')]");
+                }
             }
 
             return result;

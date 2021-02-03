@@ -57,6 +57,11 @@ namespace LogicAppTemplate
         [Parameter(Mandatory = false, HelpMessage = "If supplied, Connections for the Logic App will not be output in the ARM template")]
         public SwitchParameter DisableConnectionGeneration;
 
+        [Parameter(Mandatory = false, HelpMessage = "If supplied, Tags are not parameterized for the Logic App will not be output in the ARM template")]
+        public SwitchParameter DisableTagParameters;
+
+        [Parameter(Mandatory = false, HelpMessage = "If supplied, FunctionNames are not parameterized for the Logic App will not be output in the ARM template")]
+        public SwitchParameter DisableFunctionNameParameters;
 
         protected override void ProcessRecord()
         {
@@ -92,8 +97,10 @@ namespace LogicAppTemplate
                 GenerateHttpTriggerUrlOutput = this.GenerateHttpTriggerUrlOutput,
                 IncludeInitializeVariable = this.IncludeInitializeVariable,
                 ForceManagedIdentity = this.ForceManagedIdentity,
-                FixedFunctionAppName = FixedFunctionAppName,
-                DisableConnectionsOutput = this.DisableConnectionGeneration
+                FixedFunctionAppName = this.FixedFunctionAppName,
+                DisableConnectionsOutput = this.DisableConnectionGeneration,
+                DisableTagParameters = this.DisableTagParameters,
+                DisableFunctionNameParameters = this.DisableFunctionNameParameters
             };
 
             try
