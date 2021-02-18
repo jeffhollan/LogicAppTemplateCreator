@@ -986,7 +986,7 @@ namespace LogicAppTemplate
                             {
                                 parameterValue = connectionInstance["properties"]["nonSecretParameterValues"][parameter.Name];
                             }
-                            if (concatedId.EndsWith("/managedApis/sql')]") && parameter.Name == "authType") 
+                            else if (concatedId.EndsWith("/managedApis/sql')]") && parameter.Name == "authType") 
                             {
                                 var parameterName = connectionInstance["properties"]["parameterValueSet"]?["name"].Value<string>();
                                 parameterValue = (parameterName == "windowsAuthentication") ? "windows" : "basic";
