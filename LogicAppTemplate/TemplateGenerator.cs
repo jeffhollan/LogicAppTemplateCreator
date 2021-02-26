@@ -56,6 +56,7 @@ namespace LogicAppTemplate
         public bool DisableConnectionsOutput { get; set; }
         public bool DisableTagParameters { get; set; }
         public bool DisableFunctionNameParameters { get; set; }
+        public bool SkipSharepointConnectionAuthorization { get; set; }
 
         public async Task<JObject> GenerateTemplate()
         {
@@ -963,10 +964,10 @@ namespace LogicAppTemplate
 
 
                         }
-                        //else if (concatedId.EndsWith("/managedApis/sharepointonline')]"))
-                        //{
+                        else if (SkipSharepointConnectionAuthorization && concatedId.EndsWith("/managedApis/sharepointonline')]"))
+                        {
                         //skip because otherwise authenticated connection has to be authenticated again.
-                        //}
+                        }
                         else
                         {
                             //todo check this!

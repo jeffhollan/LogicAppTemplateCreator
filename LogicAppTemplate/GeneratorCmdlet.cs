@@ -63,6 +63,9 @@ namespace LogicAppTemplate
         [Parameter(Mandatory = false, HelpMessage = "If supplied, FunctionNames are not parameterized for the Logic App will not be output in the ARM template")]
         public SwitchParameter DisableFunctionNameParameters;
 
+        [Parameter(Mandatory = false, HelpMessage = "If supplied, SharePoint Connections Authorization are not set in the ARM template")]
+        public SwitchParameter SkipSharepointConnectionAuthorization;
+
         protected override void ProcessRecord()
         {
             AzureResourceCollector resourceCollector = new AzureResourceCollector();
@@ -100,7 +103,8 @@ namespace LogicAppTemplate
                 FixedFunctionAppName = this.FixedFunctionAppName,
                 DisableConnectionsOutput = this.DisableConnectionGeneration,
                 DisableTagParameters = this.DisableTagParameters,
-                DisableFunctionNameParameters = this.DisableFunctionNameParameters
+                DisableFunctionNameParameters = this.DisableFunctionNameParameters,
+                SkipSharepointConnectionAuthorization = this.SkipSharepointConnectionAuthorization
             };
 
             try
