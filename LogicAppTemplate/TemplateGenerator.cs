@@ -56,7 +56,7 @@ namespace LogicAppTemplate
         public bool DisableConnectionsOutput { get; set; }
         public bool DisableTagParameters { get; set; }
         public bool DisableFunctionNameParameters { get; set; }
-        public bool SkipSharepointConnectionAuthorization { get; set; }
+        public bool SkipOauthConnectionAuthorization { get; set; }
 
         public async Task<JObject> GenerateTemplate()
         {
@@ -964,15 +964,15 @@ namespace LogicAppTemplate
 
 
                         }
-                        else if (SkipSharepointConnectionAuthorization && concatedId.EndsWith("/managedApis/sharepointonline')]"))
+                        //check for the existence of token:TenantId to determine the connectoins uses Oauth
+                        else if (SkipOauthConnectionAuthorization && parameter.Name.Equals("token:TenantId"))
                         {
-                        //skip because otherwise authenticated connection has to be authenticated again.
+                            //skip because otherwise authenticated connection has to be authenticated again.
                         }
                         else
                         {
                             //todo check this!
                             object parameterValue = null;
-                            //skip the tenantId property for sharepointonline
                             if (parameter.Name.Equals("token:TenantId"))
                             {
                                 parameterValue = "[subscription().tenantId]";
