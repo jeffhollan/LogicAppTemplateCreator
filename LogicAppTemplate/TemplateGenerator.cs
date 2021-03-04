@@ -57,6 +57,7 @@ namespace LogicAppTemplate
         public bool DisableTagParameters { get; set; }
         public bool DisableFunctionNameParameters { get; set; }
         public bool SkipOauthConnectionAuthorization { get; set; }
+        public bool UseServiceBusDisplayName { get; set; }
 
         public async Task<JObject> GenerateTemplate()
         {
@@ -937,8 +938,14 @@ namespace LogicAppTemplate
                         }
                         else if (concatedId.EndsWith("/servicebus')]"))
                         {
-                            var namespace_param = AddTemplateParameter($"servicebus_namespace_name", "string", "REPLACE__servicebus_namespace");
-                            var sb_resource_group_param = AddTemplateParameter($"servicebus_resourceGroupName", "string", "REPLACE__servicebus_rg");
+                            var serviceBus_displayName = (string)connectionInstance["properties"]?["displayName"];
+                            if (string.IsNullOrEmpty(serviceBus_displayName) || !UseServiceBusDisplayName)
+                            {
+                                serviceBus_displayName = "servicebus";
+                            }
+
+                            var namespace_param = AddTemplateParameter($"{serviceBus_displayName}_namespace_name", "string", "REPLACE__servicebus_namespace");
+                            var sb_resource_group_param = AddTemplateParameter($"{serviceBus_displayName}_resourceGroupName", "string", "REPLACE__servicebus_rg");
                             var servicebus_auth_name_param = AddTemplateParameter($"servicebus_accessKey_name", "string", "RootManageSharedAccessKey");
 
                             connectionParameters.Add(parameter.Name, $"[listkeys(resourceId(parameters('{sb_resource_group_param}'),'Microsoft.ServiceBus/namespaces/authorizationRules', parameters('{namespace_param}'), parameters('{servicebus_auth_name_param}')), '2017-04-01').primaryConnectionString]");

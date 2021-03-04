@@ -66,6 +66,9 @@ namespace LogicAppTemplate
         [Parameter(Mandatory = false, HelpMessage = "If supplied, Oauth Connections Authorization are not set in the ARM template")]
         public SwitchParameter SkipOauthConnectionAuthorization;
 
+        [Parameter(Mandatory = false, HelpMessage = "If supplied, the ServiceBusDisplayNames is used within the parameters in the ARM template")]
+        public SwitchParameter UseServiceBusDisplayName;
+
         protected override void ProcessRecord()
         {
             AzureResourceCollector resourceCollector = new AzureResourceCollector();
@@ -104,7 +107,8 @@ namespace LogicAppTemplate
                 DisableConnectionsOutput = this.DisableConnectionGeneration,
                 DisableTagParameters = this.DisableTagParameters,
                 DisableFunctionNameParameters = this.DisableFunctionNameParameters,
-                SkipOauthConnectionAuthorization = this.SkipOauthConnectionAuthorization
+                SkipOauthConnectionAuthorization = this.SkipOauthConnectionAuthorization,
+                UseServiceBusDisplayName = this.UseServiceBusDisplayName
             };
 
             try
