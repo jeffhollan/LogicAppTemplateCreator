@@ -57,6 +57,17 @@ namespace LogicAppTemplate
         [Parameter(Mandatory = false, HelpMessage = "If supplied, Connections for the Logic App will not be output in the ARM template")]
         public SwitchParameter DisableConnectionGeneration;
 
+        [Parameter(Mandatory = false, HelpMessage = "If supplied, Tags are not parameterized for the Logic App will not be output in the ARM template")]
+        public SwitchParameter DisableTagParameters;
+
+        [Parameter(Mandatory = false, HelpMessage = "If supplied, FunctionNames are not parameterized for the Logic App will not be output in the ARM template")]
+        public SwitchParameter DisableFunctionNameParameters;
+
+        [Parameter(Mandatory = false, HelpMessage = "If supplied, Oauth Connections Authorization are not set in the ARM template")]
+        public SwitchParameter SkipOauthConnectionAuthorization;
+
+        [Parameter(Mandatory = false, HelpMessage = "If supplied, the ServiceBusDisplayNames is used within the parameters in the ARM template")]
+        public SwitchParameter UseServiceBusDisplayName;
 
         protected override void ProcessRecord()
         {
@@ -92,8 +103,12 @@ namespace LogicAppTemplate
                 GenerateHttpTriggerUrlOutput = this.GenerateHttpTriggerUrlOutput,
                 IncludeInitializeVariable = this.IncludeInitializeVariable,
                 ForceManagedIdentity = this.ForceManagedIdentity,
-                FixedFunctionAppName = FixedFunctionAppName,
-                DisableConnectionsOutput = this.DisableConnectionGeneration
+                FixedFunctionAppName = this.FixedFunctionAppName,
+                DisableConnectionsOutput = this.DisableConnectionGeneration,
+                DisableTagParameters = this.DisableTagParameters,
+                DisableFunctionNameParameters = this.DisableFunctionNameParameters,
+                SkipOauthConnectionAuthorization = this.SkipOauthConnectionAuthorization,
+                UseServiceBusDisplayName = this.UseServiceBusDisplayName
             };
 
             try

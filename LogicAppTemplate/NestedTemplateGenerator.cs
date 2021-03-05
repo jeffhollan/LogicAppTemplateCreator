@@ -116,9 +116,24 @@ namespace LogicAppTemplate
                             {
                                 var v1 = (JObject)nestedtemplate.parameters[parameter.Name]; //.Value["defaultValue"]?.Value<string>();\
                                                                                              //v1.Properties[""];
+                                foreach (var p in nestedtemplate.parameters.Properties())
+                                {
+                                    if (p.Name.StartsWith($"{parameter.Name}"))
+                                    {
 
+                                        var p1 = p.Value["defaultValue"];
+                                        var p2 = parameter.Value["defaultValue"];
 
-                                if (parameter.Value["defaultValue"] != null && !JToken.DeepEquals(v1["defaultValue"], parameter.Value["defaultValue"]))
+                                        if (JToken.DeepEquals(p1, p2)) {
+                                            param = p;
+                                            break; }
+                                    }
+
+                                }
+
+                                var existingParam = nestedtemplate.parameters.Properties().FirstOrDefault(p => p.Name.StartsWith($"{parameter.Name}") && JToken.DeepEquals(p.Value["defaultValue"], parameter.Value["defaultValue"]));
+
+                                if (existingParam == null)
                                 {
                                     var paramName = GetUniqueParamName(parameter.Name);
 
