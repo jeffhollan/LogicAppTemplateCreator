@@ -994,7 +994,7 @@ namespace LogicAppTemplate
                             {
                                 parameterValue = connectionInstance["properties"]["nonSecretParameterValues"][parameter.Name];
                             }
-                            else if (concatedId.EndsWith("/managedApis/sql')]") && parameter.Name == "authType") 
+                            else if (concatedId.EndsWith("/managedApis/sql')]") && parameter.Name == "authType")
                             {
                                 var parameterName = connectionInstance["properties"]["parameterValueSet"]?["name"].Value<string>();
                                 parameterValue = (parameterName == "windowsAuthentication") ? "windows" : "basic";
@@ -1041,10 +1041,11 @@ namespace LogicAppTemplate
                     currentvalue = (string)connectionInstance["properties"]["nonSecretParameterValues"]["gateway"]["id"];
 
                 }
-                else
+                else if (connectionInstance["properties"]["parameterValueSet"]["values"]["gateway"]["value"].HasValues)
                 {
                     currentvalue = (string)connectionInstance["properties"]["parameterValueSet"]["values"]["gateway"]["value"]["id"];
                 }
+
                 var rid = new AzureResourceId(currentvalue);
                 var gatewayname = AddTemplateParameter($"{connectionName}_gatewayname", "string", rid.ResourceName);
                 var resourcegroup = AddTemplateParameter($"{connectionName}_gatewayresourcegroup", "string", rid.ResourceGroupName);
@@ -1053,6 +1054,7 @@ namespace LogicAppTemplate
                 gatewayobject["id"] = $"[concat('/subscriptions/',subscription().subscriptionId,'/resourceGroups/',parameters('{resourcegroup}'),'/providers/Microsoft.Web/connectionGateways/',parameters('{gatewayname}'))]";
                 connectionParameters.Add("gateway", gatewayobject);
                 useGateway = true;
+
             }
             //only fill connectionParameters when source not empty, otherwise saved credentials will be lost.
             if (connectionParameters.HasValues)
