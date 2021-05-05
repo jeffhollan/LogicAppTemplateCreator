@@ -24,6 +24,8 @@ Install-Module Az.Accounts -Force #Only if you don't if you have it or not, it i
 Import-Module Az.Accounts
 Install-Module LogicAppTemplate -Force
 Import-Module LogicAppTemplate
+#Ensure that you are signed into an account with enough permissions
+Login-AzAccount
 ```
 3. Run the PowerShell command `Get-LogicAppTemplate`.
 ```powershell
