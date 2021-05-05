@@ -12,7 +12,7 @@ namespace LogicAppTemplate.Test
         private JObject GetTemplate()
         {
             var generator = new TemplateGenerator("INT0012C.Workday.Rehire.Leavers", "c107df29-a4af-4bc9-a733-f88f0eaa4296", "blobtest", new MockResourceCollector("BlobConnector"));
-
+            generator.GenerateHttpTriggerUrlOutput = true;
             return generator.GenerateTemplate().GetAwaiter().GetResult();
         }
 
@@ -33,7 +33,7 @@ namespace LogicAppTemplate.Test
 
             Assert.AreEqual("[parameters('azureblob_displayName')]", connection["properties"].Value<string>("displayName"));
             Assert.AreEqual("[parameters('azureblob_accountName')]", connection["properties"]["parameterValues"].Value<string>("accountName"));
-            Assert.AreEqual("[listKeys(resourceId('Microsoft.Storage/storageAccounts', parameters('azureblob_accountName')), '2018-02-01').keys[0].value]", connection["properties"]["parameterValues"].Value<string>("accessKey"));
+            Assert.AreEqual("[listKeys(resourceId(parameters('azureblob_resourceGroupName'),'Microsoft.Storage/storageAccounts', parameters('azureblob_accountName')), '2018-02-01').keys[0].value]", connection["properties"]["parameterValues"].Value<string>("accessKey"));
 
         }
 
@@ -58,7 +58,7 @@ namespace LogicAppTemplate.Test
         {
             var defintion = GetTemplate();
 
-            var workflow = defintion.Value<JArray>("resources").Where(jj => jj.Value<string>("type") == "Microsoft.Logic/workflows" && jj.Value<string>("name") == "[parameters('logicAppName')]").First();            
+            var workflow = defintion.Value<JArray>("resources").Where(jj => jj.Value<string>("type") == "Microsoft.Logic/workflows" && jj.Value<string>("name") == "[parameters('logicAppName')]").First();
 
             var actions = workflow["properties"]["definition"]["actions"];
 
@@ -79,6 +79,16 @@ namespace LogicAppTemplate.Test
             Assert.AreEqual("[parameters('Get_manger_blob-path')]", managermetadata.Value<string>("[base64(parameters('Get_manger_blob-path'))]"));
 
             Assert.AreEqual("[concat('/datasets/default/files/@{encodeURIComponent(encodeURIComponent(', parameters('__apostrophe'), base64(parameters('Get_manger_blob-path')), parameters('__apostrophe'), '))}/content')]", managerblob["inputs"].Value<string>("path"));
+
+        }
+
+        [TestMethod]
+        public void TriggerOutPutURlTest()
+        {
+            var defintion = GetTemplate();
+            var listCallbackUrl = defintion.SelectToken("outputs.httpTriggerUrl").Value<string>("value");
+            Assert.AreEqual("[listCallbackURL(concat(resourceId(resourceGroup().name,'Microsoft.Logic/workflows/', parameters('logicAppName')), '/triggers/requesttest'), '2016-06-01').value]", listCallbackUrl);
+
 
         }
     }

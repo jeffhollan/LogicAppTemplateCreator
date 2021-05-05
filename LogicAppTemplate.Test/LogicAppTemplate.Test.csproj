@@ -36,8 +36,9 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="Microsoft.CSharp" />
-    <Reference Include="Newtonsoft.Json, Version=11.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
-      <HintPath>..\packages\Newtonsoft.Json.11.0.2\lib\net45\Newtonsoft.Json.dll</HintPath>
+    <Reference Include="Newtonsoft.Json, Version=12.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <HintPath>..\packages\Newtonsoft.Json.12.0.1\lib\net45\Newtonsoft.Json.dll</HintPath>
+      <Private>True</Private>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Management.Automation, Version=3.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35" />
@@ -58,6 +59,8 @@
   </Choose>
   <ItemGroup>
     <Compile Include="AzureResourceIdTests.cs" />
+    <Compile Include="CDSConnectorTests.cs" />
+    <Compile Include="DynamicsAXConnectorTests.cs" />
     <Compile Include="IntegrationAccountTest.cs" />
     <Compile Include="BlobConnector2Test.cs" />
     <Compile Include="StorageQueueConnectorTest.cs" />
@@ -70,6 +73,7 @@
     <Compile Include="TemplateGeneratorTests.cs" />
     <Compile Include="ParamGeneratorTests.cs" />
     <Compile Include="TableConnectorTest.cs" />
+    <EmbeddedResource Include="TestFiles\Http-Variable.json" />
     <Compile Include="Utils.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -143,8 +147,37 @@
     <EmbeddedResource Include="TestFiles\AzureBlobWithDifferentNameThanConnectionName.json" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="packages.config" />
+    <EmbeddedResource Include="TestFiles\ISE.json" />
+    <EmbeddedResource Include="TestFiles\Samples\CustomConnector\SampleSwaggerDefinition.json" />
+    <EmbeddedResource Include="TestFiles\Samples\CustomConnector\SampleCustomConnectorResource.json" />
   </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="TestFiles\Samples\IntegrationAccountSchemas\SampleMap.xsd">
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="TestFiles\Samples\IntegrationAccountSchemas\SampleDefinition.json" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="packages.config" />
+    <EmbeddedResource Include="TestFiles\ManagedIdentity.json" />
+    <EmbeddedResource Include="TestFiles\Samples\DynamicsAx\providers-Microsoft.Logic-workflows-INT117-LA-004-GetFundingsFromD365-providers-microsoft.insights-diagnosticSettings.json" />
+    <EmbeddedResource Include="TestFiles\Samples\DynamicsAx\providers-Microsoft.Logic-workflows-INT117-LA-004-GetFundingsFromD365.json" />
+    <EmbeddedResource Include="TestFiles\Samples\DynamicsAx\providers-Microsoft.Web-connections-dynamicsax.json" />
+    <EmbeddedResource Include="TestFiles\Samples\DynamicsAx\providers-Microsoft.Web-connections-sql.json" />
+    <EmbeddedResource Include="TestFiles\Samples\DynamicsAx\providers-Microsoft.Web-locations-northeurope-managedApis-dynamicsax.json" />
+    <EmbeddedResource Include="TestFiles\Samples\DynamicsAx\providers-Microsoft.Web-locations-northeurope-managedApis-sql.json" />
+    <EmbeddedResource Include="TestFiles\Samples\DynamicAxTrigger\providers-Microsoft.Logic-workflows-INT142-LA-002-partsProgramming-providers-microsoft.insights-diagnosticSettings.json" />
+    <EmbeddedResource Include="TestFiles\Samples\DynamicAxTrigger\providers-Microsoft.Logic-workflows-INT142-LA-002-partsProgramming.json" />
+    <EmbeddedResource Include="TestFiles\Samples\DynamicAxTrigger\providers-Microsoft.Web-connections-dynamicsax.json" />
+    <EmbeddedResource Include="TestFiles\Samples\DynamicAxTrigger\providers-Microsoft.Web-connections-sql-1.json" />
+    <EmbeddedResource Include="TestFiles\Samples\DynamicAxTrigger\providers-Microsoft.Web-locations-eastus-managedApis-dynamicsax.json" />
+    <EmbeddedResource Include="TestFiles\Samples\DynamicAxTrigger\providers-Microsoft.Web-locations-eastus-managedApis-sql.json" />
+    <EmbeddedResource Include="TestFiles\Samples\CdsConnector\providers-Microsoft.Logic-workflows-FilePickerTest-providers-microsoft.insights-diagnosticSettings.json" />
+    <EmbeddedResource Include="TestFiles\Samples\CdsConnector\providers-Microsoft.Logic-workflows-FilePickerTest.json" />
+    <EmbeddedResource Include="TestFiles\Samples\CdsConnector\providers-Microsoft.Web-connections-commondataservice.json" />
+    <EmbeddedResource Include="TestFiles\Samples\CdsConnector\providers-Microsoft.Web-locations-northeurope-managedApis-commondataservice.json" />
+  </ItemGroup>
+  <ItemGroup />
   <Choose>
     <When Condition="'$(VisualStudioVersion)' == '10.0' And '$(IsCodedUITest)' == 'True'">
       <ItemGroup>

@@ -1,4 +1,5 @@
-﻿using Newtonsoft.Json.Linq;
+﻿using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using System.Collections.Generic;
 
 namespace LogicAppTemplate.Models
@@ -25,7 +26,12 @@ namespace LogicAppTemplate.Models
             }
         }
         public TemplateLink templateLink { get; set; }
+
+        [JsonProperty(NullValueHandling = NullValueHandling.Ignore)]
         public TemplateLink parametersLink { get; set; }
+
+        [JsonProperty(NullValueHandling = NullValueHandling.Ignore)]
+        public JObject parameters { get; set; }
     }
 
     public class NestedResourceTemplate
@@ -42,7 +48,7 @@ namespace LogicAppTemplate.Models
         {
             get
             {
-                return "2016-09-01";
+                return "2019-10-01";
             }
         }
         public List<object> dependsOn { get; set; }

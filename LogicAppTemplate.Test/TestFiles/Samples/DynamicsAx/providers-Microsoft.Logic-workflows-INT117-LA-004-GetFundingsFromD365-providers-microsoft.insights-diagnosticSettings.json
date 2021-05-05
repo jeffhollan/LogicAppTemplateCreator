@@ -1,0 +1,41 @@
+{
+  "value": [
+    {
+      "id": "/subscriptions/aabbccdd-9cb5-4652-b245-f1782aa43b25/resourcegroups/int117-funding-rg/providers/microsoft.logic/workflows/int117-la-004-getfundingsfromd365/providers/microsoft.insights/diagnosticSettings/service",
+      "type": null,
+      "name": "service",
+      "location": null,
+      "kind": null,
+      "tags": null,
+      "properties": {
+        "storageAccountId": null,
+        "serviceBusRuleId": null,
+        "workspaceId": "/subscriptions/aabbccdd-9cb5-4652-b245-f1782aa43b25/resourceGroups/integration-analytics-eus-rg/providers/Microsoft.OperationalInsights/workspaces/INTEGRATION-EUS-LAW",
+        "eventHubAuthorizationRuleId": null,
+        "eventHubName": null,
+        "metrics": [
+          {
+            "category": "AllMetrics",
+            "enabled": true,
+            "retentionPolicy": {
+              "enabled": false,
+              "days": 0
+            }
+          }
+        ],
+        "logs": [
+          {
+            "category": "WorkflowRuntime",
+            "enabled": true,
+            "retentionPolicy": {
+              "enabled": false,
+              "days": 0
+            }
+          }
+        ],
+        "logAnalyticsDestinationType": null
+      },
+      "identity": null
+    }
+  ]
+}

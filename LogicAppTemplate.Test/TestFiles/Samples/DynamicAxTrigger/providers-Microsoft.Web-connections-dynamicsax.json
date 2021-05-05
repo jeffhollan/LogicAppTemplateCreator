@@ -1,0 +1,38 @@
+{
+  "kind": "V1",
+  "properties": {
+    "displayName": "D365preTest",
+    "authenticatedUser": {
+    },
+    "statuses": [
+      {
+        "status": "Connected"
+      }
+    ],
+    "customParameterValues": {
+    },
+    "nonSecretParameterValues": {
+      "token:clientId": "6F8BEADF-0D51-4667-82FF-B8CA1BD9AF4B",
+      "token:TenantId": "6C9AE0BB-DF1F-4D52-B7BC-47DBD0DDB50E",
+      "token:grantType": "client_credentials"
+    },
+    "createdTime": "2020-11-10T10:51:38.9041399Z",
+    "changedTime": "2020-11-10T13:24:34.4448188Z",
+    "api": {
+      "name": "dynamicsax",
+      "displayName": "Dynamics 365 for Fin & Ops",
+      "description": "Microsoft Dynamics 365 for Fin & Ops connector provides access to data entities.",
+      "iconUri": "https://connectoricons-prod.azureedge.net/releases/v1.0.1400/1.0.1400.2154/dynamicsax/icon.png",
+      "brandColor": "#4A356F",
+      "category": "Standard",
+      "id": "/subscriptions/aabbccdd-9cb5-4652-b245-aabbccddeeff/providers/Microsoft.Web/locations/eastus/managedApis/dynamicsax",
+      "type": "Microsoft.Web/locations/managedApis"
+    },
+    "testLinks": [
+    ]
+  },
+  "id": "/subscriptions/aabbccdd-9cb5-4652-b245-aabbccddeeff/resourceGroups/INT142-partsProgramming-RG/providers/Microsoft.Web/connections/dynamicsax",
+  "name": "dynamicsax",
+  "type": "Microsoft.Web/connections",
+  "location": "eastus"
+}

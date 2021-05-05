@@ -1,0 +1,637 @@
+{
+  "properties": {
+    "name": "sql",
+    "connectionParameters": {
+      "server": {
+        "type": "string",
+        "uiDefinition": {
+          "displayName": "SQL server name",
+          "description": "SQL server name",
+          "tooltip": "SQL server name",
+          "constraints": {
+            "tabIndex": 1,
+            "required": "true",
+            "capability": [
+              "gateway",
+              "cloud"
+            ]
+          }
+        }
+      },
+      "database": {
+        "type": "string",
+        "uiDefinition": {
+          "displayName": "SQL database name",
+          "description": "SQL database name",
+          "tooltip": "SQL database name",
+          "constraints": {
+            "tabIndex": 2,
+            "required": "true",
+            "capability": [
+              "gateway",
+              "cloud"
+            ]
+          }
+        }
+      },
+      "authType": {
+        "type": "string",
+        "allowedValues": [
+          {
+            "value": "windows"
+          },
+          {
+            "value": "basic"
+          }
+        ],
+        "uiDefinition": {
+          "displayName": "Authentication Type",
+          "description": "Authentication type to connect to your database",
+          "tooltip": "Authentication type to connect to your database",
+          "constraints": {
+            "tabIndex": 3,
+            "required": "false",
+            "allowedValues": [
+              {
+                "text": "Windows",
+                "value": "windows"
+              },
+              {
+                "text": "Basic",
+                "value": "basic"
+              }
+            ],
+            "capability": [
+              "gateway"
+            ]
+          }
+        }
+      },
+      "username": {
+        "type": "securestring",
+        "uiDefinition": {
+          "displayName": "Username",
+          "description": "Username credential",
+          "tooltip": "Username credential",
+          "constraints": {
+            "tabIndex": 4,
+            "clearText": true,
+            "required": "true",
+            "capability": [
+              "gateway",
+              "cloud"
+            ]
+          }
+        }
+      },
+      "password": {
+        "type": "securestring",
+        "uiDefinition": {
+          "displayName": "Password",
+          "description": "Password credential",
+          "tooltip": "Password credential",
+          "constraints": {
+            "tabIndex": 5,
+            "required": "true",
+            "capability": [
+              "gateway",
+              "cloud"
+            ]
+          }
+        }
+      },
+      "gateway": {
+        "type": "gatewaySetting",
+        "gatewaySettings": {
+          "dataSourceType": "sql",
+          "connectionDetails": [
+            "server",
+            "database"
+          ]
+        },
+        "uiDefinition": {
+          "constraints": {
+            "tabIndex": 6,
+            "required": "false",
+            "capability": [
+              "gateway"
+            ]
+          }
+        }
+      },
+      "encryptConnection": {
+        "type": "bool",
+        "uiDefinition": {
+          "displayName": "Encrypt Connection",
+          "description": "Encrypt Connection",
+          "tooltip": "Encrypt Connection",
+          "constraints": {
+            "hidden": "true",
+            "tabIndex": 7,
+            "required": "false",
+            "capability": [
+              "cloud",
+              "gateway"
+            ]
+          }
+        }
+      },
+      "privacySetting": {
+        "type": "string",
+        "allowedValues": [
+          {
+            "value": "None"
+          },
+          {
+            "value": "Private"
+          },
+          {
+            "value": "Organizational"
+          },
+          {
+            "value": "Public"
+          }
+        ],
+        "uiDefinition": {
+          "displayName": "Privacy Setting",
+          "description": "Privacy Setting",
+          "tooltip": "Privacy Setting",
+          "constraints": {
+            "tabIndex": 8,
+            "required": "false",
+            "hidden": "true",
+            "capability": [
+              "cloud",
+              "gateway"
+            ],
+            "allowedValues": [
+              {
+                "name": "None",
+                "value": "None"
+              },
+              {
+                "name": "Private",
+                "value": "Private"
+              },
+              {
+                "name": "Organizational",
+                "value": "Organizational"
+              },
+              {
+                "name": "Public",
+                "value": "Public"
+              }
+            ]
+          }
+        }
+      },
+      "sqlConnectionString": {
+        "type": "securestring",
+        "uiDefinition": {
+          "displayName": "SQL Connection String",
+          "description": "SQL Connection String",
+          "tooltip": "Password credential",
+          "constraints": {
+            "required": "false",
+            "hidden": "true"
+          }
+        }
+      }
+    },
+    "connectionParameterSets": {
+      "uiDefinition": {
+        "displayName": "Authentication Type",
+        "description": "Type of authentication to be used."
+      },
+      "values": [
+        {
+          "name": "oauth",
+          "uiDefinition": {
+            "displayName": "Azure AD Integrated",
+            "description": "Use Azure Active Directory to access your SQL database."
+          },
+          "parameters": {
+            "token": {
+              "type": "oauthSetting",
+              "oAuthSettings": {
+                "identityProvider": "aadcertificate",
+                "clientId": "7ab7862c-4c57-491e-8a45-d52a7e023983",
+                "scopes": [
+                ],
+                "redirectMode": "Global",
+                "redirectUrl": "https://global.consent.azure-apim.net/redirect",
+                "properties": {
+                  "IsFirstParty": "True",
+                  "AzureActiveDirectoryResourceId": "https://database.windows.net/"
+                },
+                "customParameters": {
+                  "resourceUri": {
+                    "value": "https://database.windows.net/"
+                  },
+                  "loginUri": {
+                    "value": "https://login.windows.net"
+                  },
+                  "loginUriAAD": {
+                    "value": "https://login.windows.net"
+                  }
+                }
+              },
+              "uiDefinition": {
+                "displayName": "Login with your Azure Active Directory Credentials",
+                "description": "Login with your Azure Active Directory Credentials",
+                "tooltip": "Provide  Azure Active Directory Credentials",
+                "constraints": {
+                  "required": "true"
+                }
+              }
+            },
+            "encryptConnection": {
+              "type": "bool",
+              "uiDefinition": {
+                "displayName": "Encrypt Connection",
+                "description": "Encrypt Connection",
+                "tooltip": "Encrypt Connection",
+                "constraints": {
+                  "hidden": "true",
+                  "required": "false",
+                  "capability": [
+                    "cloud",
+                    "gateway"
+                  ]
+                }
+              }
+            },
+            "privacySetting": {
+              "type": "string",
+              "allowedValues": [
+                {
+                  "value": "None"
+                },
+                {
+                  "value": "Private"
+                },
+                {
+                  "value": "Organizational"
+                },
+                {
+                  "value": "Public"
+                }
+              ],
+              "uiDefinition": {
+                "displayName": "Privacy Setting",
+                "description": "Privacy Setting",
+                "tooltip": "Privacy Setting",
+                "constraints": {
+                  "required": "false",
+                  "hidden": "true",
+                  "capability": [
+                    "cloud",
+                    "gateway"
+                  ],
+                  "allowedValues": [
+                    {
+                      "name": "None",
+                      "value": "None"
+                    },
+                    {
+                      "name": "Private",
+                      "value": "Private"
+                    },
+                    {
+                      "name": "Organizational",
+                      "value": "Organizational"
+                    },
+                    {
+                      "name": "Public",
+                      "value": "Public"
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "metadata": {
+            "allowSharing": false
+          }
+        },
+        {
+          "name": "sqlAuthentication",
+          "uiDefinition": {
+            "displayName": "SQL Server Authentication",
+            "description": "Use an account name and password to access your SQL database."
+          },
+          "parameters": {
+            "server": {
+              "type": "string",
+              "uiDefinition": {
+                "displayName": "SQL server name",
+                "description": "Specify the name of the SQL server (server[:port])",
+                "tooltip": "SQL server name",
+                "constraints": {
+                  "tabIndex": 1,
+                  "required": "true"
+                }
+              }
+            },
+            "database": {
+              "type": "string",
+              "uiDefinition": {
+                "displayName": "SQL database name",
+                "description": "SQL database name",
+                "tooltip": "SQL database name",
+                "constraints": {
+                  "tabIndex": 2,
+                  "required": "true"
+                }
+              }
+            },
+            "username": {
+              "type": "securestring",
+              "uiDefinition": {
+                "displayName": "Username",
+                "description": "Username credential",
+                "tooltip": "Username credential",
+                "constraints": {
+                  "tabIndex": 3,
+                  "clearText": true,
+                  "required": "true"
+                }
+              }
+            },
+            "password": {
+              "type": "securestring",
+              "uiDefinition": {
+                "displayName": "Password",
+                "description": "Password credential",
+                "tooltip": "Password credential",
+                "constraints": {
+                  "tabIndex": 4,
+                  "required": "true"
+                }
+              }
+            },
+            "gateway": {
+              "type": "gatewaySetting",
+              "gatewaySettings": {
+                "dataSourceType": "sql",
+                "credentialType": "Basic",
+                "connectionDetails": [
+                  "server",
+                  "database"
+                ]
+              },
+              "uiDefinition": {
+                "displayName": "Gateway",
+                "description": "On-prem gateway",
+                "tooltip": "On-prem gateway",
+                "constraints": {
+                  "tabIndex": 5,
+                  "required": "false"
+                }
+              }
+            },
+            "encryptConnection": {
+              "type": "bool",
+              "uiDefinition": {
+                "displayName": "Encrypt Connection",
+                "description": "Encrypt Connection",
+                "tooltip": "Encrypt Connection",
+                "constraints": {
+                  "hidden": "true",
+                  "tabIndex": 6,
+                  "required": "false",
+                  "capability": [
+                    "cloud",
+                    "gateway"
+                  ]
+                }
+              }
+            },
+            "privacySetting": {
+              "type": "string",
+              "allowedValues": [
+                {
+                  "value": "None"
+                },
+                {
+                  "value": "Private"
+                },
+                {
+                  "value": "Organizational"
+                },
+                {
+                  "value": "Public"
+                }
+              ],
+              "uiDefinition": {
+                "displayName": "Privacy Setting",
+                "description": "Privacy Setting",
+                "tooltip": "Privacy Setting",
+                "constraints": {
+                  "tabIndex": 7,
+                  "required": "false",
+                  "hidden": "true",
+                  "capability": [
+                    "cloud",
+                    "gateway"
+                  ],
+                  "allowedValues": [
+                    {
+                      "name": "None",
+                      "value": "None"
+                    },
+                    {
+                      "name": "Private",
+                      "value": "Private"
+                    },
+                    {
+                      "name": "Organizational",
+                      "value": "Organizational"
+                    },
+                    {
+                      "name": "Public",
+                      "value": "Public"
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "metadata": {
+            "allowSharing": true
+          }
+        },
+        {
+          "name": "windowsAuthentication",
+          "uiDefinition": {
+            "displayName": "Windows Authentication",
+            "description": "Use an on-premise Active Directory account name and password to access your SQL database."
+          },
+          "parameters": {
+            "server": {
+              "type": "string",
+              "uiDefinition": {
+                "displayName": "SQL server name",
+                "description": "Specify the name of the SQL server (server[:port])",
+                "tooltip": "SQL server name",
+                "constraints": {
+                  "tabIndex": 1,
+                  "required": "true"
+                }
+              }
+            },
+            "database": {
+              "type": "string",
+              "uiDefinition": {
+                "displayName": "SQL database name",
+                "description": "SQL database name",
+                "tooltip": "SQL database name",
+                "constraints": {
+                  "tabIndex": 2,
+                  "required": "true"
+                }
+              }
+            },
+            "username": {
+              "type": "securestring",
+              "uiDefinition": {
+                "displayName": "Username",
+                "description": "Username credential",
+                "tooltip": "Username credential",
+                "constraints": {
+                  "tabIndex": 3,
+                  "clearText": true,
+                  "required": "true"
+                }
+              }
+            },
+            "password": {
+              "type": "securestring",
+              "uiDefinition": {
+                "displayName": "Password",
+                "description": "Password credential",
+                "tooltip": "Password credential",
+                "constraints": {
+                  "tabIndex": 4,
+                  "required": "true"
+                }
+              }
+            },
+            "gateway": {
+              "type": "gatewaySetting",
+              "gatewaySettings": {
+                "dataSourceType": "sql",
+                "credentialType": "Windows",
+                "connectionDetails": [
+                  "server",
+                  "database"
+                ]
+              },
+              "uiDefinition": {
+                "displayName": "Gateway",
+                "description": "On-prem gateway",
+                "tooltip": "On-prem gateway",
+                "constraints": {
+                  "tabIndex": 5,
+                  "required": "true"
+                }
+              }
+            },
+            "encryptConnection": {
+              "type": "bool",
+              "uiDefinition": {
+                "displayName": "Encrypt Connection",
+                "description": "Encrypt Connection",
+                "tooltip": "Encrypt Connection",
+                "constraints": {
+                  "hidden": "true",
+                  "tabIndex": 6,
+                  "required": "false",
+                  "capability": [
+                    "cloud",
+                    "gateway"
+                  ]
+                }
+              }
+            },
+            "privacySetting": {
+              "type": "string",
+              "allowedValues": [
+                {
+                  "value": "None"
+                },
+                {
+                  "value": "Private"
+                },
+                {
+                  "value": "Organizational"
+                },
+                {
+                  "value": "Public"
+                }
+              ],
+              "uiDefinition": {
+                "displayName": "Privacy Setting",
+                "description": "Privacy Setting",
+                "tooltip": "Privacy Setting",
+                "constraints": {
+                  "tabIndex": 7,
+                  "required": "false",
+                  "hidden": "true",
+                  "capability": [
+                    "cloud",
+                    "gateway"
+                  ],
+                  "allowedValues": [
+                    {
+                      "name": "None",
+                      "value": "None"
+                    },
+                    {
+                      "name": "Private",
+                      "value": "Private"
+                    },
+                    {
+                      "name": "Organizational",
+                      "value": "Organizational"
+                    },
+                    {
+                      "name": "Public",
+                      "value": "Public"
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "metadata": {
+            "allowSharing": true
+          }
+        }
+      ]
+    },
+    "metadata": {
+      "source": "marketplace",
+      "brandColor": "#ba141a"
+    },
+    "runtimeUrls": [
+      "https://logic-apis-eastus.azure-apim.net/apim/sql"
+    ],
+    "generalInformation": {
+      "iconUrl": "https://connectoricons-prod.azureedge.net/releases/v1.0.1408/1.0.1408.2187/sql/icon.png",
+      "displayName": "SQL Server",
+      "description": "Microsoft SQL Server is a relational database management system developed by Microsoft. Connect to SQL Server to manage data. You can perform various actions such as create, update, get, and delete on rows in a table.",
+      "releaseTag": "Production",
+      "tier": "Premium"
+    },
+    "capabilities": [
+      "tabular",
+      "gateway",
+      "cloud"
+    ]
+  },
+  "id": "/subscriptions/aabbccdd-9cb5-4652-b245-aabbccddeeff/providers/Microsoft.Web/locations/eastus/managedApis/sql",
+  "name": "sql",
+  "type": "Microsoft.Web/locations/managedApis",
+  "location": "eastus"
+}

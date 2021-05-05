@@ -13,6 +13,9 @@ namespace LogicAppTemplate
         [Parameter(Mandatory = true, HelpMessage = "Name of the Artifact")]
         public string ArtifactName;
 
+        [Parameter(Mandatory = false, HelpMessage = "Type of the Artifact - only Schemas/Maps are supported right now. Default is Map for backward compatibility")]
+        public string ArtifactType;
+
         [Parameter(Mandatory = true, HelpMessage = "Name of the IntegrationAccount")]
         public string IntegrationAccount;
 
@@ -61,8 +64,9 @@ namespace LogicAppTemplate
             {
                 return;
             }
-            IntegrationAccountGenerator generator = new IntegrationAccountGenerator(ArtifactName, IntegrationAccountGenerator.ARtifactType.Maps, IntegrationAccount, SubscriptionId, ResourceGroup, resourceCollector);
 
+            IntegrationAccountGenerator generator = new IntegrationAccountGenerator(ArtifactName, IntegrationAccountGenerator.ARtifactType.Maps, IntegrationAccount, SubscriptionId, ResourceGroup, resourceCollector);
+            
             try
             {
 
