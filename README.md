@@ -16,6 +16,23 @@ Example when user is connected to multitenants:
 Example with diagnostic settings:
 `Get-LogicAppTemplate -LogicApp MyApp -ResourceGroup Integrate2016 -SubscriptionId 80d4fe69-xxxx-4dd2-a938-9250f1c8ab03 -DiagnosticSettings`
 
+### How to use (via Powershell Gallery)
+1. Open a Powershell session / console.
+2. Open PowerShell and Import the module(s):
+```powershell
+Install-Module Az.Accounts -Force #Only if you don't if you have it or not, it is safe to run when in doubt
+Import-Module Az.Accounts
+Install-Module LogicAppTemplate -Force
+Import-Module LogicAppTemplate
+#Ensure that you are signed into an account with enough permissions
+Login-AzAccount
+```
+3. Run the PowerShell command `Get-LogicAppTemplate`.
+```powershell
+$token = Get-AzAccessToken -ResourceUrl "https://management.azure.com" | Select-Object -ExpandProperty Token
+Get-LogicAppTemplate -LogicApp MyApp -ResourceGroup Integrate2016 -SubscriptionId 80d4fe69-xxxx-4dd2-a938-9250f1c8ab03 -Token $token -Verbose | Out-File C:\template.json
+```
+
 ### Important Change 2019-08-09
 There has been a change from previous version on parameters that where Boolean are now SwitchParameter there will be an error when you run it the first time.
 Error is easy fixed, in your script just remove the $true part in your command se example bellow:
