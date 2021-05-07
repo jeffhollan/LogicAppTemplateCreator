@@ -471,6 +471,12 @@ namespace LogicAppTemplate.Tests
             //check parameters Raw
             Assert.AreEqual(defintion["parameters"]["HTTP_4-Raw"]["defaultValue"], "myauthheader");
             Assert.AreEqual(defintion["resources"][0]["properties"]["definition"]["actions"]["HTTP_4"]["inputs"]["uri"], "[parameters('HTTP_4-URI')]");
+
+            //check parameters ManagedServiceIdentity
+            Assert.AreEqual(defintion["resources"][0]["properties"]["definition"]["actions"]["HTTP_5"]["inputs"]["uri"], "[parameters('HTTP_5-URI')]");
+
+            Assert.AreEqual(defintion["parameters"]["HTTP_6-Audience"]["defaultValue"], "myaudience");
+            Assert.AreEqual(defintion["resources"][0]["properties"]["definition"]["actions"]["HTTP_6"]["inputs"]["uri"], "[parameters('HTTP_6-URI')]");
         }
         /** Removed due to Changes in version, need to extract new files 
         [TestMethod]
