@@ -590,13 +590,21 @@ namespace LogicAppTemplate
                                     }
 
                                     break;
-                                }
+                                }                            
                             case "commondataservice":
+                            case "dynamicscrmonline":
                                 {
                                     var inputs = action.Value.Value<JObject>("inputs");
                                     var path = inputs.Value<string>("path").Replace("'", "''");
-                                    var pathsubsets = path.Split('/');
-                                    var dataset = pathsubsets[3];
+                                    var pathsubsets = Regex.Split(path, "(?<!/)/(?!/)");
+                                    var dataset = "";
+
+                                    var datasetIndex = Array.FindIndex(pathsubsets, pathsubset => pathsubset == "datasets") + 1;
+
+                                    if (datasetIndex < pathsubsets.Length)
+                                    {
+                                        dataset = pathsubsets[datasetIndex];
+                                    }
 
                                     var m = Regex.Match(dataset, @"\(''(.*)''\)");
                                     if (m.Groups.Count > 1)
@@ -628,6 +636,38 @@ namespace LogicAppTemplate
                                     }
                                     break;
                                 }
+                            case "azuredatafactory":
+                                {
+                                    AddTemplateParameter("__apostrophe", "string", "'");
+                                    var path = action.Value["inputs"].Value<string>("path");
+
+                                    var splittedPath = path.Split('/');
+                                    splittedPath[2] = "@{encodeURIComponent(', parameters('__apostrophe'),subscription().subscriptionId, parameters('__apostrophe'),')}";
+
+                                    var rgMatch = Regex.Match(splittedPath[4], "('(?<name>.*)')");
+                                    var rgName = rgMatch.Groups["name"].Value;
+
+                                    AddTemplateParameter("__apostrophe", "string", "'");
+                                    splittedPath[4] = "@{encodeURIComponent(', parameters('__apostrophe'),parameters('" + AddTemplateParameter(action.Name + "_ADF__ResourceGroup", "string", rgName) + "'), parameters('__apostrophe'),')}";
+
+                                    var adfMatch = Regex.Match(splittedPath[8], "('(?<name>.*)')");
+                                    var adfName = adfMatch.Groups["name"].Value;
+
+                                    splittedPath[8] = "@{encodeURIComponent(', parameters('__apostrophe'),parameters('" + AddTemplateParameter(action.Name + "_ADF__Instance", "string", adfName) + "'), parameters('__apostrophe'),')}";
+
+                                    var pipelineMatch = Regex.Match(splittedPath[10], "('(?<name>.*)')");
+                                    var pipelineName = pipelineMatch.Groups["name"].Value;
+
+                                    splittedPath[10] = "@{encodeURIComponent(', parameters('__apostrophe'),parameters('" + AddTemplateParameter(action.Name + "_ADF__Pipeline", "string", pipelineName) + "'), parameters('__apostrophe'),')}";
+
+                                    //"/subscriptions/@{encodeURIComponent('04a4ca35-9cb5-4652-b245-f1782aa43b25')}/resourcegroups/@{encodeURIComponent('azne-per-adf-dev02-rg')}/providers/Microsoft.DataFactory/factories/@{encodeURIComponent('azne-per-adf-dev02')}/pipelines/@{encodeURIComponent('INT159-FinancialData-Cognos')}/CreateRun",
+                                    //replace for gui
+                                    action.Value["inputs"]["path"] = "[concat('" + string.Join("/", splittedPath) + "')]";
+
+
+                                    break;
+                                }
+
                         }
                     }
                 }
@@ -689,12 +729,20 @@ namespace LogicAppTemplate
                                     break;
                                 }
                             case "commondataservice":
+                            case "dynamicscrmonline":
                                 {
 
                                     var inputs = trigger.Value.Value<JObject>("inputs");
                                     var path = inputs.Value<string>("path").Replace("'", "''");
-                                    var pathsubsets = path.Split('/');
-                                    var dataset = pathsubsets[2];
+                                    var pathsubsets = Regex.Split(path, "(?<!/)/(?!/)");
+                                    var dataset = "";
+
+                                    var datasetIndex = Array.FindIndex(pathsubsets, pathsubset => pathsubset == "datasets") + 1;
+
+                                    if (datasetIndex < pathsubsets.Length)
+                                    {
+                                        dataset = pathsubsets[datasetIndex];
+                                    }
 
                                     var m = Regex.Match(dataset, @"\(''(.*)''\)");
                                     if (m.Groups.Count > 1)
@@ -723,7 +771,7 @@ namespace LogicAppTemplate
                                     //replace for topic
                                     trigger.Value["inputs"]["body"]["properties"]["topic"] = "[concat('" + ri.ToString() + ")]";
                                     break;
-                                }
+                                }                          
                         }
                     }
 
@@ -1066,6 +1114,8 @@ namespace LogicAppTemplate
 
             return JObject.FromObject(connectionTemplate);
         }
+
+
         private async Task<JObject> HandleTags(JObject definition)
         {
             JObject result = new JObject();
