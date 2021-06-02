@@ -484,9 +484,14 @@ namespace LogicAppTemplate
                         }
                         else if ("ManagedServiceIdentity".Equals(authType, StringComparison.CurrentCultureIgnoreCase))
                         {
+                            var msiAudience = ((JObject)definition["actions"][action.Name]["inputs"]["authentication"]).Value<string>("audience");
+
                             //only add when not parameterized yet
-                            if (!Regex.IsMatch(((JObject)definition["actions"][action.Name]["inputs"]["authentication"]).Value<string>("audience"), @"parameters\('.*'\)"))
-                                definition["actions"][action.Name]["inputs"]["authentication"]["audience"] = "[parameters('" + AddTemplateParameter(action.Name + "-Audience", "string", ((JObject)definition["actions"][action.Name]["inputs"]["authentication"]).Value<string>("audience")) + "')]";
+                            //audience is not mandatory!
+                            if (msiAudience != null && !Regex.IsMatch(msiAudience, @"parameters\('.*'\)"))
+                            {
+                                definition["actions"][action.Name]["inputs"]["authentication"]["audience"] = "[parameters('" + AddTemplateParameter(action.Name + "-Audience", "string", msiAudience) + "')]";
+                            }
 
                             if (definition["actions"][action.Name]["inputs"]["authentication"]["identity"] != null)
                             {
@@ -499,7 +504,6 @@ namespace LogicAppTemplate
                                     identityResourceGroupAddtion = $"parameters('{Constants.UserAssignedIdentityParameterName}_resourceGroup'),";
                                     //template.parameters.Add($"{Constants.UserAssignedIdentityParameterName}_resourceGroup", JObject.FromObject(new { type = "string", defaultValue = identityResource.ResourceGroupName }));
                                 }
-
 
                                 //User Assigned Identity
                                 definition["actions"][action.Name]["inputs"]["authentication"]["identity"] = $"[resourceId({identityResourceGroupAddtion}'Microsoft.ManagedIdentity/userAssignedIdentities/', parameters('{Constants.UserAssignedIdentityParameterName}'))]";

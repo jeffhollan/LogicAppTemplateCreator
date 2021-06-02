@@ -113,6 +113,40 @@
             }
           ]
         },
+        "HTTP_5": {
+          "type": "Http",
+          "inputs": {
+            "authentication": {
+              "audience": null,
+              "identity": "myidentity",
+              "type": "ManagedServiceIdentity"
+            },
+            "method": "POST",
+            "uri": "http://google.se"
+          },
+          "conditions": [
+            {
+              "dependsOn": "HTTP_4"
+            }
+          ]
+        },
+        "HTTP_6": {
+          "type": "Http",
+          "inputs": {
+            "authentication": {
+              "audience": "myaudience",
+              "identity": "myidentity",
+              "type": "ManagedServiceIdentity"
+            },
+            "method": "POST",
+            "uri": "http://google.se"
+          },
+          "conditions": [
+            {
+              "dependsOn": "HTTP_4"
+            }
+          ]
+        },
         "Response": {
           "type": "Response",
           "inputs": {
