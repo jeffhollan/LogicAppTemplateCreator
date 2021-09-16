@@ -60,6 +60,9 @@ namespace LogicAppTemplate
         [Parameter(Mandatory = false, HelpMessage = "If supplied, Tags are not parameterized for the Logic App will not be output in the ARM template")]
         public SwitchParameter DisableTagParameters;
 
+        [Parameter(Mandatory = false, HelpMessage = "If supplied, EvaluatedRecurrence is added in the ARM template, this is a non documented object")]
+        public SwitchParameter IncludeEvaluatedRecurrence;
+
         [Parameter(Mandatory = false, HelpMessage = "If supplied, FunctionNames are not parameterized for the Logic App will not be output in the ARM template")]
         public SwitchParameter DisableFunctionNameParameters;
 
@@ -106,6 +109,7 @@ namespace LogicAppTemplate
                 FixedFunctionAppName = this.FixedFunctionAppName,
                 DisableConnectionsOutput = this.DisableConnectionGeneration,
                 DisableTagParameters = this.DisableTagParameters,
+                IncludeEvaluatedRecurrence = this.IncludeEvaluatedRecurrence,
                 DisableFunctionNameParameters = this.DisableFunctionNameParameters,
                 SkipOauthConnectionAuthorization = this.SkipOauthConnectionAuthorization,
                 UseServiceBusDisplayName = this.UseServiceBusDisplayName
