@@ -275,7 +275,7 @@ namespace LogicAppTemplate
             JArray result = new JArray();
 
             // Get diagnostic settings 
-            JObject resources = await resourceCollector.GetResource("https://management.azure.com" + definition.Value<string>("id") + "/providers/microsoft.insights/diagnosticSettings", "2017-05-01-preview");
+            JObject resources = await resourceCollector.GetResource("https://management.azure.com" + definition.Value<string>("id") + "/providers/microsoft.insights/diagnosticSettings", "2021-05-01-preview");
 
             foreach (JObject resourceProperty in resources["value"])
             {
