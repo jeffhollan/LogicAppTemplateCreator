@@ -56,6 +56,7 @@ namespace LogicAppTemplate
         public bool DisableConnectionsOutput { get; set; }
         public bool DisableTagParameters { get; set; }
         public bool DisableFunctionNameParameters { get; set; }
+        public bool IncludeEvaluatedRecurrence { get; set; }
         public bool SkipOauthConnectionAuthorization { get; set; }
         public bool UseServiceBusDisplayName { get; set; }
 
@@ -274,7 +275,7 @@ namespace LogicAppTemplate
             JArray result = new JArray();
 
             // Get diagnostic settings 
-            JObject resources = await resourceCollector.GetResource("https://management.azure.com" + definition.Value<string>("id") + "/providers/microsoft.insights/diagnosticSettings", "2017-05-01-preview");
+            JObject resources = await resourceCollector.GetResource("https://management.azure.com" + definition.Value<string>("id") + "/providers/microsoft.insights/diagnosticSettings", "2021-05-01-preview");
 
             foreach (JObject resourceProperty in resources["value"])
             {
@@ -590,7 +591,7 @@ namespace LogicAppTemplate
                                     }
 
                                     break;
-                                }                            
+                                }
                             case "commondataservice":
                             case "dynamicscrmonline":
                                 {
@@ -771,7 +772,7 @@ namespace LogicAppTemplate
                                     //replace for topic
                                     trigger.Value["inputs"]["body"]["properties"]["topic"] = "[concat('" + ri.ToString() + ")]";
                                     break;
-                                }                          
+                                }
                         }
                     }
 
@@ -798,6 +799,16 @@ namespace LogicAppTemplate
                         if (recurrence["schedule"] != null)
                         {
                             definition["triggers"][trigger.Name]["recurrence"]["schedule"] = "[parameters('" + this.AddTemplateParameter(trigger.Name + "Schedule", "Object", new JProperty("defaultValue", recurrence["schedule"])) + "')]";
+                        }
+                    }
+
+                    if (!IncludeEvaluatedRecurrence)
+                    {
+                        //remove the evaluatedRecurrence, we don't need it in the source
+                        var evaluatedRecurrence = trigger.Value.SelectToken("evaluatedRecurrence");
+                        if (evaluatedRecurrence != null)
+                        {
+                            ((JObject)definition["triggers"][trigger.Name]).Remove("evaluatedRecurrence");
                         }
                     }
 
