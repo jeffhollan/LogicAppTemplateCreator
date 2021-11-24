@@ -27,7 +27,7 @@ namespace LogicAppTemplate.Models
 
         public string apiVersion
         {
-            get { return "2017-05-01-preview"; }
+            get { return "2021-05-01-preview"; }
         }
 
         public DiagnosticSettingsProperties properties { get; set; }
