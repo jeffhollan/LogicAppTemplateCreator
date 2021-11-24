@@ -68,7 +68,7 @@ namespace LogicAppTemplate.Test
             Assert.AreEqual(1, metadata.Children().Count());
             Assert.AreEqual("[parameters('Get_blob_content-path')]", metadata.Value<string>("[base64(parameters('Get_blob_content-path'))]"));
 
-            Assert.AreEqual("[concat('/datasets/default/files/@{encodeURIComponent(encodeURIComponent(', parameters('__apostrophe'), base64(parameters('Get_blob_content-path')), parameters('__apostrophe'), '))}/content')]", blob["inputs"].Value<string>("path"));
+            Assert.AreEqual("[concat('/datasets/default/files/@{encodeURIComponent(encodeURIComponent(''', base64(parameters('Get_blob_content-path')), '''))}/content')]", blob["inputs"].Value<string>("path"));
 
 
 
@@ -78,7 +78,7 @@ namespace LogicAppTemplate.Test
             Assert.AreEqual(1, managermetadata.Children().Count());
             Assert.AreEqual("[parameters('Get_manger_blob-path')]", managermetadata.Value<string>("[base64(parameters('Get_manger_blob-path'))]"));
 
-            Assert.AreEqual("[concat('/datasets/default/files/@{encodeURIComponent(encodeURIComponent(', parameters('__apostrophe'), base64(parameters('Get_manger_blob-path')), parameters('__apostrophe'), '))}/content')]", managerblob["inputs"].Value<string>("path"));
+            Assert.AreEqual("[concat('/datasets/default/files/@{encodeURIComponent(encodeURIComponent(''', base64(parameters('Get_manger_blob-path')), '''))}/content')]", managerblob["inputs"].Value<string>("path"));
 
         }
 

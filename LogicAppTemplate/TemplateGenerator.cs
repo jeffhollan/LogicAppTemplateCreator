@@ -866,10 +866,10 @@ namespace LogicAppTemplate
             {
                 return $"[base64(parameters('{param}'))]";
             }
-            var replaced = currentValue.Replace($"'{base64string}'", $"', parameters('__apostrophe'), base64(parameters('{param}')), parameters('__apostrophe'), '");
+            var replaced = currentValue.Replace("'", "''").Replace($"{base64string}", $"', base64(parameters('{param}')), '");
 
             var newValue = $"[concat('{replaced}')]";
-            AddTemplateParameter("__apostrophe", "string", "'");
+            //AddTemplateParameter("__apostrophe", "string", "'");
 
             return newValue;
         }

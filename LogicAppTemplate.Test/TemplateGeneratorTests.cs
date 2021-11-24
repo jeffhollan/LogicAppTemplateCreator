@@ -266,7 +266,7 @@ namespace LogicAppTemplate.Tests
             //File trigger parameters and base64 handling
             Assert.IsNotNull(defintion["resources"][0]["properties"]["definition"]["actions"]["List_files_in_folder"]["metadata"]["[base64(parameters('List_files_in_folder-folderPath'))]"]);
             Assert.AreEqual("[parameters('List_files_in_folder-folderPath')]", defintion["resources"][0]["properties"]["definition"]["actions"]["List_files_in_folder"]["metadata"]["[base64(parameters('List_files_in_folder-folderPath'))]"]);
-            Assert.AreEqual("[concat('/datasets/default/folders/@{encodeURIComponent(encodeURIComponent(', parameters('__apostrophe'), base64(parameters('List_files_in_folder-folderPath')), parameters('__apostrophe'), '))}')]", defintion["resources"][0]["properties"]["definition"]["actions"]["List_files_in_folder"]["inputs"]["path"]);
+            Assert.AreEqual("[concat('/datasets/default/folders/@{encodeURIComponent(encodeURIComponent(''', base64(parameters('List_files_in_folder-folderPath')), '''))}')]", defintion["resources"][0]["properties"]["definition"]["actions"]["List_files_in_folder"]["inputs"]["path"]);
             //Assert.AreEqual("[base64(parameters('When_a_file_is_created-folderPath'))]", defintion["resources"][0]["properties"]["definition"]["triggers"]["When_a_file_is_created"]["inputs"]["queries"]["folderId"]);
         }
 
@@ -609,8 +609,7 @@ namespace LogicAppTemplate.Tests
             var defintion = generator.generateDefinition(JObject.Parse(content), false).GetAwaiter().GetResult();
 
             Assert.AreEqual("[parameters('Get_blob_content-path')]", defintion["resources"][0]["properties"]["definition"]["actions"]["Condition"]["actions"]["Get_blob_content"]["metadata"]["[base64(parameters('Get_blob_content-path'))]"]);
-            Assert.AreEqual("[concat('/datasets/default/files/@{encodeURIComponent(encodeURIComponent(', parameters('__apostrophe'), base64(parameters('Get_blob_content-path')), parameters('__apostrophe'), '))}/content')]", defintion["resources"][0]["properties"]["definition"]["actions"]["Condition"]["actions"]["Get_blob_content"]["inputs"]["path"]);
-            Assert.AreEqual("'", defintion["parameters"]["__apostrophe"]["defaultValue"].Value<string>());
+            Assert.AreEqual("[concat('/datasets/default/files/@{encodeURIComponent(encodeURIComponent(''', base64(parameters('Get_blob_content-path')), '''))}/content')]", defintion["resources"][0]["properties"]["definition"]["actions"]["Condition"]["actions"]["Get_blob_content"]["inputs"]["path"]);
 
             Assert.AreEqual("[concat('/subscriptions/',subscription().subscriptionId,'/providers/Microsoft.Web/locations/',parameters('logicAppLocation'),'/managedApis/azureblob')]", defintion["resources"][0]["properties"]["parameters"]["$connections"]["value"]["azureblob"]["id"]);
             Assert.AreEqual("[resourceId('Microsoft.Web/connections', parameters('azureblob_name'))]", defintion["resources"][0]["properties"]["parameters"]["$connections"]["value"]["azureblob"]["connectionId"]);
