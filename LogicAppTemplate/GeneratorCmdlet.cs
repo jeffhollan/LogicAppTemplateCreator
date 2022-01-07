@@ -72,6 +72,9 @@ namespace LogicAppTemplate
         [Parameter(Mandatory = false, HelpMessage = "If supplied, the ServiceBusDisplayNames is used within the parameters in the ARM template")]
         public SwitchParameter UseServiceBusDisplayName;
 
+        [Parameter(Mandatory = false, HelpMessage = "If supplied, the connections are generated with paramters only, no listkeys or other functions is added in the connection object")]
+        public SwitchParameter OnlyParameterizeConnections;
+
         protected override void ProcessRecord()
         {
             AzureResourceCollector resourceCollector = new AzureResourceCollector();
@@ -112,7 +115,8 @@ namespace LogicAppTemplate
                 IncludeEvaluatedRecurrence = this.IncludeEvaluatedRecurrence,
                 DisableFunctionNameParameters = this.DisableFunctionNameParameters,
                 SkipOauthConnectionAuthorization = this.SkipOauthConnectionAuthorization,
-                UseServiceBusDisplayName = this.UseServiceBusDisplayName
+                UseServiceBusDisplayName = this.UseServiceBusDisplayName,
+                OnlyParameterizeConnections = OnlyParameterizeConnections
             };
 
             try

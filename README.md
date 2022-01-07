@@ -65,6 +65,12 @@ New is that service bus connector now comes out with inputs needed for Azure Res
 | DisabledState | If supplied, the LA ARM Template will be set to Disabled and won't be automatically run when deployed | false |
 | ForceManagedIdentity | If supplied, Managed Identity for the Logic App will be set in the ARM template | false |
 | DisableConnectionGeneration | If supplied, Connections for the Logic App will not be output in the ARM template | false |
+| DisableTagParameters| If supplied, Tags are not parameterized for the Logic App will not be output in the ARM template | false |
+| IncludeEvaluatedRecurrence| If supplied, EvaluatedRecurrence is added in the ARM template, this is a non documented object | false |
+| DisableFunctionNameParameters| If supplied, FunctionNames are not parameterized for the Logic App will not be output in the ARM template | false |
+| SkipOauthConnectionAuthorization| If supplied, Oauth Connections Authorization are not set in the ARM template | false |
+| UseServiceBusDisplayName| If supplied, the ServiceBusDisplayNames is used within the parameters in the ARM template | false |
+| OnlyParameterizeConnections| If supplied, the connections are generated with paramters only, no listkeys or other functions is added in the connection object | false |
 
 After extraction a parameters file can be created off the LogicAppTemplate. (works on any ARM template file):
 
