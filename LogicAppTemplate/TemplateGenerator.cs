@@ -59,6 +59,7 @@ namespace LogicAppTemplate
         public bool IncludeEvaluatedRecurrence { get; set; }
         public bool SkipOauthConnectionAuthorization { get; set; }
         public bool UseServiceBusDisplayName { get; set; }
+        public bool OnlyParameterizeConnections = false;
 
         public async Task<JObject> GenerateTemplate()
         {
@@ -989,17 +990,17 @@ namespace LogicAppTemplate
                         }
 
 
-                        if ((parameter.Name == "accessKey" && concatedId.EndsWith("/azureblob')]")) || parameter.Name == "sharedkey" && concatedId.EndsWith("/azuretables')]"))
+                        if (OnlyParameterizeConnections == false && (parameter.Name == "accessKey" && concatedId.EndsWith("/azureblob')]")) || parameter.Name == "sharedkey" && concatedId.EndsWith("/azuretables')]"))
                         {
                             //handle different resourceGroups
 
                             connectionParameters.Add(parameter.Name, $"[listKeys(resourceId(parameters('{AddTemplateParameter(connectionName + "_resourceGroupName", "string", instanceResourceId.ResourceGroupName)}'),'Microsoft.Storage/storageAccounts', parameters('{connectionName}_accountName')), '2018-02-01').keys[0].value]");
                         }
-                        else if (parameter.Name == "sharedkey" && concatedId.EndsWith("/azurequeues')]"))
+                        else if (OnlyParameterizeConnections == false && (parameter.Name == "sharedkey" && concatedId.EndsWith("/azurequeues')]")))
                         {
                             connectionParameters.Add(parameter.Name, $"[listKeys(resourceId(parameters('{AddTemplateParameter(connectionName + "_resourceGroupName", "string", instanceResourceId.ResourceGroupName)}'),'Microsoft.Storage/storageAccounts', parameters('{connectionName}_storageaccount')), '2018-02-01').keys[0].value]");
                         }
-                        else if (concatedId.EndsWith("/servicebus')]"))
+                        else if (OnlyParameterizeConnections == false && concatedId.EndsWith("/servicebus')]"))
                         {
                             var serviceBus_displayName = (string)connectionInstance["properties"]?["displayName"];
                             if (string.IsNullOrEmpty(serviceBus_displayName) || !UseServiceBusDisplayName)
@@ -1014,7 +1015,7 @@ namespace LogicAppTemplate
                             connectionParameters.Add(parameter.Name, $"[listkeys(resourceId(parameters('{sb_resource_group_param}'),'Microsoft.ServiceBus/namespaces/authorizationRules', parameters('{namespace_param}'), parameters('{servicebus_auth_name_param}')), '2017-04-01').primaryConnectionString]");
 
                         }
-                        else if (concatedId.EndsWith("/azureeventgridpublish')]"))
+                        else if (OnlyParameterizeConnections == false && concatedId.EndsWith("/azureeventgridpublish')]"))
                         {
                             var url = connectionInstance["properties"]["nonSecretParameterValues"].Value<string>("endpoint");
                             var location = connectionInstance.Value<string>("location");
