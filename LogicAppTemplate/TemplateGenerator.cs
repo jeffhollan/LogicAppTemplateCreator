@@ -813,19 +813,55 @@ namespace LogicAppTemplate
                         }
                     }
 
-                    // http trigger
-                    if (trigger.Value.Value<string>("type") == "Request" && trigger.Value.Value<string>("kind") == "Http")
-                    {
-                        if (this.GenerateHttpTriggerUrlOutput)
-                        {
-                            JObject outputValue = JObject.FromObject(new
-                            {
-                                type = "string",
-                                value = $"[listCallbackURL(concat(resourceId(resourceGroup().name,'Microsoft.Logic/workflows/', parameters('logicAppName')), '/triggers/{trigger.Name}'), '2016-06-01').value]"
-                            });
 
-                            this.template.outputs.Add("httpTriggerUrl", outputValue);
-                        }
+                    var type = trigger.Value.SelectToken("type")?.Value<string>()?.ToLower();
+                    switch (type)
+                    {
+                        // http trigger
+                        case "request":
+                            {
+                                var kind = trigger.Value.SelectToken("kind")?.Value<string>()?.ToLower();
+                                if (kind == "http")
+                                {
+                                    if (this.GenerateHttpTriggerUrlOutput)
+                                    {
+                                        var outputValue = JObject.FromObject(new
+                                        {
+                                            type = "string",
+                                            value = $"[listCallbackURL(concat(resourceId(resourceGroup().name,'Microsoft.Logic/workflows/', parameters('logicAppName')), '/triggers/{trigger.Name}'), '2016-06-01').value]"
+                                        });
+
+                                        this.template.outputs.Add("httpTriggerUrl", outputValue);
+                                    }
+                                }
+
+                                break;
+                            }
+                        // apimanagement trigger
+                        case "apimanagement":
+                            {
+                                var apiId = ((JObject)definition["triggers"][trigger.Name]["inputs"]["api"]).Value<string>("id");
+                                var aaid = new AzureResourceId(apiId)
+                                {
+                                    SubscriptionId = "',subscription().subscriptionId,'"
+                                };
+
+                                aaid.ResourceGroupName = "', parameters('" + AddTemplateParameter("apimResourceGroup", "string", aaid.ResourceGroupName) + "'),'";
+                                aaid.ReplaceValueAfter("service", "', parameters('" + AddTemplateParameter("apimInstanceName", "string", aaid.ValueAfter("service")) + "'),'");
+                                aaid.ReplaceValueAfter("apis", "', parameters('" + AddTemplateParameter($"api_{aaid.ValueAfter("apis")}_name", "string", aaid.ValueAfter("apis")) + "'),'");
+                                apiId = "[concat('" + aaid.ToString() + "')]";
+
+                                definition["triggers"][trigger.Name]["inputs"]["api"]["id"] = apiId;
+
+                                //handle subscriptionkey if not parematrized
+                                var subkey = ((JObject)definition["triggers"][trigger.Name]["inputs"]).Value<string>("subscriptionKey");
+                                if (subkey != null && !Regex.Match(subkey, @"parameters\('(.*)'\)").Success)
+                                {
+                                    definition["triggers"][trigger.Name]["inputs"]["subscriptionKey"] = "[parameters('" + AddTemplateParameter("apimSubscriptionKey", "string", subkey) + "')]";
+                                }
+
+                                break;
+                            }
                     }
                 }
             }
