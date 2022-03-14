@@ -42,7 +42,7 @@ namespace LogicAppTemplate.Test
 
             var JsonMap = defintion.Value<JArray>("resources").First();
             Assert.AreEqual("[parameters('integrationAccountLocation')]", JsonMap.Value<string>("location"));
-            Assert.AreEqual("2016-06-01", JsonMap.Value<string>("apiVersion"));
+            Assert.AreEqual("2019-05-01", JsonMap.Value<string>("apiVersion"));
             Assert.AreEqual("Microsoft.Logic/integrationAccounts/maps", JsonMap.Value<string>("type"));
             Assert.AreEqual("Liquid", JsonMap["properties"].Value<string>("mapType"));
             Assert.AreEqual("text/plain", JsonMap["properties"].Value<string>("contentType"));
@@ -59,7 +59,7 @@ namespace LogicAppTemplate.Test
 
             var map = defintion.Value<JArray>("resources").First();
             Assert.AreEqual("[parameters('integrationAccountLocation')]", map.Value<string>("location"));
-            Assert.AreEqual("2016-06-01", map.Value<string>("apiVersion"));
+            Assert.AreEqual("2019-05-01", map.Value<string>("apiVersion"));
             Assert.AreEqual("Microsoft.Logic/integrationAccounts/maps", map.Value<string>("type"));
             Assert.AreEqual("Xslt", map["properties"].Value<string>("mapType"));
             Assert.IsNotNull(map["properties"].Value<JObject>("parametersSchema"));            

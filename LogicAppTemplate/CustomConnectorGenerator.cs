@@ -118,7 +118,7 @@ namespace LogicAppTemplate
             propertiesObject.Add("displayname", template.WrapParameterName(name));
             propertiesObject.Add("iconUri", resource["properties"].Value<string>("iconUri"));
 
-            resourceObject.Add("apiVersion", "2016-06-01");
+            resourceObject.Add("apiVersion", "2019-05-01");
             resourceObject.Add("location", template.WrapParameterName(location));
             resourceObject.Add("name", template.WrapParameterName(name));
             resourceObject.Add("type", resource.Value<string>("type"));
