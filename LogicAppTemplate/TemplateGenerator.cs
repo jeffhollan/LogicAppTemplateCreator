@@ -63,7 +63,7 @@ namespace LogicAppTemplate
 
         public async Task<JObject> GenerateTemplate()
         {
-            JObject _definition = await resourceCollector.GetResource($"https://management.azure.com/subscriptions/{SubscriptionId}/resourceGroups/{ResourceGroup}/providers/Microsoft.Logic/workflows/{LogicApp}", "2016-06-01");
+            JObject _definition = await resourceCollector.GetResource($"https://management.azure.com/subscriptions/{SubscriptionId}/resourceGroups/{ResourceGroup}/providers/Microsoft.Logic/workflows/{LogicApp}", "2019-05-01");
             return await generateDefinition(_definition, !DisableConnectionsOutput);
         }
 
