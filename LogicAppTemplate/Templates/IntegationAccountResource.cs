@@ -22,7 +22,7 @@ namespace LogicAppTemplate.Templates
         {
             tags = new JObject();
             properties = new JObject();
-            apiVersion = "2016-06-01";         
+            apiVersion = "2019-05-01";         
         }
 
         public static ARMTemplateClass FromString(string template)

@@ -53,7 +53,7 @@ namespace LogicAppTemplate.Test
 
             var workflow = defintion.Value<JArray>("resources").Where(jj => jj.Value<string>("type") == "Microsoft.Logic/workflows" && jj.Value<string>("name") == "[parameters('logicAppName')]").First();
             Assert.AreEqual("[parameters('logicAppLocation')]", workflow.Value<string>("location"));
-            Assert.AreEqual("2016-06-01", workflow.Value<string>("apiVersion"));
+            Assert.AreEqual("2019-05-01", workflow.Value<string>("apiVersion"));
 
             var dependsOn = workflow.Value<JArray>("dependsOn");
 
