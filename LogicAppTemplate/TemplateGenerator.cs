@@ -777,6 +777,31 @@ namespace LogicAppTemplate
                         }
                     }
 
+                    //parse query parameters
+                    if (trigger.Value.SelectToken("inputs.queries") != null)
+                    {
+                        foreach (var jToken in trigger.Value["inputs"]["queries"])
+                        {
+                            try
+                            {
+                                var query = jToken as JProperty;
+                                var queryValue = query?.Value?.Value<string>();
+
+                                //[ at the beginning has to be escaped with a extra [
+                                if (query.HasValues && queryValue.StartsWith("["))
+                                {
+                                    trigger.Value["inputs"]["queries"][query.Name] = queryValue = "[" + queryValue;
+                                }
+                            }
+                            catch (FormatException ex)
+                            {
+                            }
+                        }
+
+                        break;
+                    }
+
+
                     //promote parameters for reccurence settings
                     var recurrence = trigger.Value.SelectToken("recurrence");
                     if (recurrence != null)
