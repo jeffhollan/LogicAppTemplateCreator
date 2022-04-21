@@ -777,6 +777,8 @@ namespace LogicAppTemplate
                         }
                     }
 
+
+
                     //promote parameters for reccurence settings
                     var recurrence = trigger.Value.SelectToken("recurrence");
                     if (recurrence != null)
@@ -812,7 +814,31 @@ namespace LogicAppTemplate
                             ((JObject)definition["triggers"][trigger.Name]).Remove("evaluatedRecurrence");
                         }
                     }
+                    
+                    //parse query parameters
+                    var queries = trigger.Value.SelectToken("inputs.queries");
+                    if (queries != null)
+                    {
+                        foreach (var jToken in queries)
+                        {
+                            try
+                            {
+                                var query = jToken as JProperty;
+                                var queryValue = query?.Value?.Value<string>();
 
+                                //[ at the beginning has to be escaped with a extra [
+                                if (query.HasValues && queryValue.StartsWith("["))
+                                {
+                                    definition["triggers"][trigger.Name]["inputs"]["queries"][query.Name] = queryValue = "[" + queryValue;
+                                }
+                            }
+                            catch (FormatException ex)
+                            {
+                            }
+                        }
+
+                        break;
+                    }
 
                     var type = trigger.Value.SelectToken("type")?.Value<string>()?.ToLower();
                     switch (type)
