@@ -176,6 +176,7 @@ namespace LogicAppTemplate
 
             var managedIdentity = (JObject)definition["identity"];
 
+            JObject userAssignedIdentities = null;
             if (ForceManagedIdentity || (managedIdentity != null && managedIdentity.Value<string>("type") == "SystemAssigned"))
             {
                 template.resources[0].Add("identity", JObject.Parse("{'type': 'SystemAssigned'}"));
@@ -199,7 +200,7 @@ namespace LogicAppTemplate
 
 
                 //Create identity object for ARM template
-                var userAssignedIdentities = new JObject();
+                userAssignedIdentities = new JObject();
                 userAssignedIdentities.Add($"[resourceId({identityResourceGroupAddtion}'Microsoft.ManagedIdentity/userAssignedIdentities/', parameters('{Constants.UserAssignedIdentityParameterName}'))]", JObject.FromObject(new { }));
 
                 var userAssignedIdentity = new JObject();
@@ -222,6 +223,22 @@ namespace LogicAppTemplate
                 string id = connectionProperty.First.Value<string>("id");
                 string connectionName = connectionProperty.First["connectionName"] != null ? connectionProperty.First.Value<string>("connectionName") : connectionId.Split('/').Last();
 
+                var connectionProperties = connectionProperty.First["connectionProperties"] as JObject;
+                if (connectionProperties != null)
+                {
+                    //replace identity value with parsed one for userAssignedIdentities
+                    if (connectionProperties.ContainsKey("authentication"))
+                    {
+                        if (connectionProperties["authentication"]["identity"].Value<string>().Contains("userAssignedIdentities"))
+                        {
+                            connectionProperties["authentication"] = JObject.FromObject(new
+                            {
+                                type = connectionProperties["authentication"]?["type"],
+                                identity = ((JProperty)userAssignedIdentities.First).Name
+                            });
+                        }
+                    }
+                }
 
                 //fixes old templates where name sometimes is missing
 
@@ -250,6 +267,13 @@ namespace LogicAppTemplate
                     connectionId = $"[resourceId('Microsoft.Web/connections', parameters('{connectionNameParam}'))]",
                     connectionName = $"[parameters('{connectionNameParam}')]"
                 });
+
+                //Add connectionProperties if not null
+                if (connectionProperties != null)
+                {
+                    ((JObject)workflowTemplateReference["properties"]["parameters"]["$connections"]["value"][name])
+                        .Add("connectionProperties", connectionProperties);
+                }
 
                 if (generateConnection)
                 {
@@ -814,7 +838,7 @@ namespace LogicAppTemplate
                             ((JObject)definition["triggers"][trigger.Name]).Remove("evaluatedRecurrence");
                         }
                     }
-                    
+
                     //parse query parameters
                     var queries = trigger.Value.SelectToken("inputs.queries");
                     if (queries != null)
@@ -1051,8 +1075,10 @@ namespace LogicAppTemplate
                                 continue;
                         }
 
-
-                        if (OnlyParameterizeConnections == false && (parameter.Name == "accessKey" && concatedId.EndsWith("/azureblob')]")) || parameter.Name == "sharedkey" && concatedId.EndsWith("/azuretables')]"))
+                        if (OnlyParameterizeConnections == false && concatedId.EndsWith("/azureblob')]") && connectionInstance["properties"]["parameterValueSet"]?["name"].Value<string>() == "managedIdentityAuth")
+                        {
+                        }
+                        else if (OnlyParameterizeConnections == false && (parameter.Name == "accessKey" && concatedId.EndsWith("/azureblob')]")) || parameter.Name == "sharedkey" && concatedId.EndsWith("/azuretables')]"))
                         {
                             //handle different resourceGroups
 
