@@ -1047,6 +1047,9 @@ namespace LogicAppTemplate
             var connectionTemplate = new Models.ConnectionTemplate(connectionNameParam, concatedId);
             //displayName            
             connectionTemplate.properties.displayName = $"[parameters('{AddTemplateParameter(connectionName + "_displayName", "string", (string)connectionInstance["properties"]["displayName"])}')]";
+            //parameterValueSet
+            connectionTemplate.properties.parameterValueSet = connectionInstance["properties"]?["parameterValueSet"];
+            
             JObject connectionParameters = new JObject();
 
             bool useGateway = connectionInstance["properties"]?["parameterValueSet"]?["values"]?["gateway"] != null ||
@@ -1076,7 +1079,7 @@ namespace LogicAppTemplate
                         }
 
                         if (OnlyParameterizeConnections == false && concatedId.EndsWith("/azureblob')]") && connectionInstance["properties"]["parameterValueSet"]?["name"].Value<string>() == "managedIdentityAuth")
-                        {
+                        {                         
                         }
                         else if (OnlyParameterizeConnections == false && (parameter.Name == "accessKey" && concatedId.EndsWith("/azureblob')]")) || parameter.Name == "sharedkey" && concatedId.EndsWith("/azuretables')]"))
                         {
