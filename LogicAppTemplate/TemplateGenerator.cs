@@ -1091,6 +1091,15 @@ namespace LogicAppTemplate
                         {
                             connectionParameters.Add(parameter.Name, $"[listKeys(resourceId(parameters('{AddTemplateParameter(connectionName + "_resourceGroupName", "string", instanceResourceId.ResourceGroupName)}'),'Microsoft.Storage/storageAccounts', parameters('{connectionName}_storageaccount')), '2018-02-01').keys[0].value]");
                         }
+                        else if (OnlyParameterizeConnections == false && concatedId.EndsWith("/servicebus')]") && connectionInstance["properties"]["parameterValueSet"]?["name"].Value<string>() == "managedIdentityAuth")
+                        {        
+                            //Check for namespaceEndpoint property exist and is not null
+                            var namespaceEndpoint_param = AddTemplateParameter($"servicebus_namespaceEndpoint", "string", connectionInstance["properties"]?["parameterValueSet"]?["values"]?["namespaceEndpoint"]?["value"]);
+                            if (namespaceEndpoint_param != null)
+                            {
+                                connectionInstance["properties"]["parameterValueSet"]["values"]["namespaceEndpoint"]["value"] = $"[parameters('{namespaceEndpoint_param}')]";
+                            }
+                        }
                         else if (OnlyParameterizeConnections == false && concatedId.EndsWith("/servicebus')]"))
                         {
                             var serviceBus_displayName = (string)connectionInstance["properties"]?["displayName"];
