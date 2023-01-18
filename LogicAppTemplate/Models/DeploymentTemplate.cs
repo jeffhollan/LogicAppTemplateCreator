@@ -21,12 +21,16 @@ namespace LogicAppTemplate.Models
             {
                 return "1.0.0.0";
             } }
-
+        
+        [JsonProperty(NullValueHandling = NullValueHandling.Ignore)]
         public JObject parameters { get; set; }
+
+        [JsonProperty(NullValueHandling = NullValueHandling.Ignore)]
         public JObject variables { get; set; }
 
         public IList<JObject> resources { get; set; }
 
+        [JsonProperty(NullValueHandling = NullValueHandling.Ignore)]
         public JObject outputs { get; set; }
     }
 }

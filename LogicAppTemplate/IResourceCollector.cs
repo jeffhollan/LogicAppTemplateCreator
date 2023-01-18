@@ -9,6 +9,7 @@ namespace LogicAppTemplate
         Task<JObject> GetResource(string resourceId, string apiVersion = null, string suffix = "");
 
         Task<string> GetRawResource(string resourceId, string apiVersion = null, string suffix = "");
-        
+
+        Task<JArray> GetRoles(string scope, string filter, string apiVersion = "");
     }
 }

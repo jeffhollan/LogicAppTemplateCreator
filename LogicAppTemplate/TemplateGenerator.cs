@@ -2,6 +2,7 @@ using LogicAppTemplate.Models;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -60,6 +61,7 @@ namespace LogicAppTemplate
         public bool SkipOauthConnectionAuthorization { get; set; }
         public bool UseServiceBusDisplayName { get; set; }
         public bool OnlyParameterizeConnections = false;
+        public bool GenerateManagedIdentityRoleAssignment { get; set; }
 
         public async Task<JObject> GenerateTemplate()
         {
@@ -211,6 +213,37 @@ namespace LogicAppTemplate
                 template.resources[0].Add("identity", userAssignedIdentity);
             }
 
+            //Add ManagedIdentityRoleAssignment
+            if (GenerateManagedIdentityRoleAssignment && managedIdentity != null)
+            {
+                var principalId = managedIdentity.Value<string>("principalId");
+                var filter = $"assignedTo('{principalId}')";
+                var roles = (await resourceCollector.GetRoles($"subscriptions/{rid.SubscriptionId}", filter)).ToList();
+
+                if (roles.Any())
+                {
+                    foreach (var roleByScope in roles.Select(t => t.ToObject<Models.RoleAssignmentsTemplate>()).GroupBy(s => s.properties.scope))
+                    {
+                        //create template
+                        var scope = new AzureResourceId(roleByScope.Key);
+                        var roleAssignmentsResourceGroupName = AddTemplateParameter($"{scope.Provider.Item2}_ResourceGroupName", "string", scope.ResourceGroupName);
+
+                        var deploymentTemplate = new DeploymentTemplates($"[concat(parameters('{roleAssignmentsResourceGroupName}'), '_roleAssignments')]", $"[parameters('{roleAssignmentsResourceGroupName}')]");
+
+                        foreach (var roleAssignmentTemplate in roleByScope)
+                        {
+                            var roleAssignmentsResourceName = AddTemplateParameter($"{scope.Provider.Item2}_Name", "string", scope.ResourceName);
+                            roleAssignmentTemplate.scope = $"[concat('/{scope.Provider.Item1}/{scope.Provider.Item2}/', parameters('{roleAssignmentsResourceName}'))]";
+                            deploymentTemplate.AddResource(roleAssignmentTemplate.ToJObject());
+                        }
+
+                        template.resources.Add(deploymentTemplate.ToJObject());
+                    }
+                }
+
+
+            }
+
             // WriteVerbose("Checking connections...");
             if (connections == null)
                 return JObject.FromObject(template);
@@ -229,7 +262,7 @@ namespace LogicAppTemplate
                     //replace identity value with parsed one for userAssignedIdentities
                     if (connectionProperties.ContainsKey("authentication"))
                     {
-                        if (connectionProperties["authentication"]["identity"].Value<string>().Contains("userAssignedIdentities"))
+                        if (connectionProperties["authentication"]?["identity"]?.Value<string>()?.Contains("userAssignedIdentities") == true)
                         {
                             connectionProperties["authentication"] = JObject.FromObject(new
                             {
@@ -289,6 +322,7 @@ namespace LogicAppTemplate
 
                     template.resources.Insert(1, connectionTemplate);
                 }
+
             }
 
             // WriteVerbose("Finalizing Template...");
@@ -1049,7 +1083,7 @@ namespace LogicAppTemplate
             connectionTemplate.properties.displayName = $"[parameters('{AddTemplateParameter(connectionName + "_displayName", "string", (string)connectionInstance["properties"]["displayName"])}')]";
             //parameterValueSet
             connectionTemplate.properties.parameterValueSet = connectionInstance["properties"]?["parameterValueSet"];
-            
+
             JObject connectionParameters = new JObject();
 
             bool useGateway = connectionInstance["properties"]?["parameterValueSet"]?["values"]?["gateway"] != null ||
@@ -1079,7 +1113,7 @@ namespace LogicAppTemplate
                         }
 
                         if (OnlyParameterizeConnections == false && concatedId.EndsWith("/azureblob')]") && connectionInstance["properties"]["parameterValueSet"]?["name"].Value<string>() == "managedIdentityAuth")
-                        {                         
+                        {
                         }
                         else if (OnlyParameterizeConnections == false && (parameter.Name == "accessKey" && concatedId.EndsWith("/azureblob')]")) || parameter.Name == "sharedkey" && concatedId.EndsWith("/azuretables')]"))
                         {
@@ -1092,7 +1126,7 @@ namespace LogicAppTemplate
                             connectionParameters.Add(parameter.Name, $"[listKeys(resourceId(parameters('{AddTemplateParameter(connectionName + "_resourceGroupName", "string", instanceResourceId.ResourceGroupName)}'),'Microsoft.Storage/storageAccounts', parameters('{connectionName}_storageaccount')), '2018-02-01').keys[0].value]");
                         }
                         else if (OnlyParameterizeConnections == false && concatedId.EndsWith("/servicebus')]") && connectionInstance["properties"]["parameterValueSet"]?["name"].Value<string>() == "managedIdentityAuth")
-                        {        
+                        {
                             //Check for namespaceEndpoint property exist and is not null
                             var namespaceEndpoint_param = AddTemplateParameter($"servicebus_namespaceEndpoint", "string", connectionInstance["properties"]?["parameterValueSet"]?["values"]?["namespaceEndpoint"]?["value"]);
                             if (namespaceEndpoint_param != null)

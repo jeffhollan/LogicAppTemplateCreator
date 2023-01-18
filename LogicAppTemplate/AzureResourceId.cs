@@ -45,6 +45,31 @@ namespace LogicAppTemplate
                 }
             }
         }
+        public Tuple<string, string> Provider
+        {
+            get
+            {
+                for (var i = 0; i < splittedId.Length; i++)
+                {
+                    if (splittedId[i] == "providers")
+                    {
+                        return new Tuple<string, string>(splittedId[i+1], splittedId[i+2]);
+                    }
+                }
+                return null;
+            }
+            set
+            {
+                for (var i = 0; i < splittedId.Length; i++)
+                {
+                    if (splittedId[i] == "providers")
+                    {
+                        splittedId[i + 1] = value.Item1;
+                        splittedId[i + 2] = value.Item2;
+                    }
+                }
+            }
+        }
         public string ResourceName
         {
             get

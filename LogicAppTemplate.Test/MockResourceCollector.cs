@@ -25,6 +25,11 @@ namespace LogicAppTemplate.Test
             return t;
         }
 
+        public Task<JArray> GetRoles(string scope, string filter, string apiVersion = "")
+        {
+            throw new NotImplementedException();
+        }
+
         public Task<JObject> GetResource(string resourceId, string apiVersion, string suffix = "")
         {
             var t = new Task<JObject>(() => { return JObject.Parse(Utils.GetEmbededFileContent($"LogicAppTemplate.Test.TestFiles.Samples.{basepath}.{resourceId.Split('/').SkipWhile((a) => { return a != "providers" && a != "integrationAccounts"; }).Aggregate<string>((b, c) => { return b + "-" + c; })}.json")); });
