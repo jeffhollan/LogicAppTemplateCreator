@@ -98,9 +98,11 @@
     <Compile Include="CustomConnectorGenerator.cs" />
     <Compile Include="IntegrationAccountGenerator.cs" />
     <Compile Include="IResourceCollector.cs" />
+    <Compile Include="Models\DeploymentTemplates.cs" />
     <Compile Include="Models\DiagnosticSettingsTemplate.cs" />
     <Compile Include="Models\NestedResourceTemplate.cs" />
     <Compile Include="Models\ParameterTemplate.cs" />
+    <Compile Include="Models\RoleAssignmentsTemplate.cs" />
     <Compile Include="NestedTemplateGenerator.cs" />
     <Compile Include="ParamGenerator.cs" />
     <Compile Include="TemplateGenerator.cs" />

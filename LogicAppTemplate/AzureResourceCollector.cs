@@ -54,7 +54,7 @@ namespace LogicAppTemplate
 
             if (response.StatusCode == HttpStatusCode.NotFound)
             {
-                throw new Exception("Reesource Not found, resource: " + resourceId);
+                throw new Exception("Resource Not found, resource: " + resourceId);
             }
             else if (response.StatusCode == HttpStatusCode.Forbidden)
             {
@@ -65,6 +65,34 @@ namespace LogicAppTemplate
             {
                 System.IO.File.WriteAllText(DebugOutputFolder + "\\" + resourceId.Split('/').SkipWhile((a) => { return a != "providers" && a != "integrationAccounts"; }).Aggregate<string>((b, c) => { return b + "-" + c; }) + ".json", responseContent);
             }
+            return responseContent;
+        }
+        
+        public async Task<JArray> GetRoles(string scope, string filter, string apiVersion)
+        {
+            return JObject.Parse(await GetRawRoles(scope, apiVersion, filter)).Value<JArray>("value");
+        }
+
+        public async Task<string> GetRawRoles(string scope, string apiVersion, string filter = null)
+        {
+            var url = $"https://management.azure.com/{scope}/providers/Microsoft.Authorization/roleAssignments?api-version={(string.IsNullOrEmpty(apiVersion) ? "2022-04-01" : apiVersion)}{(string.IsNullOrEmpty(filter) ? "" : $"&$filter={filter}")}";
+            client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
+            var response = await client.GetAsync(url);
+
+            if (response.StatusCode == HttpStatusCode.NotFound)
+            {
+                throw new Exception("Roles Not found, resource: " + scope);
+            }
+            else if (response.StatusCode == HttpStatusCode.Forbidden)
+            {
+                throw new Exception("Authorization failed, httpstatus: " + response.StatusCode);
+            }
+            var responseContent = await response.Content.ReadAsStringAsync();
+            if (!string.IsNullOrEmpty(DebugOutputFolder))
+            {
+                System.IO.File.WriteAllText(DebugOutputFolder + "\\" + scope.Split('/').SkipWhile((a) => { return a != "providers" && a != "integrationAccounts"; }).Aggregate<string>((b, c) => { return b + "-" + c; }) + ".json", responseContent);
+            }
+            
             return responseContent;
         }
     }

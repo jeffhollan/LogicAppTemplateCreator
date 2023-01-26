@@ -75,6 +75,9 @@ namespace LogicAppTemplate
         [Parameter(Mandatory = false, HelpMessage = "If supplied, the connections are generated with paramters only, no listkeys or other functions is added in the connection object")]
         public SwitchParameter OnlyParameterizeConnections;
 
+        [Parameter(Mandatory = false, HelpMessage = "If supplied, the RoleAssignments for ManagedIdentities are generated")]
+        public SwitchParameter GenerateManagedIdentityRoleAssignment;
+
         protected override void ProcessRecord()
         {
             AzureResourceCollector resourceCollector = new AzureResourceCollector();
@@ -116,7 +119,8 @@ namespace LogicAppTemplate
                 DisableFunctionNameParameters = this.DisableFunctionNameParameters,
                 SkipOauthConnectionAuthorization = this.SkipOauthConnectionAuthorization,
                 UseServiceBusDisplayName = this.UseServiceBusDisplayName,
-                OnlyParameterizeConnections = OnlyParameterizeConnections
+                OnlyParameterizeConnections = this.OnlyParameterizeConnections,
+                GenerateManagedIdentityRoleAssignment = this.GenerateManagedIdentityRoleAssignment
             };
 
             try
@@ -146,6 +150,8 @@ namespace LogicAppTemplate
                 }
             }
         }
+
+
         private string GetClipboardText()
         {
             string strClipboard = string.Empty;
