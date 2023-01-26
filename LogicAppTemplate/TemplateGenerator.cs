@@ -1114,12 +1114,17 @@ namespace LogicAppTemplate
 
                         if (OnlyParameterizeConnections == false && concatedId.EndsWith("/azureblob')]") && connectionInstance["properties"]["parameterValueSet"]?["name"].Value<string>() == "managedIdentityAuth")
                         {
+                            //ignore
                         }
                         else if (OnlyParameterizeConnections == false && parameter.Name == "accessKey" && concatedId.EndsWith("/azureblob')]"))
                         {
                             //handle different resourceGroups
 
                             connectionParameters.Add(parameter.Name, $"[listKeys(resourceId(parameters('{AddTemplateParameter(connectionName + "_resourceGroupName", "string", instanceResourceId.ResourceGroupName)}'),'Microsoft.Storage/storageAccounts', parameters('{connectionName}_accountName')), '2018-02-01').keys[0].value]");
+                        }
+                        else if (OnlyParameterizeConnections == false && concatedId.EndsWith("/azuretables')]") && connectionInstance["properties"]["parameterValueSet"]?["name"].Value<string>() == "managedIdentityAuth")
+                        {
+                            //ignore
                         }
                         else if (OnlyParameterizeConnections == false && parameter.Name == "sharedkey" && concatedId.EndsWith("/azuretables')]"))
                         {
