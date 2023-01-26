@@ -214,7 +214,7 @@ namespace LogicAppTemplate
             }
 
             //Add ManagedIdentityRoleAssignment
-            if (GenerateManagedIdentityRoleAssignment && managedIdentity != null)
+            if (GenerateManagedIdentityRoleAssignment && managedIdentity?.Value<string>("type") == "SystemAssigned")
             {
                 var principalId = managedIdentity.Value<string>("principalId");
                 var filter = $"assignedTo('{principalId}')";
