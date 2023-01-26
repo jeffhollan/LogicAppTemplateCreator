@@ -1115,11 +1115,17 @@ namespace LogicAppTemplate
                         if (OnlyParameterizeConnections == false && concatedId.EndsWith("/azureblob')]") && connectionInstance["properties"]["parameterValueSet"]?["name"].Value<string>() == "managedIdentityAuth")
                         {
                         }
-                        else if (OnlyParameterizeConnections == false && (parameter.Name == "accessKey" && concatedId.EndsWith("/azureblob')]")) || parameter.Name == "sharedkey" && concatedId.EndsWith("/azuretables')]"))
+                        else if (OnlyParameterizeConnections == false && parameter.Name == "accessKey" && concatedId.EndsWith("/azureblob')]"))
                         {
                             //handle different resourceGroups
 
                             connectionParameters.Add(parameter.Name, $"[listKeys(resourceId(parameters('{AddTemplateParameter(connectionName + "_resourceGroupName", "string", instanceResourceId.ResourceGroupName)}'),'Microsoft.Storage/storageAccounts', parameters('{connectionName}_accountName')), '2018-02-01').keys[0].value]");
+                        }
+                        else if (OnlyParameterizeConnections == false && parameter.Name == "sharedkey" && concatedId.EndsWith("/azuretables')]"))
+                        {
+                            //handle different resourceGroups
+
+                            connectionParameters.Add(parameter.Name, $"[listKeys(resourceId(parameters('{AddTemplateParameter(connectionName + "_resourceGroupName", "string", instanceResourceId.ResourceGroupName)}'),'Microsoft.Storage/storageAccounts', parameters('{connectionName}_storageaccount')), '2018-02-01').keys[0].value]");
                         }
                         else if (OnlyParameterizeConnections == false && (parameter.Name == "sharedkey" && concatedId.EndsWith("/azurequeues')]")))
                         {
