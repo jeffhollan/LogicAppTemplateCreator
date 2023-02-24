@@ -34,13 +34,14 @@ namespace LogicAppTemplate.Models
         {
             var retVal = new RoleAssignmentsTemplate
             {
-                name = name,                    
+                name = $"[guid(parameters('storageAccounts_ResourceGroupName'), parameters('logicAppName'), '{new AzureResourceId(properties.roleDefinitionId).ResourceName}')]",                    
                 scope = scope,
                 properties = new RoleAssignmentsProperties
                 {
                     roleDefinitionId = $"[concat(subscription().Id, '/providers/Microsoft.Authorization/roleDefinitions/{new AzureResourceId(properties.roleDefinitionId).ResourceName}')]",
                     principalId = $"[reference(concat(resourceId('Microsoft.Logic/workflows', parameters('logicAppName')), '/providers/Microsoft.ManagedIdentity/Identities/default'), '2018-11-30').principalId]",
-                    displayName = "RoleAssignments_" + name
+                    displayName = $"[concat('RoleAssignments_', guid(parameters('storageAccounts_ResourceGroupName'), parameters('logicAppName'), '{new AzureResourceId(properties.roleDefinitionId).ResourceName}'))]"
+
                 }
             };
 
