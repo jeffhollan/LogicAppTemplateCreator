@@ -232,9 +232,7 @@ namespace LogicAppTemplate
 
                         foreach (var roleAssignmentTemplate in roleByScope)
                         {
-                            var roleAssignmentsResourceName = AddTemplateParameter($"{scope.Provider.Item2}_Name", "string", scope.ResourceName);
-                            roleAssignmentTemplate.scope = $"[concat('/{scope.Provider.Item1}/{scope.Provider.Item2}/', parameters('{roleAssignmentsResourceName}'))]";
-                            deploymentTemplate.AddResource(roleAssignmentTemplate.ToJObject());
+                           deploymentTemplate.AddResource(roleAssignmentTemplate.GenerateJObject(AddTemplateParameter));
                         }
 
                         template.resources.Add(deploymentTemplate.ToJObject());
