@@ -230,7 +230,7 @@ namespace LogicAppTemplate
                         var scope = new AzureResourceId(roleByScope.Key);
                         var roleAssignmentsResourceGroupName = AddTemplateParameter($"{scope.Provider.Item2}_ResourceGroupName", "string", scope.ResourceGroupName);
 
-                        var deploymentTemplate = new DeploymentTemplates($"[concat(parameters('{roleAssignmentsResourceGroupName}'), '_roleAssignments')]", $"[parameters('{roleAssignmentsResourceGroupName}')]");
+                        var deploymentTemplate = new DeploymentTemplates($"[concat(parameters('logicAppName'), '_roles')]", $"[parameters('{roleAssignmentsResourceGroupName}')]");
 
                         foreach (var roleAssignmentTemplate in roleByScope)
                         {
@@ -1324,8 +1324,15 @@ namespace LogicAppTemplate
                 var gatewayname = AddTemplateParameter($"{connectionName}_gatewayname", "string", rid.ResourceName);
                 var resourcegroup = AddTemplateParameter($"{connectionName}_gatewayresourcegroup", "string", rid.ResourceGroupName);
 
+                var subscriptionId = "subscription().subscriptionId";
+                if (instanceResourceId.SubscriptionId != rid.SubscriptionId)
+                {
+                    subscriptionId = $"parameters('{AddTemplateParameter($"{connectionName}_gatewaysubscriptionId", "string", rid.SubscriptionId)}')";
+                }
                 var gatewayobject = new JObject();
-                gatewayobject["id"] = $"[concat('/subscriptions/',subscription().subscriptionId,'/resourceGroups/',parameters('{resourcegroup}'),'/providers/Microsoft.Web/connectionGateways/',parameters('{gatewayname}'))]";
+
+
+                gatewayobject["id"] = $"[concat('/subscriptions/',{subscriptionId},'/resourceGroups/',parameters('{resourcegroup}'),'/providers/Microsoft.Web/connectionGateways/',parameters('{gatewayname}'))]";
                 connectionParameters.Add("gateway", gatewayobject);
                 useGateway = true;
 
