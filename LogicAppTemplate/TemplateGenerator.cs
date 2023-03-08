@@ -8,6 +8,7 @@ using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using System.Web;
 
 namespace LogicAppTemplate
 {
@@ -62,6 +63,7 @@ namespace LogicAppTemplate
         public bool UseServiceBusDisplayName { get; set; }
         public bool OnlyParameterizeConnections = false;
         public bool GenerateManagedIdentityRoleAssignment { get; set; }
+        public bool ParameterizeApiDefinitionUrl { get; set; }
 
         public async Task<JObject> GenerateTemplate()
         {
@@ -232,9 +234,7 @@ namespace LogicAppTemplate
 
                         foreach (var roleAssignmentTemplate in roleByScope)
                         {
-                            var roleAssignmentsResourceName = AddTemplateParameter($"{scope.Provider.Item2}_Name", "string", scope.ResourceName);
-                            roleAssignmentTemplate.scope = $"[concat('/{scope.Provider.Item1}/{scope.Provider.Item2}/', parameters('{roleAssignmentsResourceName}'))]";
-                            deploymentTemplate.AddResource(roleAssignmentTemplate.ToJObject());
+                           deploymentTemplate.AddResource(roleAssignmentTemplate.GenerateJObject(AddTemplateParameter));
                         }
 
                         template.resources.Add(deploymentTemplate.ToJObject());
@@ -506,9 +506,74 @@ namespace LogicAppTemplate
                 }
                 else if (type == "http")
                 {
+                    var apiDefinitionUrl = definition["actions"]?[action.Name]?["metadata"]?["apiDefinitionUrl"];
+                    if (ParameterizeApiDefinitionUrl)
+                    {
+                        if (apiDefinitionUrl != null)
+                        {
+                            //get hostname from apiDefinitionUrl
+                            var apiDefinitionUri =
+                                new Uri(((JObject) definition["actions"][action.Name]["metadata"]).Value<string>(
+                                    "apiDefinitionUrl"));
+                            var apiDefinitionHostname = apiDefinitionUri.GetLeftPart(UriPartial.Authority);
+                            var apiDefinitionHostnameParam =
+                                AddTemplateParameter(action.Name + "-ApiDefinitionUrlHostname", "string",
+                                    apiDefinitionHostname);
+                            var apiDefinitionUriPathAndQuery = apiDefinitionUri.AbsolutePath;
+                            if (!string.IsNullOrEmpty(apiDefinitionUri.Query))
+                            {
+                                var queryDictionary = HttpUtility.ParseQueryString(apiDefinitionUri.Query);
+
+                                var querySeperator = "?";
+                                foreach (string key in queryDictionary)
+                                {
+                                    var value = queryDictionary.Get(key);
+                                    var queryParameterName = AddTemplateParameter(action.Name + "-ApiDefinition-" + key,
+                                        "string", value);
+
+                                    apiDefinitionUriPathAndQuery += querySeperator + key + "=', parameters('" +
+                                                                    queryParameterName + "')";
+                                    querySeperator = "&";
+                                }
+
+                            }
+                            else
+                            {
+                                apiDefinitionUriPathAndQuery += "'";
+                            }
+
+                            definition["actions"][action.Name]["metadata"]["apiDefinitionUrl"] =
+                                "[concat(parameters('" + apiDefinitionHostnameParam + "'), '" +
+                                apiDefinitionUriPathAndQuery + ")]";
+
+                            var apiUri =
+                                new Uri(((JObject) definition["actions"][action.Name]["inputs"]).Value<string>("uri"));
+                            var apiHostname = apiDefinitionUri.GetLeftPart(UriPartial.Authority);
+                            var apiHostnameParam = apiDefinitionHostname == apiHostname
+                                ? apiDefinitionHostnameParam
+                                : AddTemplateParameter(action.Name + "-UriHostname", "string", apiHostname);
+
+                            var pathAndQuery = apiUri.PathAndQuery.Replace("'", "', parameters('__apostrophe'), '");
+
+                            definition["actions"][action.Name]["inputs"]["uri"] = "[concat(parameters('" +
+                                apiHostnameParam + "'), '" + pathAndQuery + "')]";
+                            AddTemplateParameter("__apostrophe", "string", "'");
+                        } 
+
+                        //only add when not parameterized yet
+                        else if (!Regex.IsMatch(((JObject)definition["actions"][action.Name]["inputs"]).Value<string>("uri"), @"parameters\('.*'\)"))
+                            definition["actions"][action.Name]["inputs"]["uri"] = "[parameters('" + AddTemplateParameter(action.Name + "-URI", "string", ((JObject)definition["actions"][action.Name]["inputs"]).Value<string>("uri")) + "')]";
+
+                    }
+                    else
                     //only add when not parameterized yet
                     if (!Regex.IsMatch(((JObject)definition["actions"][action.Name]["inputs"]).Value<string>("uri"), @"parameters\('.*'\)"))
                         definition["actions"][action.Name]["inputs"]["uri"] = "[parameters('" + AddTemplateParameter(action.Name + "-URI", "string", ((JObject)definition["actions"][action.Name]["inputs"]).Value<string>("uri")) + "')]";
+
+
+
+                    //var metadata = ((JObject)definition["actions"][action.Name]["inputs"]["api"]).Value<string>("id");
+
 
                     var authenticationObj = (JObject)definition["actions"][action.Name]["inputs"]["authentication"];
                     if (authenticationObj != null)

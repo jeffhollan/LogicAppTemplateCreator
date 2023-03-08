@@ -78,6 +78,9 @@ namespace LogicAppTemplate
         [Parameter(Mandatory = false, HelpMessage = "If supplied, the RoleAssignments for ManagedIdentities are generated")]
         public SwitchParameter GenerateManagedIdentityRoleAssignment;
 
+        [Parameter(Mandatory = false, HelpMessage = "If supplied, the Url of the ApiDefinition are parameterized")]
+        public SwitchParameter ParameterizeApiDefinitionUrl;
+
         protected override void ProcessRecord()
         {
             AzureResourceCollector resourceCollector = new AzureResourceCollector();
@@ -120,7 +123,8 @@ namespace LogicAppTemplate
                 SkipOauthConnectionAuthorization = this.SkipOauthConnectionAuthorization,
                 UseServiceBusDisplayName = this.UseServiceBusDisplayName,
                 OnlyParameterizeConnections = this.OnlyParameterizeConnections,
-                GenerateManagedIdentityRoleAssignment = this.GenerateManagedIdentityRoleAssignment
+                GenerateManagedIdentityRoleAssignment = this.GenerateManagedIdentityRoleAssignment,
+                ParameterizeApiDefinitionUrl = this.ParameterizeApiDefinitionUrl
             };
 
             try
