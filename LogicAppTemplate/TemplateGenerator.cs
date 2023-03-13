@@ -1210,6 +1210,20 @@ namespace LogicAppTemplate
                                 connectionInstance["properties"]["parameterValueSet"]["values"]["namespaceEndpoint"]["value"] = $"[parameters('{namespaceEndpoint_param}')]";
                             }
                         }
+                        else if (OnlyParameterizeConnections == false && concatedId.EndsWith("/keyvault')]") && connectionInstance["properties"]["parameterValueSet"]?["name"].Value<string>() == "oauthMI")
+                        {
+                            if (parameter.Name != "vaultName")
+                            {
+                                continue;
+                            }
+
+                            //Check for vaultName property exist and is not null
+                            var vaultName_param = AddTemplateParameter($"vaultName", "string", connectionInstance["properties"]?["parameterValueSet"]?["values"]?["vaultName"]?["value"]);
+                            if (vaultName_param != null)
+                            {
+                                connectionInstance["properties"]["parameterValueSet"]["values"]["vaultName"]["value"] = $"[parameters('{vaultName_param}')]";
+                            }
+                        }
                         else if (OnlyParameterizeConnections == false && concatedId.EndsWith("/servicebus')]"))
                         {
                             var serviceBus_displayName = (string)connectionInstance["properties"]?["displayName"];
