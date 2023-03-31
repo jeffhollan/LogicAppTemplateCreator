@@ -1204,10 +1204,10 @@ namespace LogicAppTemplate
                         else if (OnlyParameterizeConnections == false && concatedId.EndsWith("/servicebus')]") && connectionInstance["properties"]["parameterValueSet"]?["name"].Value<string>() == "managedIdentityAuth")
                         {
                             //Check for namespaceEndpoint property exist and is not null
-                            var namespaceEndpoint_param = AddTemplateParameter($"servicebus_namespaceEndpoint", "string", connectionInstance["properties"]?["parameterValueSet"]?["values"]?["namespaceEndpoint"]?["value"]);
-                            if (namespaceEndpoint_param != null)
+                            var namespaces_Name_param = AddTemplateParameter($"namespaces_Name", "string", connectionInstance["properties"]?["parameterValueSet"]?["values"]?["namespaceEndpoint"]?["value"]);
+                            if (namespaces_Name_param != null)
                             {
-                                connectionInstance["properties"]["parameterValueSet"]["values"]["namespaceEndpoint"]["value"] = $"[parameters('{namespaceEndpoint_param}')]";
+                                connectionInstance["properties"]["parameterValueSet"]["values"]["namespaceEndpoint"]["value"] = $"[parameters('{namespaces_Name_param}')]";
                             }
                         }
                         else if (OnlyParameterizeConnections == false && concatedId.EndsWith("/keyvault')]") && connectionInstance["properties"]["parameterValueSet"]?["name"].Value<string>() == "oauthMI")
