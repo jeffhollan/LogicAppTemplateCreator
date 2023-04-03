@@ -224,7 +224,7 @@ namespace LogicAppTemplate
 
                 if (roles.Any())
                 {
-                    foreach (var roleByScope in roles.Select(t => t.ToObject<Models.RoleAssignmentsTemplate>()).GroupBy(s => s.properties.scope))
+                    foreach (var roleByScope in roles.Select(t => t.ToObject<Models.RoleAssignmentsTemplate>()).GroupBy(s => s.Properties.Scope))
                     {
                         //create template
                         var scope = new AzureResourceId(roleByScope.Key);

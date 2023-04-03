@@ -2,52 +2,51 @@
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System;
+using Newtonsoft.Json.Serialization;
 
 namespace LogicAppTemplate.Models
 {
-
+    [JsonObject(NamingStrategyType = typeof(CamelCaseNamingStrategy))]
     public class RoleAssignmentsProperties
     {
-        [JsonProperty(NullValueHandling = NullValueHandling.Ignore)]
-        public string displayName { get; set; }
-
-        public string roleDefinitionId { get; set; }
-
-        public string principalId { get; set; }
+        public string PrincipalType { get; set; } = "ServicePrincipal";
+        
+        public string RoleDefinitionId { get; set; }
+        
+        public string PrincipalId { get; set; }
         
         [JsonProperty(NullValueHandling = NullValueHandling.Ignore)]
-        public string scope { get; set; }
+        public string Scope { get; set; }
     }
 
+    [JsonObject(NamingStrategyType = typeof(CamelCaseNamingStrategy))]
     public class RoleAssignmentsTemplate
     {
-        public string type => "Microsoft.Authorization/roleAssignments";
-
-        public string apiVersion => "2022-04-01";
-
-        public string name { get; set; }
+        public string Type => "Microsoft.Authorization/roleAssignments";
         
-        public string scope { get; set; }
-
-        public RoleAssignmentsProperties properties { get; set; }
+        public string ApiVersion => "2022-04-01";
+        
+        public string Name { get; set; }
+        
+        public string Scope { get; set; }
+        
+        public RoleAssignmentsProperties Properties { get; set; }
 
         public JObject GenerateJObject(Func<string,string,string,string> addTemplateParameter)
         {
-            var resourceId = new AzureResourceId(properties.scope);
+            var resourceId = new AzureResourceId(Properties.Scope);
 
             var resourceGroupParameterName = addTemplateParameter($"{resourceId.Provider.Item2}_ResourceGroupName", "string", resourceId.ResourceGroupName);
             var roleAssignmentsResourceName = addTemplateParameter($"{resourceId.Provider.Item2}_Name", "string", resourceId.ResourceName);
 
             var retVal = new RoleAssignmentsTemplate
             {
-                name = $"[guid(parameters('{resourceGroupParameterName}'), parameters('logicAppName'), '{new AzureResourceId(properties.roleDefinitionId).ResourceName}')]",                    
-                scope = $"[concat('/{resourceId.Provider.Item1}/{resourceId.Provider.Item2}/', parameters('{roleAssignmentsResourceName}'))]",
-                properties = new RoleAssignmentsProperties
+                Name = $"[guid(parameters('{resourceGroupParameterName}'), parameters('logicAppName'), '{new AzureResourceId(Properties.RoleDefinitionId).ResourceName}')]",                    
+                Scope = $"[concat('/{resourceId.Provider.Item1}/{resourceId.Provider.Item2}/', parameters('{roleAssignmentsResourceName}'))]",
+                Properties = new RoleAssignmentsProperties
                 {
-                    roleDefinitionId = $"[concat(subscription().Id, '/providers/Microsoft.Authorization/roleDefinitions/{new AzureResourceId(properties.roleDefinitionId).ResourceName}')]",
-                    principalId = $"[reference(concat(resourceId('Microsoft.Logic/workflows', parameters('logicAppName')), '/providers/Microsoft.ManagedIdentity/Identities/default'), '2018-11-30').principalId]",
-                    displayName = $"[concat('RoleAssignments_', guid(parameters('{resourceGroupParameterName}'), parameters('logicAppName'), '{new AzureResourceId(properties.roleDefinitionId).ResourceName}'))]"
-
+                    RoleDefinitionId = $"[concat(subscription().Id, '/providers/Microsoft.Authorization/roleDefinitions/{new AzureResourceId(Properties.RoleDefinitionId).ResourceName}')]",
+                    PrincipalId = "[reference(resourceId(resourceGroup().name, 'Microsoft.Logic/workflows', parameters('logicAppName')), '2019-05-01', 'Full').identity.principalId]"
                 }
             };
 
