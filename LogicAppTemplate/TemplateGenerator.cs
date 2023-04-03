@@ -224,7 +224,7 @@ namespace LogicAppTemplate
 
                 if (roles.Any())
                 {
-                    foreach (var roleByScope in roles.Select(t => t.ToObject<Models.RoleAssignmentsTemplate>()).GroupBy(s => s.properties.scope))
+                    foreach (var roleByScope in roles.Select(t => t.ToObject<Models.RoleAssignmentsTemplate>()).GroupBy(s => s.Properties.Scope))
                     {
                         //create template
                         var scope = new AzureResourceId(roleByScope.Key);
@@ -1204,10 +1204,24 @@ namespace LogicAppTemplate
                         else if (OnlyParameterizeConnections == false && concatedId.EndsWith("/servicebus')]") && connectionInstance["properties"]["parameterValueSet"]?["name"].Value<string>() == "managedIdentityAuth")
                         {
                             //Check for namespaceEndpoint property exist and is not null
-                            var namespaceEndpoint_param = AddTemplateParameter($"servicebus_namespaceEndpoint", "string", connectionInstance["properties"]?["parameterValueSet"]?["values"]?["namespaceEndpoint"]?["value"]);
-                            if (namespaceEndpoint_param != null)
+                            var namespaces_Name_param = AddTemplateParameter($"namespaces_Name", "string", connectionInstance["properties"]?["parameterValueSet"]?["values"]?["namespaceEndpoint"]?["value"]);
+                            if (namespaces_Name_param != null)
                             {
-                                connectionInstance["properties"]["parameterValueSet"]["values"]["namespaceEndpoint"]["value"] = $"[parameters('{namespaceEndpoint_param}')]";
+                                connectionInstance["properties"]["parameterValueSet"]["values"]["namespaceEndpoint"]["value"] = $"[parameters('{namespaces_Name_param}')]";
+                            }
+                        }
+                        else if (OnlyParameterizeConnections == false && concatedId.EndsWith("/keyvault')]") && connectionInstance["properties"]["parameterValueSet"]?["name"].Value<string>() == "oauthMI")
+                        {
+                            if (parameter.Name != "vaultName")
+                            {
+                                continue;
+                            }
+
+                            //Check for vaultName property exist and is not null
+                            var vaultName_param = AddTemplateParameter($"vaultName", "string", connectionInstance["properties"]?["parameterValueSet"]?["values"]?["vaultName"]?["value"]);
+                            if (vaultName_param != null)
+                            {
+                                connectionInstance["properties"]["parameterValueSet"]["values"]["vaultName"]["value"] = $"[parameters('{vaultName_param}')]";
                             }
                         }
                         else if (OnlyParameterizeConnections == false && concatedId.EndsWith("/servicebus')]"))
