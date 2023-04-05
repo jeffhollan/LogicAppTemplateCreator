@@ -234,7 +234,7 @@ namespace LogicAppTemplate
 
                         foreach (var roleAssignmentTemplate in roleByScope)
                         {
-                           deploymentTemplate.AddResource(roleAssignmentTemplate.GenerateJObject(AddTemplateParameter));
+                            deploymentTemplate.AddResource(roleAssignmentTemplate.GenerateJObject(AddTemplateParameter));
                         }
 
                         template.resources.Add(deploymentTemplate.ToJObject());
@@ -513,7 +513,7 @@ namespace LogicAppTemplate
                         {
                             //get hostname from apiDefinitionUrl
                             var apiDefinitionUri =
-                                new Uri(((JObject) definition["actions"][action.Name]["metadata"]).Value<string>(
+                                new Uri(((JObject)definition["actions"][action.Name]["metadata"]).Value<string>(
                                     "apiDefinitionUrl"));
                             var apiDefinitionHostname = apiDefinitionUri.GetLeftPart(UriPartial.Authority);
                             var apiDefinitionHostnameParam =
@@ -547,7 +547,7 @@ namespace LogicAppTemplate
                                 apiDefinitionUriPathAndQuery + ")]";
 
                             var apiUri =
-                                new Uri(((JObject) definition["actions"][action.Name]["inputs"]).Value<string>("uri"));
+                                new Uri(((JObject)definition["actions"][action.Name]["inputs"]).Value<string>("uri"));
                             var apiHostname = apiDefinitionUri.GetLeftPart(UriPartial.Authority);
                             var apiHostnameParam = apiDefinitionHostname == apiHostname
                                 ? apiDefinitionHostnameParam
@@ -558,7 +558,7 @@ namespace LogicAppTemplate
                             definition["actions"][action.Name]["inputs"]["uri"] = "[concat(parameters('" +
                                 apiHostnameParam + "'), '" + pathAndQuery + "')]";
                             AddTemplateParameter("__apostrophe", "string", "'");
-                        } 
+                        }
 
                         //only add when not parameterized yet
                         else if (!Regex.IsMatch(((JObject)definition["actions"][action.Name]["inputs"]).Value<string>("uri"), @"parameters\('.*'\)"))
@@ -1204,10 +1204,16 @@ namespace LogicAppTemplate
                         else if (OnlyParameterizeConnections == false && concatedId.EndsWith("/servicebus')]") && connectionInstance["properties"]["parameterValueSet"]?["name"].Value<string>() == "managedIdentityAuth")
                         {
                             //Check for namespaceEndpoint property exist and is not null
-                            var namespaces_Name_param = AddTemplateParameter($"namespaces_Name", "string", connectionInstance["properties"]?["parameterValueSet"]?["values"]?["namespaceEndpoint"]?["value"]);
-                            if (namespaces_Name_param != null)
+                            var namespaceEndpoint = connectionInstance["properties"]?["parameterValueSet"]?["values"]?["namespaceEndpoint"]?["value"];
+                            if (namespaceEndpoint != null)
                             {
-                                connectionInstance["properties"]["parameterValueSet"]["values"]["namespaceEndpoint"]["value"] = $"[parameters('{namespaces_Name_param}')]";
+                                var namespaceEndpointUri = new Uri(namespaceEndpoint.Value<string>()); //example: https://{serviceNamespace}.servicebus.windows.net
+
+                                var namespaces_Name_param = AddTemplateParameter($"namespaces_Name", "string", namespaceEndpointUri.Host.Replace(".servicebus.windows.net", ""));
+                                if (namespaces_Name_param != null)
+                                {
+                                    connectionInstance["properties"]["parameterValueSet"]["values"]["namespaceEndpoint"]["value"] = $"[concat('{namespaceEndpointUri.Scheme}://', parameters('{namespaces_Name_param}'), '.servicebus.windows.net')]";
+                                }
                             }
                         }
                         else if (OnlyParameterizeConnections == false && concatedId.EndsWith("/keyvault')]") && connectionInstance["properties"]["parameterValueSet"]?["name"].Value<string>() == "oauthMI")
