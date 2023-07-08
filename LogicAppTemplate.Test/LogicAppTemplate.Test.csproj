@@ -63,6 +63,7 @@
     <Compile Include="DynamicsAXConnectorTests.cs" />
     <Compile Include="IntegrationAccountTest.cs" />
     <Compile Include="BlobConnector2Test.cs" />
+    <Compile Include="ScheduleConnectorTests.cs" />
     <Compile Include="StorageQueueConnectorTest.cs" />
     <Compile Include="ExpressionTest.cs" />
     <Compile Include="CustomConnectorTest.cs" />
@@ -175,6 +176,12 @@
     <EmbeddedResource Include="TestFiles\Samples\CdsConnector\providers-Microsoft.Logic-workflows-FilePickerTest.json" />
     <EmbeddedResource Include="TestFiles\Samples\CdsConnector\providers-Microsoft.Web-connections-commondataservice.json" />
     <EmbeddedResource Include="TestFiles\Samples\CdsConnector\providers-Microsoft.Web-locations-northeurope-managedApis-commondataservice.json" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="TestFiles\Samples\ScheduleConnector\providers-Microsoft.Logic-workflows-RecurrenceHardcodedAll.json" />
+    <EmbeddedResource Include="TestFiles\Samples\ScheduleConnector\providers-Microsoft.Logic-workflows-RecurrenceHardcodedRequiredOnly.json" />
+    <EmbeddedResource Include="TestFiles\Samples\ScheduleConnector\providers-Microsoft.Logic-workflows-RecurrenceParameterized.json" />
+    <EmbeddedResource Include="TestFiles\Samples\ScheduleConnector\providers-Microsoft.Logic-workflows-SlidingWindowParameterized.json" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

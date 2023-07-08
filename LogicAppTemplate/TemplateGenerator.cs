@@ -906,9 +906,15 @@ namespace LogicAppTemplate
                     var recurrence = trigger.Value.SelectToken("recurrence");
                     if (recurrence != null)
                     {
-                        definition["triggers"][trigger.Name]["recurrence"]["frequency"] = "[parameters('" + this.AddTemplateParameter(trigger.Name + "Frequency", "string", recurrence.Value<string>("frequency")) + "')]";
-                        definition["triggers"][trigger.Name]["recurrence"]["interval"] = "[parameters('" + this.AddTemplateParameter(trigger.Name + "Interval", "int", new JProperty("defaultValue", recurrence.Value<int>("interval"))) + "')]";
-                        if (recurrence["startTime"] != null)
+                        if (ShouldAddTemplateParameter(recurrence["frequency"]))
+                        {
+                            definition["triggers"][trigger.Name]["recurrence"]["frequency"] = "[parameters('" + this.AddTemplateParameter(trigger.Name + "Frequency", "string", recurrence.Value<string>("frequency")) + "')]";
+                        }
+                        if (ShouldAddTemplateParameter(recurrence["interval"]))
+                        {
+                            definition["triggers"][trigger.Name]["recurrence"]["interval"] = "[parameters('" + this.AddTemplateParameter(trigger.Name + "Interval", "int", new JProperty("defaultValue", recurrence.Value<int>("interval"))) + "')]";
+                        }
+                        if (ShouldAddTemplateParameter(recurrence["startTime"]))
                         {
                             string value = recurrence.Value<string>("startTime");
                             DateTime date;
@@ -918,11 +924,11 @@ namespace LogicAppTemplate
                             }
                             definition["triggers"][trigger.Name]["recurrence"]["startTime"] = "[parameters('" + this.AddTemplateParameter(trigger.Name + "StartTime", "string", value) + "')]";
                         }
-                        if (recurrence["timeZone"] != null)
+                        if (ShouldAddTemplateParameter(recurrence["timeZone"]))
                         {
                             definition["triggers"][trigger.Name]["recurrence"]["timeZone"] = "[parameters('" + this.AddTemplateParameter(trigger.Name + "TimeZone", "string", recurrence.Value<string>("timeZone")) + "')]";
                         }
-                        if (recurrence["schedule"] != null)
+                        if (ShouldAddTemplateParameter(recurrence["schedule"]))
                         {
                             definition["triggers"][trigger.Name]["recurrence"]["schedule"] = "[parameters('" + this.AddTemplateParameter(trigger.Name + "Schedule", "Object", new JProperty("defaultValue", recurrence["schedule"])) + "')]";
                         }
@@ -1383,6 +1389,11 @@ namespace LogicAppTemplate
             }
 
             return result;
+        }
+
+        private static bool ShouldAddTemplateParameter(JToken token)
+        {
+            return token != null && (token.Type != JTokenType.String || !Regex.IsMatch(token.Value<string>(), @"parameters\('.*'\)"));
         }
 
         public DeploymentTemplate GetTemplate()
