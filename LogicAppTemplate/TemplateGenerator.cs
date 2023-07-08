@@ -916,13 +916,7 @@ namespace LogicAppTemplate
                         }
                         if (ShouldAddTemplateParameter(recurrence["startTime"]))
                         {
-                            string value = recurrence.Value<string>("startTime");
-                            DateTime date;
-                            if (DateTime.TryParse(value, out date))
-                            {
-                                value = date.ToString("O");
-                            }
-                            definition["triggers"][trigger.Name]["recurrence"]["startTime"] = "[parameters('" + this.AddTemplateParameter(trigger.Name + "StartTime", "string", value) + "')]";
+                            definition["triggers"][trigger.Name]["recurrence"]["startTime"] = "[parameters('" + this.AddTemplateParameter(trigger.Name + "StartTime", "string", recurrence["startTime"]) + "')]";
                         }
                         if (ShouldAddTemplateParameter(recurrence["timeZone"]))
                         {

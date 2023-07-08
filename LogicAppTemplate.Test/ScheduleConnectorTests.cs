@@ -47,7 +47,7 @@ namespace LogicAppTemplate.Test
             //check parameters
             Assert.AreEqual("Minute", defintion["parameters"]["RecurrenceFrequency"]["defaultValue"]);
             Assert.AreEqual(3, defintion["parameters"]["RecurrenceInterval"]["defaultValue"]);
-            Assert.AreEqual("2023-07-06T14:31:12Z", defintion["parameters"]["RecurrenceStartTime"]["defaultValue"]);
+            Assert.AreEqual(new DateTime(2023, 07, 06, 14, 31, 12, DateTimeKind.Utc), defintion["parameters"]["RecurrenceStartTime"]["defaultValue"]);
             Assert.AreEqual("GMT Standard Time", defintion["parameters"]["RecurrenceTimeZone"]["defaultValue"]);
 
             //check trigger values
