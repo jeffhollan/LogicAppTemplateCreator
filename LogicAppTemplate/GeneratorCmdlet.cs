@@ -33,6 +33,9 @@ namespace LogicAppTemplate
         [Parameter(Mandatory = false, HelpMessage = "If set, result from rest interface will be saved to this folder")]
         public string DebugOutPutFolder = "";
 
+        [Parameter(Mandatory = false, HelpMessage = "If supplied, access control settings will be included in the ARM template")]
+        public SwitchParameter AccessControl;
+
         [Parameter(Mandatory = false, HelpMessage = "If supplied, diagnostic settings will be included in the ARM template")]
         public SwitchParameter DiagnosticSettings;
 
@@ -111,6 +114,7 @@ namespace LogicAppTemplate
 
             TemplateGenerator generator = new TemplateGenerator(LogicApp, SubscriptionId, ResourceGroup, resourceCollector, StripPassword, DisabledState)
             {
+                AccessControl = this.AccessControl,
                 DiagnosticSettings = this.DiagnosticSettings,
                 GenerateHttpTriggerUrlOutput = this.GenerateHttpTriggerUrlOutput,
                 IncludeInitializeVariable = this.IncludeInitializeVariable,

@@ -50,6 +50,7 @@ namespace LogicAppTemplate
             }
         }
 
+        public bool AccessControl { get; set; }
         public bool DiagnosticSettings { get; set; }
         public bool IncludeInitializeVariable { get; set; }
         public bool FixedFunctionAppName { get; set; }
@@ -141,7 +142,7 @@ namespace LogicAppTemplate
             }
 
             workflowTemplateReference["properties"]["definition"] = handleActions(def, (JObject)definition["properties"]["parameters"]);
-
+            
             if (definition.ContainsKey("tags"))
             {
                 JToken tags = await HandleTags(definition);
@@ -149,6 +150,12 @@ namespace LogicAppTemplate
                 {
                     workflowTemplateReference.Add("tags", tags);
                 }
+            }
+            
+            // Access Control
+            if (AccessControl && definition["properties"]["accessControl"] != null)
+            {
+                workflowTemplateReference["properties"]["accessControl"] = definition["properties"]["accessControl"];
             }
 
             // Diagnostic Settings
@@ -1207,7 +1214,7 @@ namespace LogicAppTemplate
                             var namespaceEndpoint = connectionInstance["properties"]?["parameterValueSet"]?["values"]?["namespaceEndpoint"]?["value"];
                             if (namespaceEndpoint != null)
                             {
-                                var namespaceEndpointUri = new Uri(namespaceEndpoint.Value<string>()); //example: https://{serviceNamespace}.servicebus.windows.net
+                                var namespaceEndpointUri = new Uri(namespaceEndpoint.Value<string>()); //example: sb://{serviceNamespace}.servicebus.windows.net
 
                                 var namespaces_Name_param = AddTemplateParameter($"namespaces_Name", "string", namespaceEndpointUri.Host.Replace(".servicebus.windows.net", ""));
                                 if (namespaces_Name_param != null)
