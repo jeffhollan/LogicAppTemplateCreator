@@ -153,9 +153,29 @@ namespace LogicAppTemplate
             }
             
             // Access Control
-            if (AccessControl && definition["properties"]["accessControl"] != null)
+            var accessControl = (JObject)definition["properties"]["accessControl"];
+            if (AccessControl && accessControl != null)
             {
-                workflowTemplateReference["properties"]["accessControl"] = definition["properties"]["accessControl"];
+
+                if ((accessControl["triggers"]?["allowedCallerIpAddresses"] as JArray)?.Any() is true)
+                {
+                    var triggerAllowedCallerIpAddresses = AddTemplateParameter("trigger_allowedCallerIpAddresses", "array", accessControl["triggers"]["allowedCallerIpAddresses"]);
+                    accessControl["triggers"]["allowedCallerIpAddresses"] = $"[parameters('{triggerAllowedCallerIpAddresses}')]";
+                }
+
+                if ((accessControl?["contents"]?["allowedCallerIpAddresses"] as JArray)?.Any() is true)
+                {
+                    var contentsAllowedCallerIpAddresses = AddTemplateParameter("contents_allowedCallerIpAddresses", "array", accessControl["contents"]["allowedCallerIpAddresses"]);
+                    accessControl["contents"]["allowedCallerIpAddresses"] = $"[parameters('{contentsAllowedCallerIpAddresses}')]";
+                }
+
+                if ((accessControl["actions"]?["allowedCallerIpAddresses"] as JArray)?.Any() is true)
+                {
+                    var actionAllowedCallerIpAddresses = AddTemplateParameter("action_allowedCallerIpAddresses", "array", accessControl["actions"]["allowedCallerIpAddresses"]);
+                    accessControl["actions"]["allowedCallerIpAddresses"] = $"[parameters('{actionAllowedCallerIpAddresses}')]";
+                }
+                
+                workflowTemplateReference["properties"]["accessControl"] = accessControl;
             }
 
             // Diagnostic Settings
