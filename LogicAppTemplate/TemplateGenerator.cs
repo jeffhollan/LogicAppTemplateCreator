@@ -51,6 +51,7 @@ namespace LogicAppTemplate
         }
 
         public bool AccessControl { get; set; }
+        public bool ForceAccessControl { get; set; }
         public bool DiagnosticSettings { get; set; }
         public bool IncludeInitializeVariable { get; set; }
         public bool FixedFunctionAppName { get; set; }
@@ -142,7 +143,7 @@ namespace LogicAppTemplate
             }
 
             workflowTemplateReference["properties"]["definition"] = handleActions(def, (JObject)definition["properties"]["parameters"]);
-            
+
             if (definition.ContainsKey("tags"))
             {
                 JToken tags = await HandleTags(definition);
@@ -151,10 +152,10 @@ namespace LogicAppTemplate
                     workflowTemplateReference.Add("tags", tags);
                 }
             }
-            
+
             // Access Control
             var accessControl = (JObject)definition["properties"]["accessControl"];
-            if (AccessControl && accessControl != null)
+            if ((ForceAccessControl || AccessControl) && accessControl != null)
             {
 
                 if ((accessControl["triggers"]?["allowedCallerIpAddresses"] as JArray)?.Any() is true)
@@ -174,8 +175,12 @@ namespace LogicAppTemplate
                     var actionAllowedCallerIpAddresses = AddTemplateParameter("action_allowedCallerIpAddresses", "array", accessControl["actions"]["allowedCallerIpAddresses"]);
                     accessControl["actions"]["allowedCallerIpAddresses"] = $"[parameters('{actionAllowedCallerIpAddresses}')]";
                 }
-                
+
                 workflowTemplateReference["properties"]["accessControl"] = accessControl;
+            }
+            else if (ForceAccessControl && accessControl == null)
+            {
+                workflowTemplateReference["properties"]["accessControl"] = JObject.Parse(@"{""triggers"":{""allowedCallerIpAddresses"":[]},""actions"":{""allowedCallerIpAddresses"":[]}}");
             }
 
             // Diagnostic Settings
