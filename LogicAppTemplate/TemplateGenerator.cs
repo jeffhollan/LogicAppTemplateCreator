@@ -50,6 +50,8 @@ namespace LogicAppTemplate
             }
         }
 
+        public bool AccessControl { get; set; }
+        public bool ForceAccessControl { get; set; }
         public bool DiagnosticSettings { get; set; }
         public bool IncludeInitializeVariable { get; set; }
         public bool FixedFunctionAppName { get; set; }
@@ -149,6 +151,36 @@ namespace LogicAppTemplate
                 {
                     workflowTemplateReference.Add("tags", tags);
                 }
+            }
+
+            // Access Control
+            var accessControl = (JObject)definition["properties"]["accessControl"];
+            if ((ForceAccessControl || AccessControl) && accessControl != null)
+            {
+
+                if ((accessControl["triggers"]?["allowedCallerIpAddresses"] as JArray)?.Any() is true)
+                {
+                    var triggerAllowedCallerIpAddresses = AddTemplateParameter("trigger_allowedCallerIpAddresses", "array", accessControl["triggers"]["allowedCallerIpAddresses"]);
+                    accessControl["triggers"]["allowedCallerIpAddresses"] = $"[parameters('{triggerAllowedCallerIpAddresses}')]";
+                }
+
+                if ((accessControl?["contents"]?["allowedCallerIpAddresses"] as JArray)?.Any() is true)
+                {
+                    var contentsAllowedCallerIpAddresses = AddTemplateParameter("contents_allowedCallerIpAddresses", "array", accessControl["contents"]["allowedCallerIpAddresses"]);
+                    accessControl["contents"]["allowedCallerIpAddresses"] = $"[parameters('{contentsAllowedCallerIpAddresses}')]";
+                }
+
+                if ((accessControl["actions"]?["allowedCallerIpAddresses"] as JArray)?.Any() is true)
+                {
+                    var actionAllowedCallerIpAddresses = AddTemplateParameter("action_allowedCallerIpAddresses", "array", accessControl["actions"]["allowedCallerIpAddresses"]);
+                    accessControl["actions"]["allowedCallerIpAddresses"] = $"[parameters('{actionAllowedCallerIpAddresses}')]";
+                }
+
+                workflowTemplateReference["properties"]["accessControl"] = accessControl;
+            }
+            else if (ForceAccessControl && accessControl == null)
+            {
+                workflowTemplateReference["properties"]["accessControl"] = JObject.Parse(@"{""triggers"":{""allowedCallerIpAddresses"":[]},""actions"":{""allowedCallerIpAddresses"":[]}}");
             }
 
             // Diagnostic Settings
@@ -1207,7 +1239,7 @@ namespace LogicAppTemplate
                             var namespaceEndpoint = connectionInstance["properties"]?["parameterValueSet"]?["values"]?["namespaceEndpoint"]?["value"];
                             if (namespaceEndpoint != null)
                             {
-                                var namespaceEndpointUri = new Uri(namespaceEndpoint.Value<string>()); //example: https://{serviceNamespace}.servicebus.windows.net
+                                var namespaceEndpointUri = new Uri(namespaceEndpoint.Value<string>()); //example: sb://{serviceNamespace}.servicebus.windows.net
 
                                 var namespaces_Name_param = AddTemplateParameter($"namespaces_Name", "string", namespaceEndpointUri.Host.Replace(".servicebus.windows.net", ""));
                                 if (namespaces_Name_param != null)
