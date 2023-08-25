@@ -155,7 +155,7 @@ namespace LogicAppTemplate
 
             // Access Control
             var accessControl = (JObject)definition["properties"]["accessControl"];
-            if ((ForceAccessControl || AccessControl) && accessControl != null)
+            if ((ForceAccessControl || AccessControl) && (accessControl != null && accessControl.ToString() != "{}"))
             {
 
                 if ((accessControl["triggers"]?["allowedCallerIpAddresses"] as JArray)?.Any() is true)
@@ -178,9 +178,15 @@ namespace LogicAppTemplate
 
                 workflowTemplateReference["properties"]["accessControl"] = accessControl;
             }
-            else if (ForceAccessControl && accessControl == null)
+            else if (ForceAccessControl && accessControl == null || accessControl?.ToString() == "{}")
             {
-                workflowTemplateReference["properties"]["accessControl"] = JObject.Parse(@"{""triggers"":{""allowedCallerIpAddresses"":[]},""actions"":{""allowedCallerIpAddresses"":[]}}");
+                //Check for triggerKind eventgrid. In that case we don't want to add whitelisting, because we will get handshake errors 
+                var triggerKind = ((JProperty)workflowTemplateReference["properties"]?["definition"]?["triggers"]?.FirstOrDefault())?.Value["kind"]?.Value<string>();
+                if (triggerKind != "EventGrid")
+                {
+                    workflowTemplateReference["properties"]["accessControl"] = JObject.Parse(@"{""triggers"":{""allowedCallerIpAddresses"":[]},""actions"":{""allowedCallerIpAddresses"":[]}}");
+                }
+
             }
 
             // Diagnostic Settings
