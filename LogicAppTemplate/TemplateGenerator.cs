@@ -272,7 +272,7 @@ namespace LogicAppTemplate
 
                         foreach (var roleAssignmentTemplate in roleByScope)
                         {
-                            deploymentTemplate.AddResource(roleAssignmentTemplate.GenerateJObject(AddTemplateParameter));
+                            deploymentTemplate.AddResource(roleAssignmentTemplate.GenerateJObject(AddTemplateParameter, roleAssignmentsResourceGroupName));
                         }
 
                         template.resources.Add(deploymentTemplate.ToJObject());
