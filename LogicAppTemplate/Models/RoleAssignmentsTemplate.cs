@@ -32,11 +32,10 @@ namespace LogicAppTemplate.Models
         
         public RoleAssignmentsProperties Properties { get; set; }
 
-        public JObject GenerateJObject(Func<string,string,string,string> addTemplateParameter)
+        public JObject GenerateJObject(Func<string, string, string, string> addTemplateParameter, string resourceGroupParameterName)
         {
             var resourceId = new AzureResourceId(Properties.Scope);
 
-            var resourceGroupParameterName = addTemplateParameter($"{resourceId.Provider.Item2}_ResourceGroupName", "string", resourceId.ResourceGroupName);
             var roleAssignmentsResourceName = addTemplateParameter($"{resourceId.Provider.Item2}_Name", "string", resourceId.ResourceName);
 
             var retVal = new RoleAssignmentsTemplate
