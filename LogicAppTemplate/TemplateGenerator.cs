@@ -1219,6 +1219,10 @@ namespace LogicAppTemplate
                         {
                             //ignore
                         }
+                        else if (OnlyParameterizeConnections == false && concatedId.EndsWith("/sql')]") && connectionInstance["properties"]["parameterValueSet"]?["name"].Value<string>() == "oauthMI")
+                        {
+                            //ignore
+                        }
                         else if (OnlyParameterizeConnections == false && parameter.Name == "accessKey" && concatedId.EndsWith("/azureblob')]"))
                         {
                             //handle different resourceGroups
@@ -1361,6 +1365,9 @@ namespace LogicAppTemplate
                                 template.parameters[addedparam]["metadata"]["description"] = parameter.Value["uiDefinition"]["description"];
                             }
                         }
+                    }
+                    else
+                    {
                     }
                 }
             }
