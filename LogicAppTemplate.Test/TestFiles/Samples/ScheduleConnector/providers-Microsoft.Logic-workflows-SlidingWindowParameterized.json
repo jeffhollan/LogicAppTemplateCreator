@@ -1,0 +1,75 @@
+{
+  "properties": {
+    "provisioningState": "Succeeded",
+    "changedTime": "2023-07-06T14:31:46.916948Z",
+    "createdTime": "2023-07-06T14:31:12.4309539Z",
+    "state": "Enabled",
+    "version": "08585130529678009870",
+    "accessEndpoint": "https://prod-99.westeurope.logic.azure.com:443/workflows/c2ba55866d4d40a4e7e255ec4b1d12ee",
+    "definition": {
+      "$schema": "https://schema.management.azure.com/providers/Microsoft.Logic/schemas/2016-06-01/workflowdefinition.json#",
+      "contentVersion": "1.0.0.0",
+      "parameters": {
+        "RecurrenceFrequency": {
+          "defaultValue": "Minute",
+          "type": "String"
+        },
+        "RecurrenceInterval": {
+          "defaultValue": 3,
+          "type": "Int"
+        },
+        "RecurrenceStartTime": {
+          "defaultValue": "2023-07-06T14:31:12Z",
+          "type": "String"
+        },
+        "RecurrenceTimeZone": {
+          "defaultValue": "GMT Standard Time",
+          "type": "String"
+        }
+      },
+      "triggers": {
+        "Sliding_Window": {
+          "evaluatedRecurrence": {
+            "frequency": "Minute",
+            "interval": 3,
+            "startTime": "2023-07-06T14:31:12Z",
+            "timeZone": "GMT Standard Time"
+          },
+          "inputs": {
+            "delay": "PT5M"
+          },
+          "recurrence": {
+            "frequency": "@parameters('RecurrenceFrequency')",
+            "interval": "@parameters('RecurrenceInterval')",
+            "startTime": "@parameters('RecurrenceStartTime')",
+            "timeZone": "@parameters('RecurrenceTimeZone')"
+          },
+          "type": "SlidingWindow"
+        }
+      },
+      "actions": {},
+      "outputs": {}
+    },
+    "parameters": {},
+    "endpointsConfiguration": {
+      "workflow": {
+        "outgoingIpAddresses": [
+          { "address": "40.68.222.65" },
+          { "address": "40.68.209.23" },
+          { "address": "13.95.147.65" }
+        ],
+        "accessEndpointIpAddresses": [
+          { "address": "13.95.155.53" },
+          { "address": "52.174.54.218" },
+          { "address": "52.174.49.6" }
+        ]
+      },
+      "connector": { "outgoingIpAddresses": [ { "address": "40.115.50.13" } ] }
+    }
+  },
+  "id": "/subscriptions/9fake3d-3c94-42e9-b2cb-18921e5d6cfa/resourceGroups/LogicAppsDev/providers/Microsoft.Logic/workflows/RecurrenceParameterized",
+  "name": "RecurrenceParameterized",
+  "location": "northeurope",
+  "type": "Microsoft.Logic/workflows",
+  "tags": {}
+}
