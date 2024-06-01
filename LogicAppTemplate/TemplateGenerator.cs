@@ -677,7 +677,15 @@ namespace LogicAppTemplate
                 }
                 else if (type == "function")
                 {
-                    var curr = ((JObject)definition["actions"][action.Name]["inputs"]["function"]).Value<string>("id");
+                    
+                    // this is to support functionApps with swagger definitions (v2)
+                    var functionNodeName = "function";
+                    if (definition["actions"][action.Name]["inputs"]["functionApp"] != null)
+                    {
+                        functionNodeName = "functionApp";
+                    }
+                    
+                    var curr = ((JObject)definition["actions"][action.Name]["inputs"][functionNodeName]).Value<string>("id");
                     var faid = new AzureResourceId(curr);
 
                     var resourcegroupValue = LogicAppResourceGroup == faid.ResourceGroupName ? "[resourceGroup().name]" : faid.ResourceGroupName;
@@ -685,17 +693,37 @@ namespace LogicAppTemplate
 
                     faid.SubscriptionId = "',subscription().subscriptionId,'";
                     faid.ResourceGroupName = "',parameters('" + AddTemplateParameter((FixedFunctionAppName ? "FunctionApp-" : action.Name + "-") + "ResourceGroup", "string", resourcegroupValue) + "'),'";
-                    faid.ReplaceValueAfter("sites", "',parameters('" + AddTemplateParameter((FixedFunctionAppName ? "" : action.Name + "-") + "FunctionApp", "string", faid.ValueAfter("sites")) + "'),'");
 
-                    if (DisableFunctionNameParameters)
+                    if (functionNodeName == "function")
                     {
-                        faid.ReplaceValueAfter("functions", faid.ValueAfter("functions") + "'");
+                        faid.ReplaceValueAfter("sites", "',parameters('" + AddTemplateParameter((FixedFunctionAppName ? "" : action.Name + "-") + "FunctionApp", "string", faid.ValueAfter("sites")) + "'),'");
+
+                        if (DisableFunctionNameParameters)
+                        {
+                            faid.ReplaceValueAfter("functions", faid.ValueAfter("functions") + "'");
+                        }
+                        else
+                        {
+                            faid.ReplaceValueAfter("functions",
+                                $"',parameters('{AddTemplateParameter((FixedFunctionAppName ? "" : action.Name + "-") + "FunctionName", "string", faid.ValueAfter("functions"))}')");
+                        }
                     }
-                    else
+                    // this is to support functionApps with swagger definitions (v2)
+                    else if (functionNodeName == "functionApp")
                     {
-                        faid.ReplaceValueAfter("functions", "',parameters('" + AddTemplateParameter((FixedFunctionAppName ? "" : action.Name + "-") + "FunctionName", "string", faid.ValueAfter("functions")) + "')");
+                        var functionAppNameParam = AddTemplateParameter($"{(FixedFunctionAppName ? "" : action.Name + "-")}FunctionApp", "string", faid.ValueAfter("sites"));
+                        faid.ReplaceValueAfter("sites", $"',parameters('{functionAppNameParam}')");
+
+                        //get hostname from functionAppUri
+                        var functionAppUri = new Uri(((JObject)definition["actions"][action.Name]["inputs"]).Value<string>("uri"));
+                        var functionAppHostname = functionAppUri.DnsSafeHost.Split('.');
+
+                        definition["actions"][action.Name]["inputs"]["uri"] =
+                            $"[concat('https://', tolower(parameters('{functionAppNameParam}')), '.{string.Join(".", functionAppHostname.Skip(1))}{functionAppUri.PathAndQuery}')]";
                     }
-                    definition["actions"][action.Name]["inputs"]["function"]["id"] = "[concat('" + faid.ToString() + ")]";
+
+                    definition["actions"][action.Name]["inputs"][functionNodeName]["id"] = $"[concat('{faid})]";
+
                 }
                 else
                 {
