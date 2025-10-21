@@ -34,10 +34,10 @@ namespace LogicAppTemplate
 
         [Parameter(Mandatory = false, HelpMessage = "Add Parameterlink")]
         public bool AddParameterlink = true;
-        
+
         [Parameter(Mandatory = false, HelpMessage = "Optional dependsOn")]
         public string DependsOn = "";
-        
+
         [Parameter(Mandatory = false, HelpMessage = "If supplied, the these parameters are not being added to the master template. Regex pattern are also supported\n\nAdd the names like this: @(\"logicAppName\", \"servicebusSubscriptionName\\\\d?\", \"topic_name\\\\d?\")")]
         public string[] ParameterNamesToSkip;
 
@@ -113,6 +113,10 @@ namespace LogicAppTemplate
 
                         foreach (JProperty parameter in parameters.Properties())
                         {
+                            //set dependency when needed
+                            if (parameter.Name.EndsWith("-LogicAppName"))
+                                nestedresource.dependsOn.Add($"{(string)parameter.Value["defaultValue"]}");
+
                             // Skip parameters that are not needed in the master template, regex pattern are also supported
                             if (ParameterNamesToSkip != null && ParameterNamesToSkip.Any(pattern => Regex.IsMatch(parameter.Name, pattern)))
                             {
@@ -133,9 +137,11 @@ namespace LogicAppTemplate
                                         var p1 = p.Value["defaultValue"];
                                         var p2 = parameter.Value["defaultValue"];
 
-                                        if (JToken.DeepEquals(p1, p2)) {
+                                        if (JToken.DeepEquals(p1, p2))
+                                        {
                                             param = p;
-                                            break; }
+                                            break;
+                                        }
                                     }
 
                                 }
@@ -156,7 +162,7 @@ namespace LogicAppTemplate
                             {
                                 nestedtemplate.parameters.Add(param);
                             }
-
+                            
                             nestedresource.properties.parameters.Add(parameter.Name, JObject.FromObject(new { value = $"[parameters('{param.Name}')]" }));
 
                         }

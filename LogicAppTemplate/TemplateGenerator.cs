@@ -232,7 +232,7 @@ namespace LogicAppTemplate
                 var identity = new AzureResourceId(identities[0].Name);
 
                 //Add ARM parameter to configure the user assigned identity
-                template.parameters.Add(Constants.UserAssignedIdentityParameterName, JObject.FromObject(new { type = "string", defaultValue = identity.ResourceName }));
+                AddTemplateParameter(Constants.UserAssignedIdentityParameterName, "string", identity.ResourceName);
 
                 //When the identity exists in a different resourcegroup add this as parameter and in the resourceId() function
                 var identityResourceGroupAddtion = "";
@@ -669,7 +669,7 @@ namespace LogicAppTemplate
                                 }
 
                                 //User Assigned Identity
-                                definition["actions"][action.Name]["inputs"]["authentication"]["identity"] = $"[resourceId({identityResourceGroupAddtion}'Microsoft.ManagedIdentity/userAssignedIdentities/', parameters('{Constants.UserAssignedIdentityParameterName}'))]";
+                                definition["actions"][action.Name]["inputs"]["authentication"]["identity"] = $"[resourceId({identityResourceGroupAddtion}'Microsoft.ManagedIdentity/userAssignedIdentities/', parameters('{AddTemplateParameter(Constants.UserAssignedIdentityParameterName, "string", identityResource.ResourceName)}'))]";
                             }
                         }
 
